@@ -1,4 +1,4 @@
-namespace PJDesignBackStageAPI
+namespace App.API
 {
     public class WeatherForecast
     {

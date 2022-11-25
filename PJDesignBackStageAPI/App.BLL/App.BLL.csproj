@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\App.Common\App.Common.csproj" />
+    <ProjectReference Include="..\App.EF\App.EF.csproj" />
+    <ProjectReference Include="..\App.Enum\App.Enum.csproj" />
+    <ProjectReference Include="..\App.Model\App.Model.csproj" />
+  </ItemGroup>
+
+</Project>

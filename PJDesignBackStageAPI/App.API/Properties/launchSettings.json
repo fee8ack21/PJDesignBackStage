@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "PJDesignBackStageAPI": {
+    "App.API": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

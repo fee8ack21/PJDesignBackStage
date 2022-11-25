@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace PJDesignBackStageAPI.Controllers
+namespace App.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
