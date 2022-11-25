@@ -17,6 +17,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 @NgModule({
   declarations: [
@@ -29,11 +32,14 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     ReactiveFormsModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatTableModule,
+    MatSortModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatCardModule,
     MatButtonModule,
+    MatPaginatorModule,
     MatListModule,
     MatToolbarModule,
     MatIconModule,
@@ -53,11 +59,14 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatInputModule,
     MatSelectModule,
     MatCardModule,
+    MatSortModule,
     MatButtonModule,
     MatMenuModule,
+    MatTableModule,
     MatDividerModule,
     MatListModule,
     MatToolbarModule,
+    MatPaginatorModule,
     MatSidenavModule,
     MatProgressBarModule,
     MatIconModule

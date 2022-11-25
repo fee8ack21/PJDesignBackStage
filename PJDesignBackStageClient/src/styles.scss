@@ -15,7 +15,14 @@ body {
 .mat-button,
 .mat-toolbar,
 h1,
-h2 {
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+p,
+a {
   font-family: "Noto Sans TC", "Helvetica Neue", sans-serif !important;
 }
 
@@ -30,6 +37,12 @@ h2 {
   padding: 16px;
   border-radius: 4px;
   box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
+}
+
+.mat-datepicker-toggle {
+  position: absolute;
+  right: 0px;
+  top: -16.5px;
 }
 
 /* width */
