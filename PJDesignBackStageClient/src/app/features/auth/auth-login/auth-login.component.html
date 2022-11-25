@@ -1,0 +1,29 @@
+<div class="auth-login">
+  <form class="auth-login__form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <mat-card>
+      <mat-card-content>
+        <div class="my-1-i">
+          <mat-form-field class="w-100" appearance="fill">
+            <mat-label>帳號</mat-label>
+            <input type="text" matInput formControlName="account" name="account">
+            <mat-error *ngIf="validatorService.isFormControlInvalid(loginForm, 'account')">
+              {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="mb-1">
+          <mat-form-field class="w-100" appearance="fill">
+            <mat-label>密碼</mat-label>
+            <input type="password" matInput formControlName="password" name="password">
+            <mat-error *ngIf="validatorService.isFormControlInvalid(loginForm, 'password')">
+              {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="mb-1-i">
+          <button type="submit" class="w-100" mat-raised-button color="primary">登入</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </form>
+</div>

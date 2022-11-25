@@ -1,1 +1,52 @@
-/* You can add global styles to this file, and also import other style files */
+@import "./styles/utils/variables";
+@import "./styles/utils/mixins";
+@import "./styles/utils/helpers";
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "Helvetica Neue", sans-serif;
+}
+
+.mat-list-text,
+.mat-button,
+.mat-toolbar,
+h1,
+h2 {
+  font-family: "Noto Sans TC", "Helvetica Neue", sans-serif !important;
+}
+
+.mat-list-icon {
+  overflow-x: hidden;
+}
+
+.mat-card {
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+  position: relative;
+  padding: 16px;
+  border-radius: 4px;
+  box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(156, 156, 156);
+
+  &:hover {
+    background: darken(rgb(156, 156, 156), 10%);
+  }
+}

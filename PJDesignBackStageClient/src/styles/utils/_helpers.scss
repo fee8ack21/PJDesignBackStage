@@ -1,0 +1,286 @@
+$widthAndHeight: (0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, auto);
+
+@each $item in $widthAndHeight {
+  @if ($item == auto) {
+    .w-#{$item} {
+      width: auto;
+    }
+    .h-#{$item} {
+      width: auto;
+    }
+    .w-#{$item}-i {
+      width: auto !important;
+    }
+    .h-#{$item}-i {
+      width: auto !important;
+    }
+  } @else {
+    .w-#{$item} {
+      width: round(percentage($item/100));
+    }
+    .h-#{$item} {
+      width: round(percentage($item/100));
+    }
+    .w-#{$item}-i {
+      width: round(percentage($item/100)) !important;
+    }
+    .h-#{$item}-i {
+      width: round(percentage($item/100)) !important;
+    }
+  }
+}
+
+$spaceAmounts: (1, 2, 3, 4, 5, 6, 7, 8, auto);
+
+@each $space in $spaceAmounts {
+  @if $space==auto {
+    .m-#{$space} {
+      margin: #{$space};
+    }
+
+    .mx-#{$space} {
+      margin-left: #{$space};
+      margin-right: #{$space};
+    }
+
+    .my-#{$space} {
+      margin-top: #{$space};
+      margin-bottom: #{$space};
+    }
+
+    .ml-#{$space} {
+      margin-left: #{$space};
+    }
+
+    .mr-#{$space} {
+      margin-right: #{$space};
+    }
+
+    .mb-#{$space} {
+      margin-bottom: #{$space};
+    }
+
+    .mt-#{$space} {
+      margin-top: #{$space};
+    }
+
+    .m-#{$space}-i {
+      margin: #{$space} !important;
+    }
+
+    .mx-#{$space}-i {
+      margin-left: #{$space} !important;
+      margin-right: #{$space} !important;
+    }
+
+    .my-#{$space}-i {
+      margin-top: #{$space} !important;
+      margin-bottom: #{$space} !important;
+    }
+
+    .ml-#{$space}-i {
+      margin-left: #{$space} !important;
+    }
+
+    .mr-#{$space}-i {
+      margin-right: #{$space} !important;
+    }
+
+    .mb-#{$space}-i {
+      margin-bottom: #{$space} !important;
+    }
+
+    .mt-#{$space}-i {
+      margin-top: #{$space} !important;
+    }
+  } @else {
+    .m-#{$space} {
+      margin: #{$space}rem;
+    }
+
+    .mx-#{$space} {
+      margin-left: #{$space}rem;
+      margin-right: #{$space}rem;
+    }
+
+    .my-#{$space} {
+      margin-top: #{$space}rem;
+      margin-bottom: #{$space}rem;
+    }
+
+    .ml-#{$space} {
+      margin-left: #{$space}rem;
+    }
+
+    .mr-#{$space} {
+      margin-right: #{$space}rem;
+    }
+
+    .mb-#{$space} {
+      margin-bottom: #{$space}rem;
+    }
+
+    .mt-#{$space} {
+      margin-top: #{$space}rem;
+    }
+
+    .p-#{$space} {
+      padding: #{$space}rem;
+    }
+
+    .px-#{$space} {
+      padding-left: #{$space}rem;
+      padding-right: #{$space}rem;
+    }
+
+    .py-#{$space} {
+      padding-top: #{$space}rem;
+      padding-bottom: #{$space}rem;
+    }
+
+    .pl-#{$space} {
+      padding-left: #{$space}rem;
+    }
+
+    .pr-#{$space} {
+      padding-right: #{$space}rem;
+    }
+
+    .pb-#{$space} {
+      padding-bottom: #{$space}rem;
+    }
+
+    .pt-#{$space} {
+      padding-top: #{$space}rem;
+    }
+
+    .m-#{$space}-i {
+      margin: #{$space}rem !important;
+    }
+
+    .mx-#{$space}-i {
+      margin-left: #{$space}rem !important;
+      margin-right: #{$space}rem !important;
+    }
+
+    .my-#{$space}-i {
+      margin-top: #{$space}rem !important;
+      margin-bottom: #{$space}rem !important;
+    }
+
+    .ml-#{$space}-i {
+      margin-left: #{$space}rem !important;
+    }
+
+    .mr-#{$space}-i {
+      margin-right: #{$space}rem !important;
+    }
+
+    .mb-#{$space}-i {
+      margin-bottom: #{$space}rem !important;
+    }
+
+    .mt-#{$space}-i {
+      margin-top: #{$space}rem !important;
+    }
+
+    .p-#{$space}-i {
+      padding: #{$space}rem !important;
+    }
+
+    .px-#{$space}-i {
+      padding-left: #{$space}rem !important;
+      padding-right: #{$space}rem !important;
+    }
+
+    .py-#{$space}-i {
+      padding-top: #{$space}rem !important;
+      padding-bottom: #{$space}rem !important;
+    }
+
+    .pl-#{$space}-i {
+      padding-left: #{$space}rem !important;
+    }
+
+    .pr-#{$space}-i {
+      padding-right: #{$space}rem !important;
+    }
+
+    .pb-#{$space}-i {
+      padding-bottom: #{$space}rem !important;
+    }
+
+    .pt-#{$space}-i {
+      padding-top: #{$space}rem !important;
+    }
+  }
+}
+
+$alignments: ("center", "space-between", "space-around", "space-evenly", "flex-start", "flex-end");
+
+@each $align in $alignments {
+  .justify-#{$align} {
+    justify-content: #{$align};
+  }
+
+  .items-#{$align} {
+    align-items: #{$align};
+  }
+
+  .justify-items-#{$align} {
+    justify-items: #{$align};
+  }
+
+  .content-#{$align} {
+    align-content: #{$align};
+  }
+
+  .justify-#{$align}-i {
+    justify-content: #{$align} !important;
+  }
+
+  .items-#{$align}-i {
+    align-items: #{$align} !important;
+  }
+
+  .justify-items-#{$align}-i {
+    justify-items: #{$align} !important;
+  }
+
+  .content-#{$align}-i {
+    align-content: #{$align} !important;
+  }
+}
+
+$displayProps: (
+  "block",
+  "inline-block",
+  "inline",
+  "flex",
+  "grid",
+  "inline-flex",
+  "inline-grid",
+  "table",
+  "inline-table",
+  "list-item",
+  "none",
+  "contents"
+);
+
+@each $disp in $displayProps {
+  .d-#{$disp} {
+    display: #{$disp};
+  }
+
+  .d-#{$disp}-i {
+    display: #{$disp} !important;
+  }
+}
+
+$textAlignments: ("left", "right", "center", "revert");
+
+@each $textAlign in $textAlignments {
+  .text-#{$textAlign} {
+    text-align: #{$textAlign};
+  }
+}

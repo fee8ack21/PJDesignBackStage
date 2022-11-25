@@ -1,0 +1,65 @@
+.layout {
+  &__navbar {
+    z-index: 2;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    display: flex !important;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 1rem;
+    box-shadow: 0 3px 5px -1px #0003, 0 6px 10px #00000024, 0 1px 18px #0000001f;
+  }
+
+  &__title-link {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  &__title {
+    font-size: 16px;
+    letter-spacing: 3px;
+  }
+
+  &__user-btn {
+    align-self: center;
+    min-width: auto;
+    letter-spacing: 3px;
+  }
+
+  &__sidenav-container {
+    flex: 1;
+  }
+
+  &__sidenav {
+    min-width: 210px !important;
+    max-width: 220px !important;
+    border-right: 1px solid #eee;
+    box-shadow: 6px 0 6px rgba(0, 0, 0, 0.1);
+    overflow-x: hidden;
+  }
+
+  &__content {
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+
+    @media screen and (min-width: 600px) {
+      top: 64px;
+      height: calc(100vh - 64px);
+    }
+  }
+
+  &__progress-bar-container {
+    height: 5px;
+  }
+
+  .mat-list-item {
+    font-size: 14px;
+
+    &.active {
+      background: rgba(0, 0, 0, 0.04);
+    }
+  }
+}
