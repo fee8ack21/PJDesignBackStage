@@ -1,26 +1,26 @@
 ﻿using App.BLL;
-using App.EF;
+using App.DAL.Models;
 using App.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace App.API.Controllers
+namespace App.PL.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class AdministratorController : ControllerBase
     {
-        private IAdministrator _service;
+        private IAdministratorService _service;
 
-        public AdministratorController(IAdministrator service)
+        public AdministratorController(IAdministratorService service)
         {
             _service = service;
         }
 
         [HttpGet]
-        public async Task<ResponseBase<List<TblEftest>>> Test()
+        public async Task<ResponseBase<List<TblAdministrator>>> GetAdministrators()
         {
-            var res = await _service.Test();
+            var res = await _service.GetAdministrators();
             return res;
         }
     }

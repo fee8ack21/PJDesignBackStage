@@ -1,5 +1,8 @@
 using App.BLL;
 using App.BLL.Administrator.Implement;
+using App.DAL.DbContexts;
+using App.DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +13,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IAdministrator, Administrator>();
+builder.Services.AddDbContext<PjdesignContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("PJDesign"));
+});
+builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 
 var app = builder.Build();
 

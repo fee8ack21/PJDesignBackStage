@@ -1,4 +1,4 @@
-﻿using App.EF;
+﻿using App.DAL.Models;
 using App.Model;
 using System;
 using System.Collections.Generic;
@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace App.BLL
 {
-    public interface IAdministrator
+    public interface IAdministratorService
     {
-        Task<ResponseBase<List<TblEftest>>> Test();
+        Task<ResponseBase<List<TblAdministrator>>> GetAdministrators();
     }
 }
