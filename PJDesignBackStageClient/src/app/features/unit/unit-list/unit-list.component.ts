@@ -1,16 +1,12 @@
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
+import { UnitDialogComponent } from '../feature-shared/components/unit-dialog/unit-dialog.component';
+import { UnitFlatNode } from '../feature-shared/models/unit-flat-node';
+import { UnitNode } from '../feature-shared/models/unit-node';
 
-interface UnitNode {
-  id: number;
-  name: string;
-  status: number,
-  children?: UnitNode[];
-}
-
-const TREE_DATA: UnitNode[] = [
+let TREE_DATA: UnitNode[] = [
   {
     id: 1,
     name: '首頁',
@@ -65,26 +61,6 @@ const TREE_DATA: UnitNode[] = [
   },
 ];
 
-interface ExampleFlatNode {
-  expandable: boolean;
-  id: number,
-  status: number,
-  name: string;
-  level: number;
-}
-
-export interface DialogData {
-  animal: 'panda' | 'unicorn' | 'lion';
-}
-
-@Component({
-  selector: 'dialog-data-example-dialog',
-  templateUrl: 'unit-dialog.html',
-})
-export class DialogDataExampleDialog {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
-}
-
 @Component({
   selector: 'app-unit-list',
   templateUrl: './unit-list.component.html',
@@ -101,7 +77,7 @@ export class UnitListComponent implements OnInit {
     };
   };
 
-  treeControl = new FlatTreeControl<ExampleFlatNode>(
+  treeControl = new FlatTreeControl<UnitFlatNode>(
     node => node.level,
     node => node.expandable,
   );
@@ -122,7 +98,7 @@ export class UnitListComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  hasChild = (_: number, node: ExampleFlatNode) => node.expandable;
+  hasChild = (_: number, node: UnitFlatNode) => node.expandable;
 
   addChildNode(id?: number) {
     this.openDialog();
@@ -132,11 +108,19 @@ export class UnitListComponent implements OnInit {
 
   }
 
-  openDialog() {
-    this.dialog.open(DialogDataExampleDialog, {
+  openDialog(): void {
+    const dialogRef = this.dialog.open(UnitDialogComponent, {
+      width: '250px',
       data: {
-        animal: 'panda',
+        id: 1,
+        name: '測試',
+        status: 1
       },
+    });
+
+    dialogRef.afterClosed().subscribe(res => {
+      if (typeof res == undefined) { return; }
+      console.log(res)
     });
   }
 }

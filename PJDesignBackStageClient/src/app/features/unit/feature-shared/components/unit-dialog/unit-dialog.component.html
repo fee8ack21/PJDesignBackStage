@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>{{data.id != null && data.id != undefined ? '編輯' : '新增'}}</h1>
+<div mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>名稱</mat-label>
+    <input matInput [(ngModel)]="data.name">
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>狀態</mat-label>
+    <mat-select>
+      <mat-option>
+        啟用
+      </mat-option>
+      <mat-option>
+        停用
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions class="d-flex justify-center">
+  <button mat-button (click)="onCancelBtnClick()">取消</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>確定</button>
+</div>
