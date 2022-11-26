@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BaseComponent } from 'src/app/shared/components/base/base.component';
 import { FormControlErrorType } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
@@ -32,7 +31,10 @@ export class AuthLoginComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.loginForm.invalid) { return; }
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
 
     this.router.navigate(['/administrator']);
     // this.httpService.post<ResponseBase<string>>('').subscribe();

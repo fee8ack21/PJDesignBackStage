@@ -20,6 +20,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { MatTreeModule } from '@angular/material/tree';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -32,9 +35,12 @@ import { MatSortModule } from '@angular/material/sort';
     ReactiveFormsModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatCheckboxModule,
+    MatTreeModule,
     MatTableModule,
     MatSortModule,
     MatFormFieldModule,
+    MatDialogModule,
     MatInputModule,
     MatSelectModule,
     MatCardModule,
@@ -61,8 +67,11 @@ import { MatSortModule } from '@angular/material/sort';
     MatCardModule,
     MatSortModule,
     MatButtonModule,
+    MatTreeModule,
+    MatCheckboxModule,
     MatMenuModule,
     MatTableModule,
+    MatDialogModule,
     MatDividerModule,
     MatListModule,
     MatToolbarModule,

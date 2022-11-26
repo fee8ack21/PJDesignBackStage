@@ -3,13 +3,50 @@
     <mat-card>
       <mat-card-content>
         <h2>單元管理</h2>
-        <div class="container">
-          <div>
-            <mat-icon>people_outline</mat-icon>
-            <p>No users exist.</p>
-          </div>
-          <mat-icon> </mat-icon>
-        </div>
+        <mat-divider></mat-divider>
+        <button mat-stroked-button class="my-1-i" (click)="addChildNode()">新增母節點</button>
+        <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+          <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+            <button mat-icon-button disabled></button>
+            <span style="position:relative;top:1px;" [style.textDecoration]="node.status ? 'none' : 'line-through'">
+              {{node.name}}</span>
+            <button mat-icon-button [matMenuTriggerFor]="unitMenu" class="ml-2-i">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #unitMenu="matMenu" xPosition="after" yPosition="above" [overlapTrigger]="false">
+              <a class="d-flex-i items-center-i " mat-menu-item (click)="addChildNode(node.id)">
+                <mat-icon style="margin-right: 5px !important;">add</mat-icon>
+                <span>新增節點</span>
+              </a>
+              <a class="d-flex-i items-center-i " mat-menu-item (click)="toggleNodeStatus(node.id)">
+                <mat-icon style="margin-right: 5px !important;">{{node.status ? 'block' : 'check_circle'}}</mat-icon>
+                <span>{{node.status ? '停用' : '啟用'}}</span>
+              </a>
+            </mat-menu>
+          </mat-tree-node>
+          <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+            <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+            <span style="position:relative;top:1px;" [style.textDecoration]="node.status ? 'none' : 'line-through'">
+              {{node.name}}</span>
+            <button mat-icon-button [matMenuTriggerFor]="unitMenu" class="ml-2-i">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #unitMenu="matMenu" xPosition="after" yPosition="above" [overlapTrigger]="false">
+              <a class="d-flex-i items-center-i " mat-menu-item (click)="addChildNode(node.id)">
+                <mat-icon style="margin-right: 5px !important;">add</mat-icon>
+                <span>新增節點</span>
+              </a>
+              <a class="d-flex-i items-center-i " mat-menu-item (click)="toggleNodeStatus(node.id)">
+                <mat-icon style="margin-right: 5px !important;">{{node.status ? 'block' : 'check_circle'}}</mat-icon>
+                <span>{{node.status ? '停用' : '啟用'}}</span>
+              </a>
+            </mat-menu>
+          </mat-tree-node>
+        </mat-tree>
       </mat-card-content>
     </mat-card>
   </div>
