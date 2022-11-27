@@ -1,15 +1,14 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
-  selector: 'app-administrator-list',
-  templateUrl: './administrator-list.component.html',
-  styleUrls: ['./administrator-list.component.scss']
+  selector: 'app-portfolio-list',
+  templateUrl: './portfolio-list.component.html',
+  styleUrls: ['./portfolio-list.component.scss']
 })
-
-export class AdministratorListComponent implements OnInit, AfterViewInit {
+export class PortfolioListComponent implements OnInit {
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol', 'tool'];
   dataSource = new MatTableDataSource(ELEMENT_DATA);
 

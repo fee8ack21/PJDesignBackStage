@@ -5,12 +5,18 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpService } from './shared/services/http.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ValidatorService } from './shared/services/validator.service';
 import { SharedModule } from './shared/modules/shared.module';
 import { AuthModule } from './features/auth/auth.module';
 import { AdministratorModule } from './features/administrator/administrator.module';
 import { UnitModule } from './features/unit/unit.module';
+import { ReviewModule } from './features/review/review.module';
+import { PortfolioModule } from './features/portfolio/portfolio.module';
+import { AuthService } from './shared/services/auth.service';
+import { JwtInterceptor } from './shared/interceptors/jwt-interceptor';
+import { ErrorInterceptor } from './shared/interceptors/error-interceptor';
+import { SnackBarService } from './shared/services/snack-bar.service';
 
 @NgModule({
   declarations: [
@@ -25,10 +31,16 @@ import { UnitModule } from './features/unit/unit.module';
     AuthModule,
     AdministratorModule,
     UnitModule,
+    ReviewModule,
+    PortfolioModule,
   ],
   providers: [
     HttpService,
-    ValidatorService
+    ValidatorService,
+    AuthService,
+    SnackBarService,
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

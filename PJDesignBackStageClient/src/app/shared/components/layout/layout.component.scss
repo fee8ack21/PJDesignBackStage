@@ -63,4 +63,29 @@
       background: rgba(0, 0, 0, 0.04);
     }
   }
+
+  .mat-expansion-panel-header {
+    &::before {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      margin-top: -5px;
+      border-style: solid;
+      border-width: 0 2px 2px 0;
+      content: "";
+      display: inline-block;
+      padding: 3px;
+      transform: rotate(45deg);
+      vertical-align: middle;
+      color: #0000008a;
+      transition: 0.15s transform;
+    }
+
+    &.mat-expanded {
+      &::before {
+        top: 56%;
+        transform: rotate(225deg);
+      }
+    }
+  }
 }

@@ -41,47 +41,73 @@
           </mat-icon>
           <p mat-line> 單元管理 </p>
         </a>
-        <a mat-list-item [routerLink]="['/users']" routerLinkActive="active">
+        <a mat-list-item [routerLink]="['/review']" routerLinkActive="active">
           <mat-icon mat-list-icon>
             list
           </mat-icon>
           <p mat-line> 審核列表 </p>
         </a>
-        <a mat-list-item [routerLink]="['/account/profile']">
+        <a mat-list-item [routerLink]="['/home']" routerLinkActive="active">
           <mat-icon mat-list-icon>settings</mat-icon>
           <p mat-line> 首頁設定 </p>
         </a>
-        <a mat-list-item [routerLink]="['/icons']" routerLinkActive="active">
+        <a mat-list-item [routerLink]="['/footer']" routerLinkActive="active">
           <mat-icon mat-list-icon>
             settings
           </mat-icon>
           <p mat-line> Footer設定 </p>
         </a>
-        <mat-divider></mat-divider>
-        <h3 mat-subheader>自定義單元</h3>
-        <a mat-list-item [routerLink]="['/typography']" routerLinkActive="active">
+        <a mat-list-item [routerLink]="['/portfolio']" routerLinkActive="active">
           <mat-icon mat-list-icon>
             photo
           </mat-icon>
           <p mat-line> 作品集 </p>
         </a>
-        <a mat-list-item [routerLink]="['/typography']" routerLinkActive="active">
+        <mat-accordion mat-list-item>
+          <mat-expansion-panel hideToggle style="box-shadow: none;">
+            <mat-expansion-panel-header class="px-1-i" style="height: 56px !important;">
+              <mat-panel-title style="margin-right: 0px;">
+                <mat-icon mat-list-icon style="padding: 4px;">
+                  work
+                </mat-icon>
+                <p mat-line style="margin-bottom: 0px;padding-left:16px;line-height: 32px;"> 客戶服務 </p>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-nav-list>
+              <a mat-list-item [routerLink]="['/question']" routerLinkActive="active">
+                <mat-icon mat-list-icon>
+                  question_answer
+                </mat-icon>
+                <p mat-line> 常見問題 </p>
+              </a>
+              <a mat-list-item [routerLink]="['/contact']" routerLinkActive="active">
+                <mat-icon mat-list-icon>
+                  email
+                </mat-icon>
+                <p mat-line> 聯絡我們 </p>
+              </a>
+            </mat-nav-list>
+          </mat-expansion-panel>
+        </mat-accordion>
+        <mat-divider></mat-divider>
+        <h3 mat-subheader>自定義單元</h3>
+        <a mat-list-item [routerLink]="['/type1']" routerLinkActive="active">
           <mat-icon mat-list-icon>
-            event_note
+            settings
+          </mat-icon>
+          <p mat-line> 關於我們 </p>
+        </a>
+        <a mat-list-item [routerLink]="['/type2']" routerLinkActive="active">
+          <mat-icon mat-list-icon>
+            settings
           </mat-icon>
           <p mat-line> 活動快訊 </p>
         </a>
-        <a mat-list-item href="https://material.angular.io/components/categories" target="_blank">
+        <a mat-list-item [routerLink]="['/type2']" routerLinkActive="active">
           <mat-icon mat-list-icon>
-            question_answer
+            settings
           </mat-icon>
-          <p mat-line> 常見問題 </p>
-        </a>
-        <a mat-list-item href="https://material.angular.io/components/categories" target="_blank">
-          <mat-icon mat-list-icon>
-            phone
-          </mat-icon>
-          <p mat-line> 聯絡我們 </p>
+          <p mat-line> 知識部落格 </p>
         </a>
       </mat-nav-list>
     </mat-sidenav>

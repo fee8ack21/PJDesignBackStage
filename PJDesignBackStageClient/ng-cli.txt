@@ -1,0 +1,12 @@
+1.建立專案
+ng new <project-name>
+
+2.建立專案，不要測試
+ng new <project-name> --skip-tests
+
+3.建立模組，包括routing module，並指定附屬到哪個模組
+ng generate module features/home --module=app.module --routing --route
+
+4.建立元件，並指定附屬到哪個模組
+ng g component features/store/store-member --module=store.module
+ng g c features/store/store-layout --module=store.module

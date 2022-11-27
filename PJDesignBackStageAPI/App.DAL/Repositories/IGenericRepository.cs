@@ -10,5 +10,7 @@ namespace App.DAL.Repositories
     public interface IGenericRepository<TModel> where TModel : class
     {
         Task<List<TModel>> GetAllAsync();
+        Task<List<TModel>> GetByConditionAsync(Expression<Func<TModel, bool>> expression);
+        Task<TModel?> GetFirstOrDefaultByConditionAsync(Expression<Func<TModel, bool>> expression);
     }
 }

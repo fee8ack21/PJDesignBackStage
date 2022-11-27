@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace App.BLL.Administrator.Implement
+namespace App.BLL
 {
     public class AdministratorService : IAdministratorService
     {

@@ -5,6 +5,24 @@
     <input matInput [(ngModel)]="data.name">
   </mat-form-field>
   <mat-form-field appearance="fill">
+    <mat-label>URL</mat-label>
+    <input matInput>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>模板</mat-label>
+    <mat-select>
+      <mat-option>
+        無
+      </mat-option>
+      <mat-option>
+        單一編輯器
+      </mat-option>
+      <mat-option>
+        列表 + 內頁
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
     <mat-label>狀態</mat-label>
     <mat-select>
       <mat-option>

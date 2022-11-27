@@ -3,11 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 
 @Component({
-  selector: 'app-administrator-detail',
-  templateUrl: './administrator-detail.component.html',
-  styleUrls: ['./administrator-detail.component.scss']
+  selector: 'app-portfolio-detail',
+  templateUrl: './portfolio-detail.component.html',
+  styleUrls: ['./portfolio-detail.component.scss']
 })
-export class AdministratorDetailComponent extends DetailBaseComponent implements OnInit {
+export class PortfolioDetailComponent extends DetailBaseComponent implements OnInit {
   constructor(protected route: ActivatedRoute) {
     super(route);
   }

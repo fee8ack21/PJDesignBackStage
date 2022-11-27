@@ -1,8 +1,19 @@
+import { StatusCode } from "./enums";
+
 export class RequestBase {
-  PageIndex = 1;
-  PageSize = 20;
 }
 
 export class ResponseBase<T>{
-  TotalItems: number;
+  message?: string;
+  statusCode?: StatusCode;
+  entries?: T;
+}
+
+export class ListRequestBase {
+  pageIndex?: number;
+  pageSize?: number;
+}
+
+export class ListResponseBase<T> extends ResponseBase<T> {
+  totalItems?: number;
 }

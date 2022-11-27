@@ -23,6 +23,8 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -52,7 +54,9 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatMenuModule,
     MatSidenavModule,
     MatDividerModule,
-    MatProgressBarModule
+    MatSnackBarModule,
+    MatProgressBarModule,
+    MatExpansionModule
   ],
   exports: [
     CommonModule,
@@ -65,11 +69,13 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatInputModule,
     MatSelectModule,
     MatCardModule,
+    MatExpansionModule,
     MatSortModule,
     MatButtonModule,
     MatTreeModule,
     MatCheckboxModule,
     MatMenuModule,
+    MatSnackBarModule,
     MatTableModule,
     MatDialogModule,
     MatDividerModule,

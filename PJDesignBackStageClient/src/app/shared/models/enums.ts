@@ -7,3 +7,8 @@ export enum PageStatus {
   Edit = 2,
   Review = 3,
 }
+
+export enum StatusCode {
+  Success = 0,
+  Fail = 1,
+}
