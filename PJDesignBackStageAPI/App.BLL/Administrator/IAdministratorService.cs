@@ -10,6 +10,6 @@ namespace App.BLL
 {
     public interface IAdministratorService
     {
-        Task<ResponseBase<List<TblAdministrator>>> GetAdministrators();
+        Task<ResponseBase<List<TblAdministrator>>> GetAdministratorsAsync();
     }
 }

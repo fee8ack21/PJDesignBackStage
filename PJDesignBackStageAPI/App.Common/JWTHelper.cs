@@ -11,9 +11,9 @@ namespace App.Common
     {
         private static string secret = "+TZere4d=C2mzr_dGZZwgRg0eGdDrl";
 
-        public static JWTPayload CreatePayload(int id, string account, byte level)
+        public static JWTPayload CreatePayload(int id, string account, int groupId)
         {
-            return new JWTPayload { Id = id, Account = account, Level = level, ExpiredTime = DateTime.UtcNow.AddDays(1) };
+            return new JWTPayload { Id = id, Account = account, GroupId = groupId, ExpiredTime = DateTime.UtcNow.AddDays(1) };
         }
 
         public static JWTPayload DecodePayload(string token)

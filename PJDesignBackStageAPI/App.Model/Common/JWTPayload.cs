@@ -10,7 +10,7 @@ namespace App.Model
     {
         public int Id { get; set; }
         public string? Account { get; set; }
-        public byte Level { get; set; }
+        public int GroupId { get; set; }
         public DateTime ExpiredTime { get; set; }
     }
 }

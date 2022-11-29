@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace App.DAL.Repositories
 {
-    public interface IAdministratorRepository : IGenericRepository<TblAdministrator>
+    public interface IGroupRepository : IGenericRepository<TblGroup>
     {
     }
 }

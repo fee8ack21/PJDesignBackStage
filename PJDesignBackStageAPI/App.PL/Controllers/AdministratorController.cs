@@ -23,7 +23,7 @@ namespace App.PL.Controllers
         public async Task<ResponseBase<List<TblAdministrator>>> GetAdministrators()
         {
             var payload = HttpContext.Items["jwtPayload"];
-            return await _service.GetAdministrators(); ;
+            return await _service.GetAdministratorsAsync(); ;
         }
     }
 }

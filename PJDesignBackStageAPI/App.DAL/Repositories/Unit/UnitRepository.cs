@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace App.DAL.Repositories
 {
-    public class AdministratorRepository : GenericRepository<TblAdministrator>, IAdministratorRepository
+    public class UnitRepository : GenericRepository<TblUnit>, IUnitRepository
     {
-        public AdministratorRepository(PjdesignContext context) : base(context)
+        public UnitRepository(PjdesignContext context) : base(context)
         {
         }
     }

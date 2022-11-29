@@ -27,7 +27,7 @@ namespace App.PL.Filters
                 var jwtToken = fullToken.Substring(7).Trim();
                 var payload = JWTHelper.DecodePayload(jwtToken);
 
-                if(payload.ExpiredTime >= DateTime.UtcNow)
+                if(payload.ExpiredTime <= DateTime.UtcNow)
                 {
                     throw new Exception();
                 }

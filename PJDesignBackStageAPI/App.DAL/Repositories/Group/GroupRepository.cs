@@ -1,5 +1,6 @@
 ﻿using App.DAL.Contexts;
 using App.DAL.Models;
+using App.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace App.DAL.Repositories
 {
-    public class AdministratorRepository : GenericRepository<TblAdministrator>, IAdministratorRepository
+    public class GroupRepository : GenericRepository<TblGroup>, IGroupRepository
     {
-        public AdministratorRepository(PjdesignContext context) : base(context)
+        public GroupRepository(PjdesignContext context) : base(context)
         {
         }
     }

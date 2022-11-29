@@ -1,4 +1,4 @@
-﻿using App.DAL.DbContexts;
+﻿using App.DAL.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,48 +9,38 @@ using System.Threading.Tasks;
 
 namespace App.DAL.Repositories
 {
-    public class GenericRepository<TModel> : IGenericRepository<TModel> where TModel : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         private readonly PjdesignContext _context;
+
         public GenericRepository(PjdesignContext context)
         {
             _context = context;
         }
 
-        public async Task<List<TModel>> GetAllAsync()
+        public IQueryable<T> GetAll()
         {
-            try
-            {
-                return await _context.Set<TModel>().ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            return _context.Set<T>().AsNoTracking();
         }
 
-        public async Task<List<TModel>> GetByConditionAsync(Expression<Func<TModel, bool>> expression)
+        public IQueryable<T> GetByCondition(Expression<Func<T, bool>> expression)
         {
-            try
-            {
-                return await _context.Set<TModel>().Where(expression).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            return _context.Set<T>().Where(expression).AsNoTracking();
         }
 
-        public async Task<TModel?> GetFirstOrDefaultByConditionAsync(Expression<Func<TModel, bool>> expression)
+        public void Create(T entity)
         {
-            try
-            {
-                return await _context.Set<TModel>().Where(expression).FirstOrDefaultAsync();
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            _context.Set<T>().Add(entity);
+        }
+
+        public void Delete(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+        }
+
+        public void Update(T entity)
+        {
+            _context.Set<T>().Update(entity);
         }
     }
 }

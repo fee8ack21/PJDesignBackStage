@@ -3,21 +3,17 @@ using App.DAL.Models;
 using App.DAL.Repositories;
 using App.Enum;
 using App.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.BLL
 {
     public class AuthService : IAuthService
     {
-        private readonly IGenericRepository<TblAdministrator> _repository;
+        private readonly IRepositoryWrapper _repositoryWrapper;
 
-        public AuthService(IGenericRepository<TblAdministrator> repository)
+        public AuthService(IRepositoryWrapper repositoryWrapper)
         {
-            _repository = repository;
+            _repositoryWrapper = repositoryWrapper;
         }
 
         public async Task<ResponseBase<string>> Login(AuthLoginRequest request)
@@ -26,8 +22,19 @@ namespace App.BLL
 
             try
             {
-                var tblAdministrator = await _repository.GetFirstOrDefaultByConditionAsync(x => x.CAccount == request.Account);
-                if (tblAdministrator == null)
+                var query = _repositoryWrapper.Administrator
+                    .GetByCondition(x => x.CAccount == request.Account)
+                    .Join(_repositoryWrapper.AdministratorGroup.GetAll(), x => x.CId, y => y.CAdministratorId, (x, y) => new
+                    {
+                        Id = x.CId,
+                        Account = x.CAccount,
+                        Password = x.CPassword,
+                        GroupId = y.CGroupId
+                    });
+
+                var administrator = await query.FirstOrDefaultAsync();
+
+                if (administrator == null)
                 {
                     response.StatusCode = StatusCode.Fail;
                     response.Message = "無此用戶!";
@@ -35,14 +42,14 @@ namespace App.BLL
                 else
                 {
                     var hashedPassword = HashHelper.GetPbkdf2Value(request.Password);
-                    if (hashedPassword != tblAdministrator.CPassword)
+                    if (hashedPassword != administrator.Password)
                     {
                         response.StatusCode = StatusCode.Fail;
                         response.Message = "密碼錯誤!";
                     }
                     else
                     {
-                        var payload = JWTHelper.CreatePayload(tblAdministrator.CId, tblAdministrator.CAccount, tblAdministrator.CLevel);
+                        var payload = JWTHelper.CreatePayload(administrator.Id, administrator.Account, administrator.GroupId);
                         var token = JWTHelper.GetToken(payload);
 
                         response.Entries = token;

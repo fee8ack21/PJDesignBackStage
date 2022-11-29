@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace App.DAL.Models;
 
-public partial class TblAdministrator
+public partial class TblPortfolioPhotoAfter
 {
     /// <summary>
     /// 流水號
@@ -11,24 +11,19 @@ public partial class TblAdministrator
     public int CId { get; set; }
 
     /// <summary>
-    /// 帳號
-    /// </summary>
-    public string CAccount { get; set; } = null!;
-
-    /// <summary>
-    /// 密碼
-    /// </summary>
-    public string CPassword { get; set; } = null!;
-
-    /// <summary>
-    /// 名稱
+    /// 圖片檔案名稱
     /// </summary>
     public string CName { get; set; } = null!;
 
     /// <summary>
-    /// 創建時間
+    /// 圖片檔案路徑
     /// </summary>
-    public DateTime CCreateDt { get; set; }
+    public string CPath { get; set; } = null!;
+
+    /// <summary>
+    /// 作品集ID
+    /// </summary>
+    public int CPortfolioId { get; set; }
 
     /// <summary>
     /// 是否啟用

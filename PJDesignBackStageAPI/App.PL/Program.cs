@@ -1,5 +1,5 @@
 using App.BLL;
-using App.DAL.DbContexts;
+using App.DAL.Contexts;
 using App.DAL.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -28,9 +28,11 @@ builder.Services.AddDbContext<PjdesignContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("PJDesign"));
 });
-builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+//builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUnitService, UnitService>();
 
 var app = builder.Build();
 

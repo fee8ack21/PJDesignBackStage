@@ -1,7 +1,9 @@
-﻿using App.DAL.DbContexts;
+﻿using App.DAL;
 using App.DAL.Models;
 using App.DAL.Repositories;
+using App.Enum;
 using App.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,23 +14,24 @@ namespace App.BLL
 {
     public class AdministratorService : IAdministratorService
     {
-        private readonly IGenericRepository<TblAdministrator> _repository;
+        private readonly IRepositoryWrapper _repositoryWrapper;
 
-        public AdministratorService(IGenericRepository<TblAdministrator> repository)
+        public AdministratorService(IRepositoryWrapper repositoryWrapper)
         {
-            _repository = repository;
+            _repositoryWrapper = repositoryWrapper;
         }
 
-        public async Task<ResponseBase<List<TblAdministrator>>> GetAdministrators()
+        public async Task<ResponseBase<List<TblAdministrator>>> GetAdministratorsAsync()
         {
             var response = new ResponseBase<List<TblAdministrator>>();
             try
             {
-                response.Entries = await _repository.GetAllAsync();
+                response.Entries = await _repositoryWrapper.Administrator.GetAll().ToListAsync();
             }
             catch (Exception ex)
             {
-                throw;
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
             }
 
             return response;

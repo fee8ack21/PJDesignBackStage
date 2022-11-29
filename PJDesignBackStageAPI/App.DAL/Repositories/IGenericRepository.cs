@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 
 namespace App.DAL.Repositories
 {
-    public interface IGenericRepository<TModel> where TModel : class
+    public interface IGenericRepository<T> where T : class
     {
-        Task<List<TModel>> GetAllAsync();
-        Task<List<TModel>> GetByConditionAsync(Expression<Func<TModel, bool>> expression);
-        Task<TModel?> GetFirstOrDefaultByConditionAsync(Expression<Func<TModel, bool>> expression);
+        IQueryable<T> GetAll();
+        IQueryable<T> GetByCondition(Expression<Func<T, bool>> expression);
+
+        void Create(T entity);
+        void Update(T entity);
+        void Delete(T entity);
     }
 }
