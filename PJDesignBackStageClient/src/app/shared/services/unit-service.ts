@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
 import { ResponseBase } from '../models/bases';
 import { StatusCode, TemplateType, UnitID } from '../models/enums';
-import { GetUnitsResponse } from '../models/get-units';
+import { GetBackStageUnitsByGroupIdResponse } from '../models/get-back-stage-units-by-group-id';
 import { HttpService } from './http.service';
 @Injectable()
 
 export class UnitService {
-  private _units: GetUnitsResponse[];
-  private _fixedUnits: GetUnitsResponse[] = [];
-  private _customUnits: GetUnitsResponse[] = [];
+  private _units: GetBackStageUnitsByGroupIdResponse[];
+  private _fixedUnits: GetBackStageUnitsByGroupIdResponse[] = [];
+  private _customUnits: GetBackStageUnitsByGroupIdResponse[] = [];
 
   constructor(private httpService: HttpService) { }
 
-  async getUnits() {
+  async getBackStageUnitsByGroupId() {
     if (this._units != undefined) { return [this._fixedUnits, this._customUnits] };
 
-    const response = await this.httpService.get<ResponseBase<GetUnitsResponse[]>>('unit/getUnits').toPromise();
+    const response = await this.httpService.get<ResponseBase<GetBackStageUnitsByGroupIdResponse[]>>('unit/getBackStageUnitsByGroupId').toPromise();
     if (response.statusCode == StatusCode.Success) {
       this._units = response.entries!;
       this._setFormattedUnits(response.entries!)
@@ -26,10 +26,10 @@ export class UnitService {
     return [[], []];
   }
 
-  private _setFormattedUnits(units: GetUnitsResponse[]) {
-    let fixedUnits: GetUnitsResponse[] = []
-    let customUnits: GetUnitsResponse[] = []
-    let childUnits: GetUnitsResponse[] = []
+  private _setFormattedUnits(units: GetBackStageUnitsByGroupIdResponse[]) {
+    let fixedUnits: GetBackStageUnitsByGroupIdResponse[] = []
+    let customUnits: GetBackStageUnitsByGroupIdResponse[] = []
+    let childUnits: GetBackStageUnitsByGroupIdResponse[] = []
 
     units.forEach(unit => {
       if (unit.parent) {

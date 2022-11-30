@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace App.Model
 {
-    public class GetUnitsResponse
+    public class GetBackStageUnitsByGroupIdResponse
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

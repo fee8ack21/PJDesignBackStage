@@ -63,5 +63,66 @@ namespace App.BLL
 
             return response;
         }
+
+        public async Task<ResponseBase<List<GetRightsResponse>>> GetRights()
+        {
+            var response = new ResponseBase<List<GetRightsResponse>>() { Entries = new List<GetRightsResponse>() };
+            try
+            {
+                response.Entries = await _repositoryWrapper.Right.GetAll().Select(x => new GetRightsResponse()
+                {
+                    Id = x.CId,
+                    Name = x.CName,
+                }).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseBase<CreateGroupResponse>> CreateGroup(CreateGroupRequest request)
+        {
+            var response = new ResponseBase<CreateGroupResponse>() { Entries = new CreateGroupResponse() };
+            try
+            {
+                var tblGroup = new TblGroup() { CName = request.Name };
+                _repositoryWrapper.Group.Create(tblGroup);
+                await _repositoryWrapper.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request)
+        {
+            var response = new ResponseBase<string>();
+            try
+            {
+                if (request.Id == null)
+                {
+                    // 新增
+                }
+                else
+                {
+                    // 修改
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+
+            return response;
+        }
     }
 }

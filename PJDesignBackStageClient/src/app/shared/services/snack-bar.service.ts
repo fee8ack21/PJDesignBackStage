@@ -3,6 +3,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 @Injectable()
 
 export class SnackBarService {
+  static RequestFailedText = "請求失敗";
+  static RequestSuccessText = "請求成功";
+
   constructor(private snackBar: MatSnackBar) { }
 
   showSnackBar(text: string) {

@@ -13,8 +13,10 @@ namespace App.DAL.Repositories
         IAdministratorGroupRepository AdministratorGroup { get; }
         IUnitRepository Unit { get; }
         IGroupRepository Group { get; }
-        IGroupUnitRepository GroupUnit { get; }
+        IGroupUnitRightRepository GroupUnitRight { get; }
+        IRightRepository Right { get; }
 
         void Save();
+        Task SaveAsync();
     }
 }

@@ -14,7 +14,8 @@ namespace App.DAL.Repositories
         private IAdministratorGroupRepository? _administratorGroup;
         private IUnitRepository? _unit;
         private IGroupRepository? _group;
-        private IGroupUnitRepository? _groupUnit;
+        private IGroupUnitRightRepository? _groupUnitRight;
+        private IRightRepository? _right;
 
         public RepositoryWrapper(PjdesignContext context)
         {
@@ -59,16 +60,16 @@ namespace App.DAL.Repositories
             }
         }
 
-        public IGroupUnitRepository GroupUnit
+        public IGroupUnitRightRepository GroupUnitRight
         {
             get
             {
-                if (_groupUnit == null)
+                if (_groupUnitRight == null)
                 {
-                    _groupUnit = new GroupUnitRepository(_context);
+                    _groupUnitRight = new GroupUnitRightRepository(_context);
                 }
 
-                return _groupUnit;
+                return _groupUnitRight;
             }
         }
 
@@ -85,9 +86,27 @@ namespace App.DAL.Repositories
             }
         }
 
+        public IRightRepository Right
+        {
+            get
+            {
+                if (_right == null)
+                {
+                    _right = new RightRepository(_context);
+                }
+
+                return _right;
+            }
+        }
+
         public void Save()
         {
             _context.SaveChanges();
+        }
+
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

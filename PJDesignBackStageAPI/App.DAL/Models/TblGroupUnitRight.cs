@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace App.DAL.Models;
 
-public partial class TblGroupUnit
+public partial class TblGroupUnitRight
 {
     public int CId { get; set; }
 
@@ -11,8 +11,5 @@ public partial class TblGroupUnit
 
     public int CUnitId { get; set; }
 
-    /// <summary>
-    /// 操作權限: 0.CRUD
-    /// </summary>
-    public byte CRightType { get; set; }
+    public int CRightId { get; set; }
 }

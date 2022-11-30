@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace App.DAL.Repositories
 {
-    public interface IGroupUnitRepository : IGenericRepository<TblGroupUnit>
+    public interface IGroupUnitRightRepository : IGenericRepository<TblGroupUnitRight>
     {
     }
 }

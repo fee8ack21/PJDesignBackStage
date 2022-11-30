@@ -5,40 +5,56 @@
         <h2>帳戶管理 - {{pageStatusName}}</h2>
         <mat-divider></mat-divider>
         <div class="pt-1">
-          <form>
-            <div class="d-flex justify-space-between">
+          <form [formGroup]="administratorForm" (ngSubmit)="onSubmit()">
+            <div class="d-flex justify-space-between py-1">
+              <input matInput formControlName="id" name="id" [value]="null" type="hidden">
               <mat-form-field appearance="fill">
                 <mat-label>帳戶</mat-label>
-                <input matInput>
+                <input matInput formControlName="account" name="account" readonly
+                  onfocus="this.removeAttribute('readonly');">
+                <mat-error *ngIf="validatorService.isFormControlInvalid(administratorForm, 'account')">
+                  {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+                </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>名稱</mat-label>
-                <input matInput>
+                <input matInput formControlName="name" name="name" readonly onfocus="this.removeAttribute('readonly');">
+                <mat-error *ngIf="validatorService.isFormControlInvalid(administratorForm, 'name')">
+                  {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+                </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>密碼</mat-label>
-                <input matInput>
+                <input matInput type="password" formControlName="password" name="password" readonly
+                  onfocus="this.removeAttribute('readonly');">
+                <mat-error *ngIf="validatorService.isFormControlInvalid(administratorForm, 'password')">
+                  {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+                </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>身份</mat-label>
-                <mat-select>
-                  <mat-option value="one">管理員</mat-option>
-                  <mat-option value="two">一般用戶</mat-option>
+                <mat-label>組別</mat-label>
+                <mat-select formControlName="groupId" name="groupId">
+                  <mat-option *ngFor="let item of groups" [value]="item.id">{{item.name}}</mat-option>
                 </mat-select>
+                <mat-error *ngIf="validatorService.isFormControlInvalid(administratorForm, 'groupId')">
+                  {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+                </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>狀態</mat-label>
-                <mat-select>
-                  <mat-option value="one">啟用</mat-option>
-                  <mat-option value="two">停用</mat-option>
+                <mat-select formControlName="isEnabled" name="isEnabled">
+                  <mat-option [value]="true">啟用</mat-option>
+                  <mat-option [value]="false">停用</mat-option>
                 </mat-select>
+                <mat-error *ngIf="validatorService.isFormControlInvalid(administratorForm, 'isEnabled')">
+                  {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+                </mat-error>
               </mat-form-field>
             </div>
             <mat-divider></mat-divider>
-
             <div class="d-flex justify-center pt-1">
-              <a mat-stroked-button class="mr-1-i" [routerLink]="['/administrator',]">取消</a>
-              <button mat-raised-button color="primary">送出</button>
+              <a mat-stroked-button class="mr-1-i" [routerLink]="['/administrator']">取消</a>
+              <button type="submit" mat-raised-button color="primary">送出</button>
             </div>
           </form>
         </div>

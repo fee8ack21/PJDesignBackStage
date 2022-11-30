@@ -9,6 +9,7 @@ namespace App.BLL
 {
     public interface IUnitService
     {
-        Task<ResponseBase<List<GetUnitsResponse>>> GetUnits(JWTPayload payload);
+        Task<ResponseBase<List<GetBackStageUnitsResponse>>> GetBackStageUnits();
+        Task<ResponseBase<List<GetBackStageUnitsByGroupIdResponse>>> GetBackStageUnitsByGroupId(JWTPayload payload);
     }
 }

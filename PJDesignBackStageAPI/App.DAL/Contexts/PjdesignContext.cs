@@ -28,7 +28,7 @@ public partial class PjdesignContext : DbContext
 
     public virtual DbSet<TblGroup> TblGroups { get; set; }
 
-    public virtual DbSet<TblGroupUnit> TblGroupUnits { get; set; }
+    public virtual DbSet<TblGroupUnitRight> TblGroupUnitRights { get; set; }
 
     public virtual DbSet<TblMailQueue> TblMailQueues { get; set; }
 
@@ -39,6 +39,8 @@ public partial class PjdesignContext : DbContext
     public virtual DbSet<TblPortfolioPhotoAfter> TblPortfolioPhotoAfters { get; set; }
 
     public virtual DbSet<TblPortfolioPhotoBefore> TblPortfolioPhotoBefores { get; set; }
+
+    public virtual DbSet<TblRight> TblRights { get; set; }
 
     public virtual DbSet<TblType> TblTypes { get; set; }
 
@@ -152,12 +154,11 @@ public partial class PjdesignContext : DbContext
 
         modelBuilder.Entity<TblGroup>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("tblGroup");
+            entity.HasKey(e => e.CId);
+
+            entity.ToTable("tblGroup");
 
             entity.Property(e => e.CId)
-                .ValueGeneratedOnAdd()
                 .HasComment("流水號")
                 .HasColumnName("cId");
             entity.Property(e => e.CName)
@@ -166,17 +167,17 @@ public partial class PjdesignContext : DbContext
                 .HasColumnName("cName");
         });
 
-        modelBuilder.Entity<TblGroupUnit>(entity =>
+        modelBuilder.Entity<TblGroupUnitRight>(entity =>
         {
-            entity.HasKey(e => e.CId).HasName("PK_tblGroupUnitRight");
+            entity.HasKey(e => e.CId);
 
-            entity.ToTable("tblGroupUnit");
+            entity.ToTable("tblGroupUnitRight");
 
             entity.Property(e => e.CId).HasColumnName("cId");
             entity.Property(e => e.CGroupId).HasColumnName("cGroupId");
-            entity.Property(e => e.CRightType)
-                .HasComment("操作權限: 0.CRUD")
-                .HasColumnName("cRightType");
+            entity.Property(e => e.CRightId)
+                .HasComment("")
+                .HasColumnName("cRightId");
             entity.Property(e => e.CUnitId).HasColumnName("cUnitId");
         });
 
@@ -296,6 +297,18 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CPortfolioId)
                 .HasComment("作品集ID")
                 .HasColumnName("cPortfolioId");
+        });
+
+        modelBuilder.Entity<TblRight>(entity =>
+        {
+            entity.HasKey(e => e.CId);
+
+            entity.ToTable("tblRight");
+
+            entity.Property(e => e.CId).HasColumnName("cId");
+            entity.Property(e => e.CName)
+                .HasMaxLength(50)
+                .HasColumnName("cName");
         });
 
         modelBuilder.Entity<TblType>(entity =>

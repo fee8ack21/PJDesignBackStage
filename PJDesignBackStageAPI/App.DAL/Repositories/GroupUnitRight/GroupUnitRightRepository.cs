@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace App.DAL.Repositories
 {
-    public class GroupUnitRepository : GenericRepository<TblGroupUnit>, IGroupUnitRepository
+    public class GroupUnitRightRepository : GenericRepository<TblGroupUnitRight>, IGroupUnitRightRepository
     {
-        public GroupUnitRepository(PjdesignContext context) : base(context)
+        public GroupUnitRightRepository(PjdesignContext context) : base(context)
         {
         }
     }

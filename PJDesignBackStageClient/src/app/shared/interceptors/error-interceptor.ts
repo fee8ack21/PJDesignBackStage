@@ -32,7 +32,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
           console.log(errorMessage);
 
-          this.snackBarService.showSnackBar('請求錯誤');
+          this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
 
           return throwError(errorMessage);
         })

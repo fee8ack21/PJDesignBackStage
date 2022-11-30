@@ -32,8 +32,23 @@ namespace App.PL.Controllers
         [JWTFilter]
         public async Task<ResponseBase<List<GetGroupsResponse>>> GetGroups()
         {
-            var payload = HttpContext.Items["jwtPayload"];
             return await _service.GetGroups(); ;
+        }
+
+        [HttpPost]
+        [Route("CreateGroup")]
+        [JWTFilter]
+        public async Task<ResponseBase<CreateGroupResponse>> CreateGroup(CreateGroupRequest request)
+        {
+            return await _service.CreateGroup(request);
+        }
+
+        [HttpGet]
+        [Route("GetRights")]
+        [JWTFilter]
+        public async Task<ResponseBase<List<GetRightsResponse>>> GetRights()
+        {
+            return await _service.GetRights();
         }
     }
 }
