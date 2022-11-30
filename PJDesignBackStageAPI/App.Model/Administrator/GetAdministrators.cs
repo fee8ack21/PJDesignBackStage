@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace App.Model
 {
-    public class GetUnitsResponse
+    public class GetAdministratorsResponse
     {
         public int Id { get; set; }
+        public string Account { get; set; } = null!;
         public string Name { get; set; } = null!;
-        public string? Url { get; set; }
-        public bool IsAnotherWindow { get; set; }
-        public int? Parent { get; set; }
-        public int TemplateType { get; set; }
+        public DateTime CreateDt { get; set; }
+        public bool? IsEnabled { get; set; }
     }
 }

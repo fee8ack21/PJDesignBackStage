@@ -1,0 +1,33 @@
+.mat-form-field {
+  max-width: 185px;
+}
+
+.mat-table {
+  th {
+    &:nth-child(1) {
+    }
+    &:nth-child(2) {
+    }
+    &:nth-child(3) {
+    }
+    &:nth-child(4) {
+    }
+    &:nth-child(5) {
+      width: 90px;
+      text-align: center;
+    }
+    &:nth-child(6) {
+      width: 90px;
+      text-align: center;
+    }
+  }
+
+  td {
+    &:nth-child(5) {
+      text-align: center;
+    }
+    &:nth-child(6) {
+      text-align: center;
+    }
+  }
+}

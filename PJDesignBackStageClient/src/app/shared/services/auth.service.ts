@@ -2,23 +2,31 @@ import { Injectable } from '@angular/core';
 @Injectable()
 
 export class AuthService {
-  readonly itemName = "PJDesignToken";
+  private readonly tokenItemName = "PJDesignToken";
+  private readonly administratorItemName = "PJDesignAdministratorName";
 
   constructor() { }
 
   checkToken() {
-
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.itemName);
+    return localStorage.getItem(this.tokenItemName);
   }
 
   setToken(value: string) {
-    localStorage.setItem(this.itemName, value);
+    localStorage.setItem(this.tokenItemName, value);
   }
 
   removeToken() {
-    localStorage.removeItem(this.itemName);
+    localStorage.removeItem(this.tokenItemName);
+  }
+
+  getAdministratorName(): string | null {
+    return localStorage.getItem(this.administratorItemName);
+  }
+
+  setAdministratorName(value: string) {
+    localStorage.setItem(this.administratorItemName, value);
   }
 }

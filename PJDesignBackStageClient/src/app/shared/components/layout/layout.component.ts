@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ResponseBase } from '../../models/bases';
 import { GetUnitsResponse } from '../../models/get-units';
+import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
 import { UnitService } from '../../services/unit-service';
 
@@ -10,20 +12,38 @@ import { UnitService } from '../../services/unit-service';
   styleUrls: ['./layout.component.scss']
 })
 export class LayoutComponent implements OnInit {
-  userName = '測試人員'
+  administratorName = ''
 
   fixedUnits: GetUnitsResponse[] = [];
   customUnits: GetUnitsResponse[] = [];
 
-  constructor(private httpService: HttpService, public unitService: UnitService) { }
+  constructor(
+    private httpService: HttpService,
+    public unitService: UnitService,
+    public router: Router,
+    private authSerivce: AuthService) { }
 
   ngOnInit(): void {
-    this.getUnitList();
+    this.getAdministratorName();
+    this.getUnits();
   }
 
-  async getUnitList() {
+  getAdministratorName() {
+    this.administratorName = this.authSerivce.getAdministratorName() ?? '';
+  }
+
+  async getUnits() {
     let temp = await this.unitService.getUnits();
     this.fixedUnits = temp[0];
     this.customUnits = temp[1];
+  }
+
+  logout(e: any) {
+    if (e != undefined) {
+      e.preventDefault();
+    }
+
+    this.authSerivce.removeToken();
+    this.router.navigate(['/']);
   }
 }

@@ -26,4 +26,19 @@ public partial class TblPortfolioBefore
     public DateTime CCreateDt { get; set; }
 
     public string? CNote { get; set; }
+
+    /// <summary>
+    /// 0.暫存 1.審核中 2.駁回
+    /// </summary>
+    public byte CStatus { get; set; }
+
+    /// <summary>
+    /// 編輯人員ID
+    /// </summary>
+    public int CEditAdministratorId { get; set; }
+
+    /// <summary>
+    /// 審核人員ID
+    /// </summary>
+    public int CReviewAdministratorId { get; set; }
 }

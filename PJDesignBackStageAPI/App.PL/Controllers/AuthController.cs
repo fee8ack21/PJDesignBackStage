@@ -1,6 +1,5 @@
 ﻿using App.BLL;
 using App.Model;
-using App.Model;
 using App.PL.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +19,7 @@ namespace App.PL.Controllers
 
         [HttpPost]
         [Route("Login")]
-        public async Task<ResponseBase<string>> Login(AuthLoginRequest request)
+        public async Task<ResponseBase<AuthLoginResponse>> Login(AuthLoginRequest request)
         {
             return await _service.Login(request); ;
         }

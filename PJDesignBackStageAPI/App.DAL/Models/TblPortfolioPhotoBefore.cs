@@ -13,7 +13,7 @@ public partial class TblPortfolioPhotoBefore
     /// <summary>
     /// 圖片檔案名稱
     /// </summary>
-    public string CName { get; set; } = null!;
+    public string CFilename { get; set; } = null!;
 
     /// <summary>
     /// 圖片檔案路徑
@@ -24,4 +24,6 @@ public partial class TblPortfolioPhotoBefore
     /// 作品集ID
     /// </summary>
     public int CPortfolioId { get; set; }
+
+    public string CContentHash { get; set; } = null!;
 }

@@ -24,14 +24,13 @@ namespace App.BLL
             try
             {
                 var query = _repositoryWrapper.GroupUnit.GetByCondition(x => x.CGroupId == payload.GroupId)
-                    .Join(_repositoryWrapper.Unit.GetByCondition(y => y.CIsBackStage), x => x.CUnitId, y => y.CId, (x, y) => new GetUnitsResponse
+                    .Join(_repositoryWrapper.Unit.GetByCondition(y => y.CStageType == (int)StageType.後台 || y.CStageType == (int)StageType.前後台), x => x.CUnitId, y => y.CId, (x, y) => new GetUnitsResponse
                     {
                         Id = y.CId,
                         Name = y.CName,
-                        Url = y.CUrl,
+                        Url = y.CBackStageUrl,
                         Parent = y.CParent,
-                        IsAnotherWindow = y.CIsAnotherWindow,
-                        Type = y.CType
+                        TemplateType = y.CTemplateType
                     });
 
                 response.Entries = await query.ToListAsync();

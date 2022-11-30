@@ -21,12 +21,39 @@ namespace App.BLL
             _repositoryWrapper = repositoryWrapper;
         }
 
-        public async Task<ResponseBase<List<TblAdministrator>>> GetAdministratorsAsync()
+        public async Task<ResponseBase<List<GetAdministratorsResponse>>> GetAdministrators()
         {
-            var response = new ResponseBase<List<TblAdministrator>>();
+            var response = new ResponseBase<List<GetAdministratorsResponse>>() { Entries = new List<GetAdministratorsResponse>() };
             try
             {
-                response.Entries = await _repositoryWrapper.Administrator.GetAll().ToListAsync();
+                response.Entries = await _repositoryWrapper.Administrator.GetAll().Select(x => new GetAdministratorsResponse()
+                {
+                    Id = x.CId,
+                    Account = x.CAccount,
+                    Name = x.CName,
+                    IsEnabled = x.CIsEnabled,
+                    CreateDt = x.CCreateDt
+                }).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseBase<List<GetGroupsResponse>>> GetGroups()
+        {
+            var response = new ResponseBase<List<GetGroupsResponse>>() { Entries = new List<GetGroupsResponse>() };
+            try
+            {
+                response.Entries = await _repositoryWrapper.Group.GetAll().Select(x => new GetGroupsResponse()
+                {
+                    Id = x.CId,
+                    Name = x.CName,
+                }).ToListAsync();
             }
             catch (Exception ex)
             {

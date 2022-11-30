@@ -19,11 +19,21 @@ namespace App.PL.Controllers
         }
 
         [HttpGet]
+        [Route("GetAdministrators")]
         [JWTFilter]
-        public async Task<ResponseBase<List<TblAdministrator>>> GetAdministrators()
+        public async Task<ResponseBase<List<GetAdministratorsResponse>>> GetAdministrators()
         {
             var payload = HttpContext.Items["jwtPayload"];
-            return await _service.GetAdministratorsAsync(); ;
+            return await _service.GetAdministrators(); ;
+        }
+
+        [HttpGet]
+        [Route("GetGroups")]
+        [JWTFilter]
+        public async Task<ResponseBase<List<GetGroupsResponse>>> GetGroups()
+        {
+            var payload = HttpContext.Items["jwtPayload"];
+            return await _service.GetGroups(); ;
         }
     }
 }

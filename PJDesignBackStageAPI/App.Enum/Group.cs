@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace App.Enum
 {
-    public enum AdministratorLevel
+    public enum Group
     {
-        Root = 1,
-        Normal = 2
+        系統管理員 = 1,
+        一般用戶 = 2
     }
 }

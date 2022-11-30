@@ -14,11 +14,11 @@
       <button class="layout__user-btn" mat-button [matMenuTriggerFor]="userMenu">
         <mat-icon>person</mat-icon>
         <span>
-          {{userName}}
+          {{administratorName}}
         </span>
       </button>
       <mat-menu #userMenu="matMenu" xPosition="before" yPosition="above" [overlapTrigger]="false">
-        <a class="d-flex-i items-center-i" mat-menu-item [routerLink]="['/']">
+        <a class="d-flex-i items-center-i" mat-menu-item (click)="logout($event)">
           <mat-icon>exit_to_app</mat-icon>
           <span>登出</span>
         </a>

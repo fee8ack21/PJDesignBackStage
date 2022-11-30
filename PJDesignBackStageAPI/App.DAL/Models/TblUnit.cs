@@ -18,17 +18,14 @@ public partial class TblUnit
     /// <summary>
     /// 單元路徑
     /// </summary>
-    public string? CUrl { get; set; }
+    public string? CBackStageUrl { get; set; }
 
     /// <summary>
     /// 模板類別: -1.固定單元 0.無 1.模板一 2.模板二
     /// </summary>
-    public int CType { get; set; }
+    public int CTemplateType { get; set; }
 
-    /// <summary>
-    /// 是否為後台單元
-    /// </summary>
-    public bool CIsBackStage { get; set; }
+    public string? CFrontStageUrl { get; set; }
 
     /// <summary>
     /// 是否另開視窗
@@ -54,4 +51,11 @@ public partial class TblUnit
     /// 母單元
     /// </summary>
     public int? CParent { get; set; }
+
+    /// <summary>
+    /// 0.前後台 1.僅前台 2.僅後台
+    /// </summary>
+    public int CStageType { get; set; }
+
+    public byte? CSort { get; set; }
 }

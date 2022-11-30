@@ -18,6 +18,7 @@ import { JwtInterceptor } from './shared/interceptors/jwt-interceptor';
 import { ErrorInterceptor } from './shared/interceptors/error-interceptor';
 import { SnackBarService } from './shared/services/snack-bar.service';
 import { UnitService } from './shared/services/unit-service';
+import { AuthGuard } from './shared/guards/auth-guard';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { UnitService } from './shared/services/unit-service';
     AuthService,
     SnackBarService,
     UnitService,
+    AuthGuard,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],

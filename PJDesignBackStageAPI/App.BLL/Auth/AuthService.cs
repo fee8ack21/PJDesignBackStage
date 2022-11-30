@@ -16,9 +16,9 @@ namespace App.BLL
             _repositoryWrapper = repositoryWrapper;
         }
 
-        public async Task<ResponseBase<string>> Login(AuthLoginRequest request)
+        public async Task<ResponseBase<AuthLoginResponse>> Login(AuthLoginRequest request)
         {
-            var response = new ResponseBase<string>();
+            var response = new ResponseBase<AuthLoginResponse>() { Entries = new AuthLoginResponse() };
 
             try
             {
@@ -27,6 +27,7 @@ namespace App.BLL
                     .Join(_repositoryWrapper.AdministratorGroup.GetAll(), x => x.CId, y => y.CAdministratorId, (x, y) => new
                     {
                         Id = x.CId,
+                        Name = x.CName,
                         Account = x.CAccount,
                         Password = x.CPassword,
                         GroupId = y.CGroupId
@@ -52,7 +53,8 @@ namespace App.BLL
                         var payload = JWTHelper.CreatePayload(administrator.Id, administrator.Account, administrator.GroupId);
                         var token = JWTHelper.GetToken(payload);
 
-                        response.Entries = token;
+                        response.Entries.Name = administrator.Name;
+                        response.Entries.Token = token;
                         response.Message = "登入成功!";
                     }
                 }

@@ -7,7 +7,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
-import { AuthLoginRequest } from '../featured-shared/models/auth-login';
+import { AuthLoginRequest, AuthLoginResponse } from '../featured-shared/models/auth-login';
 
 @Component({
   selector: 'app-auth-login',
@@ -26,7 +26,13 @@ export class AuthLoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.checkIfLogin();
     this.initForm();
+  }
+
+  checkIfLogin() {
+    if (this.authService.getToken() == null) { return; }
+    this.router.navigate(['/administrator']);
   }
 
   initForm() {
@@ -45,13 +51,14 @@ export class AuthLoginComponent implements OnInit {
     let request = new AuthLoginRequest();
     request = { ...this.loginForm.value };
 
-    this.httpService.post<ResponseBase<string>>('auth/login', request).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail || typeof response.entries != 'string') {
+    this.httpService.post<ResponseBase<AuthLoginResponse>>('auth/login', request).subscribe(response => {
+      if (response?.statusCode == null || response.statusCode == StatusCode.Fail || typeof response.entries == null) {
         this.snackBarService.showSnackBar(response.message ?? "登入失敗");
         return;
       }
 
-      this.authService.setToken(response.entries);
+      this.authService.setAdministratorName(response.entries!.name);
+      this.authService.setToken(response.entries!.token);
       this.snackBarService.showSnackBar(response.message ?? "登入成功");
       this.router.navigate(['/administrator']);
     })

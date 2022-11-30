@@ -4,6 +4,6 @@ export class GetUnitsResponse {
   url?: string;
   isAnotherWindow: boolean;
   parent: number;
-  type: number;
+  templateType: number;
   children?: GetUnitsResponse[];
 }

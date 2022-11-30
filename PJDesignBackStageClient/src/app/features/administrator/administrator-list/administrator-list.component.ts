@@ -2,6 +2,13 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
+import { ResponseBase } from 'src/app/shared/models/bases';
+import { StatusCode } from 'src/app/shared/models/enums';
+import { HttpService } from 'src/app/shared/services/http.service';
+import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { GetAdministratorsResponse } from '../feature-shared/models/get-administrators';
+import { GetGroupsResponse } from '../feature-shared/models/get-groups';
 
 @Component({
   selector: 'app-administrator-list',
@@ -9,18 +16,49 @@ import { MatTableDataSource } from '@angular/material/table';
   styleUrls: ['./administrator-list.component.scss']
 })
 
-export class AdministratorListComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol', 'tool'];
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
-
-  constructor(private _liveAnnouncer: LiveAnnouncer) { }
-  ngOnInit(): void {
-  }
+export class AdministratorListComponent extends ListBaseComponent implements OnInit {
+  displayedColumns: string[] = ['id', 'account', 'name', 'createDt', 'isEnabled', 'tool'];
+  dataSource: MatTableDataSource<GetAdministratorsResponse>;
+  groups: GetGroupsResponse[] = [];
 
   @ViewChild(MatSort) sort: MatSort;
 
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
+  constructor(
+    private httpService: HttpService,
+    private snackBarService: SnackBarService,
+    private _liveAnnouncer: LiveAnnouncer) {
+    super();
+  }
+
+  ngOnInit(): void {
+    this.getGroups();
+    this.getAdministrators();
+  }
+
+  todo() {
+    // forkJoin();
+  }
+
+  getAdministrators() {
+    this.httpService.get<ResponseBase<GetAdministratorsResponse[]>>('administrator/getAdministrators').subscribe(response => {
+      if (response.statusCode == StatusCode.Fail) {
+        this.snackBarService.showSnackBar('請求錯誤');
+        return;
+      }
+      this.dataSource = new MatTableDataSource(response.entries);
+      this.dataSource.sort = this.sort;
+    });
+  }
+
+  getGroups() {
+    this.httpService.get<ResponseBase<GetGroupsResponse[]>>('administrator/getGroups').subscribe(response => {
+      if (response.statusCode == StatusCode.Fail) {
+        this.snackBarService.showSnackBar('請求錯誤');
+        return;
+      }
+
+      this.groups = response.entries!;
+    });
   }
 
   /** Announce the change in sort state for assistive technology. */
@@ -36,22 +74,3 @@ export class AdministratorListComponent implements OnInit, AfterViewInit {
     }
   }
 }
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
-const ELEMENT_DATA: PeriodicElement[] = [
-  { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-  { position: 2, name: 'Helium', weight: 4.0026, symbol: 'He' },
-  { position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li' },
-  { position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be' },
-  { position: 5, name: 'Boron', weight: 10.811, symbol: 'B' },
-  { position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C' },
-  { position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N' },
-  { position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O' },
-  { position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F' },
-  { position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne' },
-];

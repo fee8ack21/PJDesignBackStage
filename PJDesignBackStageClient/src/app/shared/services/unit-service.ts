@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ResponseBase } from '../models/bases';
-import { StatusCode, UnitID, UnitType } from '../models/enums';
+import { StatusCode, TemplateType, UnitID } from '../models/enums';
 import { GetUnitsResponse } from '../models/get-units';
 import { HttpService } from './http.service';
 @Injectable()
@@ -37,7 +37,7 @@ export class UnitService {
         return;
       }
 
-      if (unit.type == UnitType.固定單元) {
+      if (unit.templateType == TemplateType.固定單元) {
         fixedUnits.push(unit)
         return;
       }
@@ -47,7 +47,7 @@ export class UnitService {
 
     while (childUnits.length > 0) {
       childUnits.forEach((cUnit, i) => {
-        if (cUnit.type == UnitType.固定單元) {
+        if (cUnit.templateType == TemplateType.固定單元) {
           fixedUnits.forEach(pUnit => {
             if (pUnit.id == cUnit.parent) {
 

@@ -24,9 +24,13 @@ public partial class PjdesignContext : DbContext
 
     public virtual DbSet<TblCategoryMapping> TblCategoryMappings { get; set; }
 
+    public virtual DbSet<TblContact> TblContacts { get; set; }
+
     public virtual DbSet<TblGroup> TblGroups { get; set; }
 
     public virtual DbSet<TblGroupUnit> TblGroupUnits { get; set; }
+
+    public virtual DbSet<TblMailQueue> TblMailQueues { get; set; }
 
     public virtual DbSet<TblPortfolioAfter> TblPortfolioAfters { get; set; }
 
@@ -35,6 +39,8 @@ public partial class PjdesignContext : DbContext
     public virtual DbSet<TblPortfolioPhotoAfter> TblPortfolioPhotoAfters { get; set; }
 
     public virtual DbSet<TblPortfolioPhotoBefore> TblPortfolioPhotoBefores { get; set; }
+
+    public virtual DbSet<TblType> TblTypes { get; set; }
 
     public virtual DbSet<TblUnit> TblUnits { get; set; }
 
@@ -135,6 +141,15 @@ public partial class PjdesignContext : DbContext
                 .HasColumnName("cUnitId");
         });
 
+        modelBuilder.Entity<TblContact>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("tblContact");
+
+            entity.Property(e => e.CId).HasColumnName("cId");
+        });
+
         modelBuilder.Entity<TblGroup>(entity =>
         {
             entity
@@ -163,6 +178,15 @@ public partial class PjdesignContext : DbContext
                 .HasComment("操作權限: 0.CRUD")
                 .HasColumnName("cRightType");
             entity.Property(e => e.CUnitId).HasColumnName("cUnitId");
+        });
+
+        modelBuilder.Entity<TblMailQueue>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("tblMailQueue");
+
+            entity.Property(e => e.CId).HasColumnName("cId");
         });
 
         modelBuilder.Entity<TblPortfolioAfter>(entity =>
@@ -204,6 +228,9 @@ public partial class PjdesignContext : DbContext
                 .HasComment("作品日期")
                 .HasColumnType("date")
                 .HasColumnName("cDate");
+            entity.Property(e => e.CEditAdministratorId)
+                .HasComment("編輯人員ID")
+                .HasColumnName("cEditAdministratorId");
             entity.Property(e => e.CName)
                 .HasMaxLength(50)
                 .HasComment("名稱")
@@ -211,6 +238,12 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CNote)
                 .HasMaxLength(200)
                 .HasColumnName("cNote");
+            entity.Property(e => e.CReviewAdministratorId)
+                .HasComment("審核人員ID")
+                .HasColumnName("cReviewAdministratorId");
+            entity.Property(e => e.CStatus)
+                .HasComment("0.暫存 1.審核中 2.駁回")
+                .HasColumnName("cStatus");
         });
 
         modelBuilder.Entity<TblPortfolioPhotoAfter>(entity =>
@@ -249,10 +282,13 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CId)
                 .HasComment("流水號")
                 .HasColumnName("cId");
-            entity.Property(e => e.CName)
+            entity.Property(e => e.CContentHash)
+                .HasMaxLength(200)
+                .HasColumnName("cContentHash");
+            entity.Property(e => e.CFilename)
                 .HasMaxLength(200)
                 .HasComment("圖片檔案名稱")
-                .HasColumnName("cName");
+                .HasColumnName("cFilename");
             entity.Property(e => e.CPath)
                 .HasMaxLength(200)
                 .HasComment("圖片檔案路徑")
@@ -260,6 +296,20 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CPortfolioId)
                 .HasComment("作品集ID")
                 .HasColumnName("cPortfolioId");
+        });
+
+        modelBuilder.Entity<TblType>(entity =>
+        {
+            entity.HasKey(e => e.CId);
+
+            entity.ToTable("tblType");
+
+            entity.Property(e => e.CId)
+                .ValueGeneratedNever()
+                .HasColumnName("cId");
+            entity.Property(e => e.CName)
+                .HasMaxLength(50)
+                .HasColumnName("cName");
         });
 
         modelBuilder.Entity<TblUnit>(entity =>
@@ -271,17 +321,21 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CId)
                 .HasComment("流水號")
                 .HasColumnName("cId");
+            entity.Property(e => e.CBackStageUrl)
+                .HasMaxLength(200)
+                .HasComment("單元路徑")
+                .HasColumnName("cBackStageUrl");
             entity.Property(e => e.CCreateDt)
                 .HasDefaultValueSql("(getdate())")
                 .HasComment("創建時間")
                 .HasColumnType("datetime")
                 .HasColumnName("cCreateDt");
+            entity.Property(e => e.CFrontStageUrl)
+                .HasMaxLength(200)
+                .HasColumnName("cFrontStageUrl");
             entity.Property(e => e.CIsAnotherWindow)
                 .HasComment("是否另開視窗")
                 .HasColumnName("cIsAnotherWindow");
-            entity.Property(e => e.CIsBackStage)
-                .HasComment("是否為後台單元")
-                .HasColumnName("cIsBackStage");
             entity.Property(e => e.CIsEnabled)
                 .IsRequired()
                 .HasDefaultValueSql("((1))")
@@ -297,13 +351,14 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CSettings)
                 .HasComment("單元半結構化資料")
                 .HasColumnName("cSettings");
-            entity.Property(e => e.CType)
+            entity.Property(e => e.CSort).HasColumnName("cSort");
+            entity.Property(e => e.CStageType)
+                .HasDefaultValueSql("((2))")
+                .HasComment("0.前後台 1.僅前台 2.僅後台")
+                .HasColumnName("cStageType");
+            entity.Property(e => e.CTemplateType)
                 .HasComment("模板類別: -1.固定單元 0.無 1.模板一 2.模板二")
-                .HasColumnName("cType");
-            entity.Property(e => e.CUrl)
-                .HasMaxLength(50)
-                .HasComment("單元路徑")
-                .HasColumnName("cUrl");
+                .HasColumnName("cTemplateType");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -9,6 +9,6 @@ namespace App.BLL
 {
     public interface IAuthService
     {
-        Task<ResponseBase<string>> Login(AuthLoginRequest request);
+        Task<ResponseBase<AuthLoginResponse>> Login(AuthLoginRequest request);
     }
 }

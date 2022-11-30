@@ -31,15 +31,21 @@ export enum UnitID {
   關於我們 = 13,
 }
 
-export enum UnitType {
+export enum TemplateType {
   固定單元 = -1,
   無 = 0,
   模板一 = 1,
   模板二 = 2,
 }
 
+export enum StageType {
+  前後台 = 0,
+  前台 = 1,
+  後台 = 2,
+}
+
 export enum Right {
-  CRUD = 1,
+  C_R_U_D = 1,
   C = 2,
   R = 3,
   U = 4,
