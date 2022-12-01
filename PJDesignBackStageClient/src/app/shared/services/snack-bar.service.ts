@@ -10,6 +10,7 @@ export class SnackBarService {
 
   showSnackBar(text: string) {
     this.snackBar.open(text, '關閉', {
+      duration: 2000,
       horizontalPosition: 'right',
       verticalPosition: 'top',
     });
