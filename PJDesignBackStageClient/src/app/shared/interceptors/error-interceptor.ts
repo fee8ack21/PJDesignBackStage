@@ -18,10 +18,10 @@ export class ErrorInterceptor implements HttpInterceptor {
           let errorMessage = '';
 
           if (error.error instanceof ErrorEvent) {
-            console.log('This is client side error');
+            // client side
             errorMessage = `Error: ${error.error.message}`;
           } else {
-            console.log('This is server side error');
+            // server side
             errorMessage = `Error Code: ${error.status},  Message: ${error.message}`;
           }
 

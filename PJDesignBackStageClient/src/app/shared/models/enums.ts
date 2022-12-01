@@ -3,9 +3,9 @@ export enum FormControlErrorType {
 }
 
 export enum PageStatus {
-  新增 = 1,
-  編輯 = 2,
-  審核 = 3,
+  Create = 1,
+  Edit = 2,
+  Review = 3,
 }
 
 export enum StatusCode {
@@ -50,4 +50,10 @@ export enum Right {
   R = 3,
   U = 4,
   D = 5
+}
+
+export enum EnabledOptions {
+  全部 = -1,
+  啟用 = 1,
+  停用 = 0
 }

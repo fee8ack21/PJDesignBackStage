@@ -120,7 +120,6 @@ export class UnitListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(res => {
       if (typeof res == undefined) { return; }
-      console.log(res)
     });
   }
 }

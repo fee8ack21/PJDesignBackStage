@@ -1,4 +1,5 @@
 ﻿using App.DAL.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace App.DAL.Repositories
         IGroupUnitRightRepository GroupUnitRight { get; }
         IRightRepository Right { get; }
 
+        IDbContextTransaction CreateTransaction();
         void Save();
         Task SaveAsync();
     }

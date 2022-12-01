@@ -1,4 +1,5 @@
 ﻿using App.DAL.Contexts;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,6 +98,11 @@ namespace App.DAL.Repositories
 
                 return _right;
             }
+        }
+
+        public IDbContextTransaction CreateTransaction()
+        {
+            return _context.Database.BeginTransaction();
         }
 
         public void Save()

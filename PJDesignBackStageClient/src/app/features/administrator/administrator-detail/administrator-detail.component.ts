@@ -3,11 +3,12 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { StatusCode } from 'src/app/shared/models/enums';
+import { PageStatus, StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
 import { CreateOrUpdateAdministratorRequest } from '../feature-shared/models/create-or-update-administrator';
+import { GetAdministratorByIdResponse } from '../feature-shared/models/get-administrator-by-id';
 import { GetGroupsResponse } from '../feature-shared/models/get-groups';
 
 @Component({
@@ -31,6 +32,21 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
   ngOnInit(): void {
     this.initForm();
     this.getGroups();
+    this.getAdministratorById();
+  }
+
+  getAdministratorById() {
+    if (this.pageStatus == PageStatus.Create || this.id == null) {
+      return;
+    }
+    this.httpService.get<ResponseBase<GetAdministratorByIdResponse>>(`administrator/GetAdministratorById?id=${this.id}`).subscribe(response => {
+      if (response.statusCode == StatusCode.Fail) {
+        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+        return;
+      }
+
+      this.updateForm(response.entries!);
+    });
   }
 
   initForm() {
@@ -38,10 +54,14 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
       id: new FormControl(null),
       account: new FormControl(null, [Validators.required]),
       name: new FormControl(null, [Validators.required]),
-      password: new FormControl(null, [Validators.required]),
+      password: new FormControl(null, this.pageStatus == PageStatus.Create ? [Validators.required] : null),
       groupId: new FormControl(null, [Validators.required]),
       isEnabled: new FormControl(null, [Validators.required]),
     });
+  }
+
+  updateForm(data: GetAdministratorByIdResponse) {
+    this.administratorForm.patchValue({ ...data });
   }
 
   getGroups() {

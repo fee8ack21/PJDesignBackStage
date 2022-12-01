@@ -35,20 +35,44 @@ namespace App.PL.Controllers
             return await _service.GetGroups(); ;
         }
 
-        [HttpPost]
-        [Route("CreateGroup")]
-        [JWTFilter]
-        public async Task<ResponseBase<CreateGroupResponse>> CreateGroup(CreateGroupRequest request)
-        {
-            return await _service.CreateGroup(request);
-        }
-
         [HttpGet]
         [Route("GetRights")]
         [JWTFilter]
         public async Task<ResponseBase<List<GetRightsResponse>>> GetRights()
         {
             return await _service.GetRights();
+        }
+
+        [HttpPost]
+        [Route("CreateOrUpdateAdministrator")]
+        [JWTFilter]
+        public async Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request)
+        {
+            return await _service.CreateOrUpdateAdministrator(request);
+        }
+
+        [HttpGet]
+        [Route("GetAdministratorById")]
+        [JWTFilter]
+        public async Task<ResponseBase<GetAdministratorByIdResponse>> GetAdministratorById(int id)
+        {
+            return await _service.GetAdministratorById(id);
+        }
+
+        [HttpPost]
+        [Route("CreateOrUpdateGroup")]
+        [JWTFilter]
+        public async Task<ResponseBase<string>> CreateOrUpdateGroup(CreateOrUpdateGroupRequest request)
+        {
+            return await _service.CreateOrUpdateGroup(request);
+        }
+
+        [HttpPost]
+        [Route("GetUnitRightsByGroupId")]
+        [JWTFilter]
+        public async Task<ResponseBase<List<GetUnitRightsByGroupIdResponse>>> GetUnitRightsByGroupId(GetUnitRightsByGroupIdRequest request)
+        {
+            return await _service.GetUnitRightsByGroupId(request);
         }
     }
 }

@@ -7,7 +7,7 @@
         <div class="pt-1">
           <form [formGroup]="administratorForm" (ngSubmit)="onSubmit()">
             <div class="d-flex justify-space-between py-1">
-              <input matInput formControlName="id" name="id" [value]="null" type="hidden">
+              <input formControlName="id" name="id" [value]="null" type="hidden">
               <mat-form-field appearance="fill">
                 <mat-label>帳戶</mat-label>
                 <input matInput formControlName="account" name="account" readonly
@@ -27,7 +27,7 @@
                 <mat-label>密碼</mat-label>
                 <input matInput type="password" formControlName="password" name="password" readonly
                   onfocus="this.removeAttribute('readonly');">
-                <mat-error *ngIf="validatorService.isFormControlInvalid(administratorForm, 'password')">
+                <mat-error *ngIf="pageStatus == PageStatus.Create && validatorService.isFormControlInvalid(administratorForm, 'password')">
                   {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
                 </mat-error>
               </mat-form-field>

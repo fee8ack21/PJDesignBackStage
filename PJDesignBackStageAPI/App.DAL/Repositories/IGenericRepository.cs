@@ -13,7 +13,10 @@ namespace App.DAL.Repositories
         IQueryable<T> GetByCondition(Expression<Func<T, bool>> expression);
 
         void Create(T entity);
+        void CreateRange(IEnumerable<T> entities);
         void Update(T entity);
+        void UpdateRange(IEnumerable<T> entities);
         void Delete(T entity);
+        void DeleteRange(IEnumerable<T> entity);
     }
 }

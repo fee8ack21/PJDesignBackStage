@@ -1,23 +1,43 @@
-<h1 mat-dialog-title>新增組別</h1>
-<div mat-dialog-content>
-  <mat-form-field appearance="fill">
-    <mat-label>名稱</mat-label>
-    <input matInput [(ngModel)]="data.name">
-  </mat-form-field>
-  <h1 mat-dialog-title>單元權限</h1>
-  <div class="d-flex flex-wrap">
-    <div class="d-flex w-50" *ngFor="let item of data.units;let i = index;">
-      <mat-form-field appearance="fill" [ngClass]="{'ml-auto-i': i % 2 == 1}" [attr.data-unit-id]="item.id">
-        <mat-label>{{item.name}}</mat-label>
-        <mat-select>
-          <mat-option [value]="-1">無</mat-option>
-          <mat-option *ngFor="let item of data.rights" [value]="item.id">{{item.name}}</mat-option>
-        </mat-select>
-      </mat-form-field>
+<h1 mat-dialog-title>{{data.isEdit ? '編輯' : '新增'}}組別</h1>
+<form [formGroup]="groupForm" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content>
+    <div *ngIf="data.isEdit && (data.groups == null || data.groups.length == 0)">
+      <p class="text-center">目前無可編輯組別</p>
+    </div>
+    <div class="d-flex" *ngIf="!(data.isEdit && (data.groups == null || data.groups.length == 0))">
+      <div class="d-flex w-50" *ngIf="data.isEdit">
+        <mat-form-field appearance="fill">
+          <mat-label>組別</mat-label>
+          <mat-select formControlName="id">
+            <mat-option *ngFor="let item of data.groups" [value]="item.id">{{item.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div [ngClass]="{'ml-auto-i': data.isEdit}">
+        <mat-form-field appearance="fill">
+          <mat-label>名稱</mat-label>
+          <input matInput formControlName="name" name="name">
+          <mat-error *ngIf="validatorService.isFormControlInvalid(groupForm, 'name')">
+            {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <h1 mat-dialog-title>單元權限</h1>
+    <div class="d-flex flex-wrap">
+      <div class="d-flex w-50" *ngFor="let item of data.units;let i = index;">
+        <mat-form-field appearance="fill" [ngClass]="{'ml-auto-i': i % 2 == 1}" [attr.data-unit-id]="item.id">
+          <mat-label>{{item.name}}</mat-label>
+          <mat-select [formControlName]="'unit' + item.id">
+            <mat-option [value]="-1">無</mat-option>
+            <mat-option *ngFor="let item of data.rights" [value]="item.id">{{item.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
     </div>
   </div>
-</div>
-<div mat-dialog-actions class="d-flex justify-center">
-  <button mat-button (click)="onCancelBtnClick()">取消</button>
-  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>確定</button>
-</div>
+  <div mat-dialog-actions class="d-flex justify-center">
+    <button mat-button type="button" (click)="onCancelBtnClick()">取消</button>
+    <button mat-button type="submit" cdkFocusInitial>確定</button>
+  </div>
+</form>

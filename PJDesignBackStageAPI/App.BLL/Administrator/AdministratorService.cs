@@ -1,4 +1,5 @@
-﻿using App.DAL;
+﻿using App.Common;
+using App.DAL;
 using App.DAL.Models;
 using App.DAL.Repositories;
 using App.Enum;
@@ -26,14 +27,21 @@ namespace App.BLL
             var response = new ResponseBase<List<GetAdministratorsResponse>>() { Entries = new List<GetAdministratorsResponse>() };
             try
             {
-                response.Entries = await _repositoryWrapper.Administrator.GetAll().Select(x => new GetAdministratorsResponse()
-                {
-                    Id = x.CId,
-                    Account = x.CAccount,
-                    Name = x.CName,
-                    IsEnabled = x.CIsEnabled,
-                    CreateDt = x.CCreateDt
-                }).ToListAsync();
+                response.Entries = await _repositoryWrapper.Administrator.GetAll()
+                    .Join(_repositoryWrapper.AdministratorGroup.GetAll(), x => x.CId, y => y.CAdministratorId, (x, y) => new
+                    {
+                        x,
+                        y
+                    }).Join(_repositoryWrapper.Group.GetAll(), x => x.y.CGroupId, y => y.CId, (x, y) => new GetAdministratorsResponse
+                    {
+                        Id = x.x.CId,
+                        Account = x.x.CAccount,
+                        Name = x.x.CName,
+                        GroupId = y.CId,
+                        GroupName = y.CName,
+                        IsEnabled = x.x.CIsEnabled,
+                        CreateDt = x.x.CCreateDt
+                    }).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -84,14 +92,96 @@ namespace App.BLL
             return response;
         }
 
-        public async Task<ResponseBase<CreateGroupResponse>> CreateGroup(CreateGroupRequest request)
+        public async Task<ResponseBase<string>> CreateOrUpdateGroup(CreateOrUpdateGroupRequest request)
         {
-            var response = new ResponseBase<CreateGroupResponse>() { Entries = new CreateGroupResponse() };
+            var response = new ResponseBase<string>();
             try
             {
-                var tblGroup = new TblGroup() { CName = request.Name };
-                _repositoryWrapper.Group.Create(tblGroup);
-                await _repositoryWrapper.SaveAsync();
+                using (var transaction = _repositoryWrapper.CreateTransaction())
+                {
+                    if (request.Id == null)
+                    {
+                        if (_repositoryWrapper.Group.GetByCondition(x => x.CName == request.Name).Any())
+                        {
+                            response.StatusCode = StatusCode.Fail;
+                            response.Message = "此組別名稱已存在";
+                            return response;
+                        }
+
+                        var tblGroup = new TblGroup() { CName = request.Name };
+
+                        _repositoryWrapper.Group.Create(tblGroup);
+                        await _repositoryWrapper.SaveAsync();
+
+                        if (request.UnitRights != null)
+                        {
+                            var tblGroupUnitRights = new List<TblGroupUnitRight>();
+
+                            foreach (var unitRight in request.UnitRights)
+                            {
+                                var tblGroupUnitRight = new TblGroupUnitRight() { CGroupId = tblGroup.CId, CRightId = unitRight.RightId, CUnitId = unitRight.UnitId };
+                                tblGroupUnitRights.Add(tblGroupUnitRight);
+                            }
+
+                            _repositoryWrapper.GroupUnitRight.CreateRange(tblGroupUnitRights);
+                            await _repositoryWrapper.SaveAsync();
+                        }
+
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        var tblGroup = await _repositoryWrapper.Group.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
+                        if (tblGroup == null)
+                        {
+                            response.Message = "無此組別";
+                            response.StatusCode = StatusCode.Fail;
+                            return response;
+                        }
+
+                        if (tblGroup.CName != request.Name)
+                        {
+                            if (_repositoryWrapper.Group.GetByCondition(x => x.CName == request.Name).Any())
+                            {
+                                response.StatusCode = StatusCode.Fail;
+                                response.Message = "此組別名稱已存在";
+                                return response;
+                            }
+
+                            tblGroup.CName = request.Name;
+                            _repositoryWrapper.Group.Update(tblGroup);
+                        }
+
+                        if (request.UnitRights != null)
+                        {
+                            var unitIDs = request.UnitRights.Select(x => x.UnitId).ToList();
+
+                            var existedUnitRights = await _repositoryWrapper.GroupUnitRight.GetByCondition(x => x.CGroupId == request.Id).ToListAsync();
+                            var createdUnitRights = new List<TblGroupUnitRight>();
+                            var removedUnitRights = existedUnitRights.Where(x => !unitIDs.Contains(x.CUnitId)).ToList();
+                            var updatedUnitRights = existedUnitRights.Except(removedUnitRights);
+
+                            foreach (var unitRight in request.UnitRights)
+                            {
+                                if (updatedUnitRights.Any(x => x.CUnitId == unitRight.UnitId))
+                                {
+                                    updatedUnitRights.Where(x => x.CUnitId == unitRight.UnitId).FirstOrDefault()!.CRightId = unitRight.RightId;
+                                }
+                                else
+                                {
+                                    createdUnitRights.Add(new TblGroupUnitRight() { CGroupId = (int)request.Id, CUnitId = unitRight.UnitId, CRightId = unitRight.RightId });
+                                }
+                            }
+
+                            _repositoryWrapper.GroupUnitRight.DeleteRange(removedUnitRights);
+                            _repositoryWrapper.GroupUnitRight.UpdateRange(updatedUnitRights);
+                            _repositoryWrapper.GroupUnitRight.CreateRange(createdUnitRights);
+                        }
+
+                        await _repositoryWrapper.SaveAsync();
+                        transaction.Commit();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -109,12 +199,98 @@ namespace App.BLL
             {
                 if (request.Id == null)
                 {
-                    // 新增
+                    if (_repositoryWrapper.Administrator.GetByCondition(x => x.CAccount == request.Account.Trim()).Any())
+                    {
+                        response.Message = "此帳號已被使用";
+                        response.StatusCode = StatusCode.Fail;
+                        return response;
+                    }
+
+                    using (var transaction = _repositoryWrapper.CreateTransaction())
+                    {
+                        var tblAdministrator = new TblAdministrator() { CAccount = request.Account, CPassword = HashHelper.GetPbkdf2Value(request.Password), CName = request.Name, CIsEnabled = request.IsEnabled };
+                        _repositoryWrapper.Administrator.Create(tblAdministrator);
+                        await _repositoryWrapper.SaveAsync();
+
+                        var tblAdministratorGroup = new TblAdministratorGroup() { CAdministratorId = tblAdministrator.CId, CGroupId = request.GroupId };
+                        _repositoryWrapper.AdministratorGroup.Create(tblAdministratorGroup);
+                        await _repositoryWrapper.SaveAsync();
+
+                        transaction.Commit();
+                        return response;
+                    }
                 }
-                else
+
+                var administrator = await _repositoryWrapper.Administrator.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
+                if (administrator == null)
                 {
-                    // 修改
+                    response.Message = "無此帳號";
+                    response.StatusCode = StatusCode.Fail;
+                    return response;
                 }
+
+                administrator.CName = request.Name;
+                administrator.CAccount = request.Account;
+                administrator.CIsEnabled = request.IsEnabled;
+                if (!string.IsNullOrEmpty(request.Password)) { administrator.CPassword = HashHelper.GetPbkdf2Value(request.Password); }
+                _repositoryWrapper.Administrator.Update(administrator);
+
+                var administratorGroup = await _repositoryWrapper.AdministratorGroup.GetByCondition(x => x.CAdministratorId == request.Id).FirstOrDefaultAsync();
+                if (administratorGroup == null)
+                {
+                    response.Message = "請求錯誤";
+                    response.StatusCode = StatusCode.Fail;
+                    return response;
+                }
+
+                administratorGroup.CGroupId = request.GroupId;
+                _repositoryWrapper.AdministratorGroup.Update(administratorGroup);
+
+                await _repositoryWrapper.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseBase<GetAdministratorByIdResponse>> GetAdministratorById(int id)
+        {
+            var response = new ResponseBase<GetAdministratorByIdResponse>() { Entries = new GetAdministratorByIdResponse() };
+            try
+            {
+                response.Entries = await _repositoryWrapper.Administrator.GetByCondition(x => x.CId == id)
+                    .Join(_repositoryWrapper.AdministratorGroup.GetByCondition(y => y.CAdministratorId == id), x => x.CId, y => y.CAdministratorId, (x, y) => new GetAdministratorByIdResponse
+                    {
+                        Id = id,
+                        Account = x.CAccount,
+                        Name = x.CName,
+                        GroupId = y.CGroupId,
+                        IsEnabled = x.CIsEnabled ?? true
+                    }).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseBase<List<GetUnitRightsByGroupIdResponse>>> GetUnitRightsByGroupId(GetUnitRightsByGroupIdRequest request)
+        {
+            var response = new ResponseBase<List<GetUnitRightsByGroupIdResponse>>() { Entries = new List<GetUnitRightsByGroupIdResponse>() };
+            try
+            {
+                response.Entries = await _repositoryWrapper.GroupUnitRight.GetByCondition(x => x.CGroupId == request.Id).Select(x => new GetUnitRightsByGroupIdResponse()
+                {
+                    UnitId = x.CUnitId,
+                    RightId = x.CRightId
+                }).ToListAsync();
             }
             catch (Exception ex)
             {
