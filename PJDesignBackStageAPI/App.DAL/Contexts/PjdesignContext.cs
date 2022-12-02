@@ -42,6 +42,8 @@ public partial class PjdesignContext : DbContext
 
     public virtual DbSet<TblRight> TblRights { get; set; }
 
+    public virtual DbSet<TblSetting> TblSettings { get; set; }
+
     public virtual DbSet<TblType> TblTypes { get; set; }
 
     public virtual DbSet<TblUnit> TblUnits { get; set; }
@@ -311,6 +313,16 @@ public partial class PjdesignContext : DbContext
                 .HasColumnName("cName");
         });
 
+        modelBuilder.Entity<TblSetting>(entity =>
+        {
+            entity.HasKey(e => e.CId);
+
+            entity.ToTable("tblSetting");
+
+            entity.Property(e => e.CId).HasColumnName("cId");
+            entity.Property(e => e.CContent).HasColumnName("cContent");
+        });
+
         modelBuilder.Entity<TblType>(entity =>
         {
             entity.HasKey(e => e.CId);
@@ -361,9 +373,9 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CParent)
                 .HasComment("母單元")
                 .HasColumnName("cParent");
-            entity.Property(e => e.CSettings)
+            entity.Property(e => e.CSettingId)
                 .HasComment("單元半結構化資料")
-                .HasColumnName("cSettings");
+                .HasColumnName("cSettingId");
             entity.Property(e => e.CSort).HasColumnName("cSort");
             entity.Property(e => e.CStageType)
                 .HasDefaultValueSql("((2))")

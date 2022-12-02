@@ -29,4 +29,8 @@ export class AuthService {
   setAdministratorName(value: string) {
     localStorage.setItem(this.administratorItemName, value);
   }
+
+  removeAdministratorName() {
+    localStorage.removeItem(this.administratorItemName);
+  }
 }

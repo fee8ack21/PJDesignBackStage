@@ -19,6 +19,8 @@ import { ErrorInterceptor } from './shared/interceptors/error-interceptor';
 import { SnackBarService } from './shared/services/snack-bar.service';
 import { UnitService } from './shared/services/unit-service';
 import { AuthGuard } from './shared/guards/auth-guard';
+import { ProgressBarService } from './shared/services/progress-bar.service';
+import { FooterModule } from './features/footer/footer.module';
 
 @NgModule({
   declarations: [
@@ -35,6 +37,7 @@ import { AuthGuard } from './shared/guards/auth-guard';
     UnitModule,
     ReviewModule,
     PortfolioModule,
+    FooterModule,
   ],
   providers: [
     HttpService,
@@ -43,6 +46,7 @@ import { AuthGuard } from './shared/guards/auth-guard';
     SnackBarService,
     UnitService,
     AuthGuard,
+    ProgressBarService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],

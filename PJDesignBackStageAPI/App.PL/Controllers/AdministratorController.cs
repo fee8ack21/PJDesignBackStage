@@ -48,7 +48,8 @@ namespace App.PL.Controllers
         [JWTFilter]
         public async Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request)
         {
-            return await _service.CreateOrUpdateAdministrator(request);
+            var payload = HttpContext.Items["jwtPayload"] as JWTPayload;
+            return await _service.CreateOrUpdateAdministrator(request, payload);
         }
 
         [HttpGet]

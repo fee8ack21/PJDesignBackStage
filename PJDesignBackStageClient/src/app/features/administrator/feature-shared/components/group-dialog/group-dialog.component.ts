@@ -16,6 +16,7 @@ import { GroupDialogData } from '../../models/group-dialog-data';
   styleUrls: ['./group-dialog.component.scss']
 })
 export class GroupDialogComponent implements OnInit {
+  readonly rightDefaultId = -1;
   groupForm: FormGroup;
 
   public get FormControlErrorType(): typeof FormControlErrorType {
@@ -32,7 +33,7 @@ export class GroupDialogComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.initFirstGroupData();
-    this.handleGroupSelectChange();
+    this.onGroupSelectChange();
   }
 
   initForm() {
@@ -45,7 +46,7 @@ export class GroupDialogComponent implements OnInit {
     groupData.name = new FormControl(data.name, [Validators.required]);
 
     data.units.forEach(unit => {
-      groupData['unit' + unit.id] = new FormControl(-1);
+      groupData['unit' + unit.id] = new FormControl(this.rightDefaultId);
     })
 
     return groupData;
@@ -55,14 +56,15 @@ export class GroupDialogComponent implements OnInit {
     if (!this.data.isEdit) { return; }
     if (this.data?.groups == null || this.data.groups.length == 0) { return; }
 
-    const unitRightsResponse = await this.getGroupUnitRightById(this.data.groups[0].id);
+    const unitRightsResponse = await this.getGroupUnitRightByIdPromise(this.data.groups[0].id);
+
     if (unitRightsResponse?.statusCode == StatusCode.Fail) { return; }
     if (unitRightsResponse.entries!.length == 0) { return; }
 
     this.updateUnitRights(unitRightsResponse.entries);
   }
 
-  getGroupUnitRightById(id: number) {
+  getGroupUnitRightByIdPromise(id: number) {
     let request = new GetUnitRightsByGroupIdRequest();
     request.id = id;
 
@@ -71,21 +73,23 @@ export class GroupDialogComponent implements OnInit {
 
   async updateUnitRights(unitRights?: GetUnitRightsByGroupIdResponse[]) {
     let patchValues: any = {}
+
     this.data.units.forEach(unit => {
       const key = 'unit' + unit.id;
-      patchValues[key] = unitRights?.find(unitRight => unitRight.unitId == unit.id)?.rightId ?? -1;
+      patchValues[key] = unitRights?.find(unitRight => unitRight.unitId == unit.id)?.rightId ?? this.rightDefaultId;
     })
 
     this.groupForm.patchValue(patchValues);
   }
 
-  handleGroupSelectChange() {
+  onGroupSelectChange() {
     if (!this.data.isEdit) { return; }
 
     this.groupForm.get('id')?.valueChanges.subscribe(async value => {
       this.groupForm.patchValue({ name: this.data?.groups?.find(x => x.id == value)?.name })
 
-      const unitRightsResponse = await this.getGroupUnitRightById(value);
+      const unitRightsResponse = await this.getGroupUnitRightByIdPromise(value);
+
       if (unitRightsResponse?.statusCode == StatusCode.Fail) { return; }
 
       this.updateUnitRights(unitRightsResponse.entries);
@@ -108,7 +112,7 @@ export class GroupDialogComponent implements OnInit {
       const unitId = parseInt(key.replace('unit', ""));
       const rightId = this.groupForm.value[key];
 
-      if (rightId == -1) { continue; }
+      if (rightId == this.rightDefaultId) { continue; }
 
       let temp = new UnitRight();
       temp.unitId = unitId;

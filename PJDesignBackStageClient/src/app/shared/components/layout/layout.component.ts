@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ResponseBase } from '../../models/bases';
 import { GetBackStageUnitsByGroupIdResponse } from '../../models/get-back-stage-units-by-group-id';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
+import { ProgressBarService } from '../../services/progress-bar.service';
 import { UnitService } from '../../services/unit-service';
 
 @Component({
@@ -17,15 +17,19 @@ export class LayoutComponent implements OnInit {
   fixedUnits: GetBackStageUnitsByGroupIdResponse[] = [];
   customUnits: GetBackStageUnitsByGroupIdResponse[] = [];
 
+  isShowProgressBar = false;
+
   constructor(
     private httpService: HttpService,
     public unitService: UnitService,
     public router: Router,
-    private authSerivce: AuthService) { }
+    private authSerivce: AuthService,
+    private progressBarService: ProgressBarService) { }
 
   ngOnInit(): void {
     this.getAdministratorName();
     this.getUnits();
+    this.listenProgrssBarService();
   }
 
   getAdministratorName() {
@@ -34,16 +38,21 @@ export class LayoutComponent implements OnInit {
 
   async getUnits() {
     let temp = await this.unitService.getBackStageUnitsByGroupId();
-    this.fixedUnits = temp[0];
-    this.customUnits = temp[1];
+    this.fixedUnits = temp.fixedUnits;
+    this.customUnits = temp.customUnits;
   }
 
   logout(e: any) {
-    if (e != undefined) {
-      e.preventDefault();
-    }
+    if (e != undefined) { e.preventDefault(); }
 
     this.authSerivce.removeToken();
+    this.authSerivce.removeAdministratorName();
     this.router.navigate(['/']);
+  }
+
+  listenProgrssBarService() {
+    this.progressBarService.isShow.subscribe(response => {
+      this.isShowProgressBar = response;
+    })
   }
 }

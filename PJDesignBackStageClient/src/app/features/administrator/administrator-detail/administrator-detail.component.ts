@@ -35,6 +35,17 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
     this.getAdministratorById();
   }
 
+  getGroups() {
+    this.httpService.get<ResponseBase<GetGroupsResponse[]>>('administrator/getGroups').subscribe(response => {
+      if (response.statusCode == StatusCode.Fail) {
+        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+        return;
+      }
+
+      this.groups = response.entries!;
+    });
+  }
+
   getAdministratorById() {
     if (this.pageStatus == PageStatus.Create || this.id == null) {
       return;
@@ -62,17 +73,6 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
 
   updateForm(data: GetAdministratorByIdResponse) {
     this.administratorForm.patchValue({ ...data });
-  }
-
-  getGroups() {
-    this.httpService.get<ResponseBase<GetGroupsResponse[]>>('administrator/getGroups').subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
-
-      this.groups = response.entries!;
-    });
   }
 
   onSubmit() {

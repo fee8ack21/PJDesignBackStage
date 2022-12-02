@@ -25,10 +25,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { SafeUrlPipe } from '../pipes/safe-url.pipe';
 
 @NgModule({
   declarations: [
-    LayoutComponent
+    LayoutComponent,
+    SafeUrlPipe,
   ],
   imports: [
     CommonModule,
@@ -56,7 +58,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatDividerModule,
     MatSnackBarModule,
     MatProgressBarModule,
-    MatExpansionModule
+    MatExpansionModule,
   ],
   exports: [
     CommonModule,
@@ -84,7 +86,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatPaginatorModule,
     MatSidenavModule,
     MatProgressBarModule,
-    MatIconModule
+    MatIconModule,
+    SafeUrlPipe
   ]
 })
 

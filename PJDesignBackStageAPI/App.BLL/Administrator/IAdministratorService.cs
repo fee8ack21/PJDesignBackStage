@@ -13,7 +13,7 @@ namespace App.BLL
         Task<ResponseBase<List<GetAdministratorsResponse>>> GetAdministrators();
         Task<ResponseBase<List<GetGroupsResponse>>> GetGroups();
         Task<ResponseBase<List<GetRightsResponse>>> GetRights();
-        Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request);
+        Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request, JWTPayload? payload);
         Task<ResponseBase<GetAdministratorByIdResponse>> GetAdministratorById(int id);
         Task<ResponseBase<string>> CreateOrUpdateGroup(CreateOrUpdateGroupRequest request);
         Task<ResponseBase<List<GetUnitRightsByGroupIdResponse>>> GetUnitRightsByGroupId(GetUnitRightsByGroupIdRequest request);

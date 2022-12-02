@@ -12,18 +12,29 @@ export class UnitService {
 
   constructor(private httpService: HttpService) { }
 
-  async getBackStageUnitsByGroupId() {
-    if (this._units != undefined) { return [this._fixedUnits, this._customUnits] };
+  async getBackStageUnitsByGroupId(): Promise<{ fixedUnits: GetBackStageUnitsByGroupIdResponse[], customUnits: GetBackStageUnitsByGroupIdResponse[] }> {
+    if (this._units != undefined) { return { fixedUnits: this._fixedUnits, customUnits: this._customUnits } };
 
     const response = await this.httpService.get<ResponseBase<GetBackStageUnitsByGroupIdResponse[]>>('unit/getBackStageUnitsByGroupId').toPromise();
     if (response.statusCode == StatusCode.Success) {
       this._units = response.entries!;
       this._setFormattedUnits(response.entries!)
 
-      return [this._fixedUnits, this._customUnits];
+      return { fixedUnits: this._fixedUnits, customUnits: this._customUnits };
     }
 
-    return [[], []];
+    return { fixedUnits: [], customUnits: [] };
+  }
+
+  getCurrentUnit() {
+    if (this._units == null || this._units.length == 0) { return -1; }
+
+    const path = window.location.pathname;
+    const filtededUnits = this._units.filter(x => x.url == path);
+
+    if (filtededUnits.length == 0) { return -1; }
+
+    return filtededUnits[0].id;
   }
 
   private _setFormattedUnits(units: GetBackStageUnitsByGroupIdResponse[]) {

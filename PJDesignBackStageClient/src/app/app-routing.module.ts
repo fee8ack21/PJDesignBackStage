@@ -16,6 +16,9 @@ const routes: Routes = [
   },
   {
     path: 'portfolio', loadChildren: () => import('./features/portfolio/portfolio.module').then(m => m.PortfolioModule),
+  },
+  {
+    path: 'footer', loadChildren: () => import('./features/footer/footer.module').then(m => m.FooterModule),
   }
 ];
 

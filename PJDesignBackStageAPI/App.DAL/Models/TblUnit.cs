@@ -35,7 +35,7 @@ public partial class TblUnit
     /// <summary>
     /// 單元半結構化資料
     /// </summary>
-    public string? CSettings { get; set; }
+    public int? CSettingId { get; set; }
 
     /// <summary>
     /// 是否啟用

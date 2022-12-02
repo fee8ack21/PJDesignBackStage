@@ -16,6 +16,7 @@ namespace App.DAL.Repositories
         IGroupRepository Group { get; }
         IGroupUnitRightRepository GroupUnitRight { get; }
         IRightRepository Right { get; }
+        ISettingRepository Setting { get; }
 
         IDbContextTransaction CreateTransaction();
         void Save();

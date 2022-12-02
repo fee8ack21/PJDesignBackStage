@@ -45,9 +45,8 @@
         </div>
         <mat-divider></mat-divider>
         <div class="pt-1">
-          <p *ngIf="dataSource?.data == null || dataSource.data.length == 0" class="py-1 text-center">查詢範圍無內容</p>
-          <table *ngIf="dataSource?.data != null && dataSource.data.length > 0" mat-table [dataSource]="dataSource"
-            matSort (matSortChange)="announceSortChange($event)" class="w-100 mat-elevation-z8">
+          <table mat-table (matSortChange)="tableSortCb($event)" [dataSource]="dataSource" matSort
+            class="w-100 mat-elevation-z8">
             <ng-container matColumnDef="id">
               <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by number">
                 ID
@@ -97,8 +96,10 @@
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell text-center" colspan="7">查詢範圍內無內容</td>
+            </tr>
           </table>
-
           <mat-paginator [length]="dataSource != null ? dataSource.data.length : 0" [pageSize]="10"
             [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
           </mat-paginator>

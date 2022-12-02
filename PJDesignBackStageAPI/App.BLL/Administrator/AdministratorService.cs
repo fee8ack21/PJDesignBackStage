@@ -103,9 +103,7 @@ namespace App.BLL
                     {
                         if (_repositoryWrapper.Group.GetByCondition(x => x.CName == request.Name).Any())
                         {
-                            response.StatusCode = StatusCode.Fail;
-                            response.Message = "此組別名稱已存在";
-                            return response;
+                            throw new Exception("此組別名稱已存在");
                         }
 
                         var tblGroup = new TblGroup() { CName = request.Name };
@@ -134,18 +132,14 @@ namespace App.BLL
                         var tblGroup = await _repositoryWrapper.Group.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
                         if (tblGroup == null)
                         {
-                            response.Message = "無此組別";
-                            response.StatusCode = StatusCode.Fail;
-                            return response;
+                            throw new Exception("無此組別");
                         }
 
                         if (tblGroup.CName != request.Name)
                         {
                             if (_repositoryWrapper.Group.GetByCondition(x => x.CName == request.Name).Any())
                             {
-                                response.StatusCode = StatusCode.Fail;
-                                response.Message = "此組別名稱已存在";
-                                return response;
+                                throw new Exception("此組別名稱已存在");
                             }
 
                             tblGroup.CName = request.Name;
@@ -192,7 +186,7 @@ namespace App.BLL
             return response;
         }
 
-        public async Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request)
+        public async Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request, JWTPayload? payload)
         {
             var response = new ResponseBase<string>();
             try
@@ -201,9 +195,7 @@ namespace App.BLL
                 {
                     if (_repositoryWrapper.Administrator.GetByCondition(x => x.CAccount == request.Account.Trim()).Any())
                     {
-                        response.Message = "此帳號已被使用";
-                        response.StatusCode = StatusCode.Fail;
-                        return response;
+                        throw new Exception("此帳號已被使用");
                     }
 
                     using (var transaction = _repositoryWrapper.CreateTransaction())
@@ -224,9 +216,11 @@ namespace App.BLL
                 var administrator = await _repositoryWrapper.Administrator.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
                 if (administrator == null)
                 {
-                    response.Message = "無此帳號";
-                    response.StatusCode = StatusCode.Fail;
-                    return response;
+                    throw new Exception("無此帳號");
+                }
+                if (request.Id == payload?.Id && !request.IsEnabled)
+                {
+                    throw new Exception("無法停用當前帳號");
                 }
 
                 administrator.CName = request.Name;
@@ -238,9 +232,7 @@ namespace App.BLL
                 var administratorGroup = await _repositoryWrapper.AdministratorGroup.GetByCondition(x => x.CAdministratorId == request.Id).FirstOrDefaultAsync();
                 if (administratorGroup == null)
                 {
-                    response.Message = "請求錯誤";
-                    response.StatusCode = StatusCode.Fail;
-                    return response;
+                    throw new Exception("請求錯誤");
                 }
 
                 administratorGroup.CGroupId = request.GroupId;
