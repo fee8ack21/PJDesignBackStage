@@ -52,8 +52,24 @@ export enum Right {
   D = 5
 }
 
+export enum Status {
+  Disabled = 0,
+  Enabled = 1,
+  Review = 2,
+  Reject = 3,
+  Approve = 4
+}
+
 export enum EnabledOptions {
   全部 = -1,
   啟用 = 1,
   停用 = 0
+}
+
+export enum StatusOptions {
+  全部 = -1,
+  停用 = 0,
+  啟用 = 1,
+  審核中 = 2,
+  駁回 = 3,
 }

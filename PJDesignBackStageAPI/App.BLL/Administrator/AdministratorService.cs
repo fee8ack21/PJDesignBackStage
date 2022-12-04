@@ -225,8 +225,19 @@ namespace App.BLL
 
                 administrator.CName = request.Name;
                 administrator.CAccount = request.Account;
+
+                if (administrator.CIsEnabled == false && administrator.CLoginAttemptCount >= 3 && request.IsEnabled)
+                {
+                    administrator.CLoginAttemptCount = 0;
+                }
+                
                 administrator.CIsEnabled = request.IsEnabled;
-                if (!string.IsNullOrEmpty(request.Password)) { administrator.CPassword = HashHelper.GetPbkdf2Value(request.Password); }
+
+                if (!string.IsNullOrEmpty(request.Password))
+                {
+                    administrator.CPassword = HashHelper.GetPbkdf2Value(request.Password);
+                }
+
                 _repositoryWrapper.Administrator.Update(administrator);
 
                 var administratorGroup = await _repositoryWrapper.AdministratorGroup.GetByCondition(x => x.CAdministratorId == request.Id).FirstOrDefaultAsync();

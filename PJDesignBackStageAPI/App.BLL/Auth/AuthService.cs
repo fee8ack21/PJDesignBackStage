@@ -22,42 +22,50 @@ namespace App.BLL
 
             try
             {
-                var query = _repositoryWrapper.Administrator
-                    .GetByCondition(x => x.CAccount == request.Account)
-                    .Join(_repositoryWrapper.AdministratorGroup.GetAll(), x => x.CId, y => y.CAdministratorId, (x, y) => new
-                    {
-                        Id = x.CId,
-                        Name = x.CName,
-                        Account = x.CAccount,
-                        Password = x.CPassword,
-                        GroupId = y.CGroupId
-                    });
-
-                var administrator = await query.FirstOrDefaultAsync();
+                var administrator = await _repositoryWrapper.Administrator.GetByCondition(x => x.CAccount == request.Account).FirstOrDefaultAsync();
 
                 if (administrator == null)
                 {
-                    response.StatusCode = StatusCode.Fail;
-                    response.Message = "無此用戶!";
+                    throw new Exception("無此用戶");
                 }
-                else
+                if (administrator.CIsEnabled != true)
                 {
-                    var hashedPassword = HashHelper.GetPbkdf2Value(request.Password);
-                    if (hashedPassword != administrator.Password)
-                    {
-                        response.StatusCode = StatusCode.Fail;
-                        response.Message = "密碼錯誤!";
-                    }
-                    else
-                    {
-                        var payload = JWTHelper.CreatePayload(administrator.Id, administrator.Account, administrator.GroupId);
-                        var token = JWTHelper.GetToken(payload);
-
-                        response.Entries.Name = administrator.Name;
-                        response.Entries.Token = token;
-                        response.Message = "登入成功!";
-                    }
+                    throw new Exception("帳號停用中");
                 }
+
+                var hashedPassword = HashHelper.GetPbkdf2Value(request.Password);
+                if (hashedPassword != administrator.CPassword)
+                {
+                    administrator.CLoginAttemptCount += 1;
+
+                    if (administrator.CLoginAttemptCount < 3)
+                    {
+                        _repositoryWrapper.Administrator.Update(administrator);
+                        await _repositoryWrapper.SaveAsync();
+
+                        throw new Exception("密碼錯誤");
+                    }
+
+                    administrator.CIsEnabled = false;
+                    _repositoryWrapper.Administrator.Update(administrator);
+                    await _repositoryWrapper.SaveAsync();
+
+                    throw new Exception("嘗試登入達三次，帳戶停用");
+                }
+
+                var tblAdministratorGroup = await _repositoryWrapper.AdministratorGroup.GetByCondition(x => x.CAdministratorId == administrator.CId).FirstOrDefaultAsync();
+                if (tblAdministratorGroup == null)
+                {
+                    throw new Exception("請求錯誤");
+                }
+
+                var payload = JWTHelper.CreatePayload(administrator.CId, administrator.CAccount, tblAdministratorGroup.CGroupId);
+                var token = JWTHelper.GetToken(payload);
+
+                response.Entries.Id = administrator.CId;
+                response.Entries.Name = administrator.CName;
+                response.Entries.Token = token;
+                response.Message = "登入成功";
             }
             catch (Exception ex)
             {

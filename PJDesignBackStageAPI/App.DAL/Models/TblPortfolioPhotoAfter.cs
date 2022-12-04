@@ -13,7 +13,7 @@ public partial class TblPortfolioPhotoAfter
     /// <summary>
     /// 圖片檔案名稱
     /// </summary>
-    public string CName { get; set; } = null!;
+    public string CFilename { get; set; } = null!;
 
     /// <summary>
     /// 圖片檔案路徑
@@ -28,5 +28,5 @@ public partial class TblPortfolioPhotoAfter
     /// <summary>
     /// 是否啟用
     /// </summary>
-    public bool? CIsEnabled { get; set; }
+    public string CContentHash { get; set; } = null!;
 }

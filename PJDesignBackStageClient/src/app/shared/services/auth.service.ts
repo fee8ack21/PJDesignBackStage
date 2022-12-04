@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 
 export class AuthService {
   private readonly tokenItemName = "PJDesignToken";
-  private readonly administratorItemName = "PJDesignAdministratorName";
+  private readonly administratorItemName = "PJDesignAdministrator";
 
   constructor() { }
 
@@ -22,15 +22,16 @@ export class AuthService {
     localStorage.removeItem(this.tokenItemName);
   }
 
-  getAdministratorName(): string | null {
-    return localStorage.getItem(this.administratorItemName);
+  getAdministrator(): { id: number, name: string } | null {
+    const administratorJSON = localStorage.getItem(this.administratorItemName)
+    return administratorJSON != null ? JSON.parse(administratorJSON) : null;
   }
 
-  setAdministratorName(value: string) {
-    localStorage.setItem(this.administratorItemName, value);
+  setAdministrator(value: { id: number, name: string }) {
+    localStorage.setItem(this.administratorItemName, JSON.stringify(value));
   }
 
-  removeAdministratorName() {
+  removeAdministrator() {
     localStorage.removeItem(this.administratorItemName);
   }
 }

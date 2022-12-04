@@ -28,7 +28,7 @@ public partial class TblPortfolioBefore
     public string? CNote { get; set; }
 
     /// <summary>
-    /// 0.暫存 1.審核中 2.駁回
+    /// 0.停用 1.啟用 2.暫存 3.審核中 4.駁回
     /// </summary>
     public byte CStatus { get; set; }
 
@@ -41,4 +41,8 @@ public partial class TblPortfolioBefore
     /// 審核人員ID
     /// </summary>
     public int CReviewAdministratorId { get; set; }
+
+    public int CAfterId { get; set; }
+
+    public DateTime CEditDt { get; set; }
 }

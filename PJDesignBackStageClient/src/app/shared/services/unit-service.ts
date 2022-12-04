@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { ResponseBase } from '../models/bases';
 import { StatusCode, TemplateType, UnitID } from '../models/enums';
 import { GetBackStageUnitsByGroupIdResponse } from '../models/get-back-stage-units-by-group-id';
@@ -6,6 +7,7 @@ import { HttpService } from './http.service';
 @Injectable()
 
 export class UnitService {
+  isBackStageUnitsInit = new BehaviorSubject<boolean>(false);
   private _units: GetBackStageUnitsByGroupIdResponse[];
   private _fixedUnits: GetBackStageUnitsByGroupIdResponse[] = [];
   private _customUnits: GetBackStageUnitsByGroupIdResponse[] = [];
@@ -20,6 +22,7 @@ export class UnitService {
       this._units = response.entries!;
       this._setFormattedUnits(response.entries!)
 
+      this.isBackStageUnitsInit.next(true);
       return { fixedUnits: this._fixedUnits, customUnits: this._customUnits };
     }
 

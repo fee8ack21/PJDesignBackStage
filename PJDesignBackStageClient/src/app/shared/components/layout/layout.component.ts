@@ -33,7 +33,7 @@ export class LayoutComponent implements OnInit {
   }
 
   getAdministratorName() {
-    this.administratorName = this.authSerivce.getAdministratorName() ?? '';
+    this.administratorName = this.authSerivce.getAdministrator()?.name ?? '';
   }
 
   async getUnits() {
@@ -46,7 +46,7 @@ export class LayoutComponent implements OnInit {
     if (e != undefined) { e.preventDefault(); }
 
     this.authSerivce.removeToken();
-    this.authSerivce.removeAdministratorName();
+    this.authSerivce.removeAdministrator();
     this.router.navigate(['/']);
   }
 

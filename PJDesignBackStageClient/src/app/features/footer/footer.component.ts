@@ -1,13 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSelectionList } from '@angular/material/list';
-import { Router } from '@angular/router';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
+import { ReviewNoteDialogComponent } from 'src/app/shared/components/review-note-dialog/review-note-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { CreateOrUpdateSetting } from 'src/app/shared/models/create-or-update-setting';
-import { StatusCode, UnitID } from 'src/app/shared/models/enums';
+import { Status, StatusCode } from 'src/app/shared/models/enums';
 import { GetSettingByUnitIdResponse } from 'src/app/shared/models/get-setting-by-unit-id';
+import { ReviewNote } from 'src/app/shared/models/review-note';
+import { ReviewNoteDialogData } from 'src/app/shared/models/review-note-dialog-data';
+import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
+import { ProgressBarService } from 'src/app/shared/services/progress-bar.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
@@ -20,10 +25,19 @@ import { FooterSocialIcon, FooterSettings } from './feature-shared/update-footer
   styleUrls: ['./footer.component.scss']
 })
 export class FooterComponent extends ListBaseComponent implements OnInit {
+  administrator: { id: number, name: string } | null;
+  settingEditorId?: number;
+  settingEditorName?: string;
+  settingCreateDt?: Date | null;
+  settingReviewNote: string | null;
+  settingReviewNotes: ReviewNote[] = [];
   unitId: number;
+
   footerForm: FormGroup;
   type2Units: { id: number, name: string, selected: boolean }[] = [];
   socialIcons: FooterSocialIcon[] = [];
+
+  settingStatus?: Status;
 
   @ViewChild('displayUnits') displayUnits: MatSelectionList;
 
@@ -32,40 +46,64 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
     public validatorService: ValidatorService,
     private snackBarService: SnackBarService,
     private unitService: UnitService,
-    private router: Router) {
+    private authService: AuthService,
+    private progressBarService: ProgressBarService,
+    public dialog: MatDialog) {
     super();
   }
 
   ngOnInit(): void {
+    this.setAdministrator();
+    this.listenUnitService();
     this.initForm();
-    this.setUnitId();
-    this.getType2Units();
+  }
+
+  setAdministrator() {
+    this.administrator = this.authService.getAdministrator();
+  }
+
+  listenUnitService() {
+    this.unitService.isBackStageUnitsInit.subscribe(async response => {
+      this.setUnitId();
+      await this.setType2Units();
+      this.getSettingByUnitId();
+    });
   }
 
   setUnitId() {
     this.unitId = this.unitService.getCurrentUnit();
   }
 
-  getType2Units() {
-    this.httpService.get<ResponseBase<GetType2UnitsResponse[]>>('unit/getType2Units').subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
-
+  async setType2Units() {
+    const type2UnitsRespoonse = await this.getType2UnitsPromise();
+    if (type2UnitsRespoonse.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+    } else {
       this.type2Units = [{ id: -1, name: '網站導覽', selected: false }];
-      response.entries?.forEach(item => { this.type2Units.push({ ...item, selected: false }); });
-      this.getFooterSetting();
-
-    });
+      type2UnitsRespoonse.entries?.forEach(item => { this.type2Units.push({ ...item, selected: false }); });
+    }
   }
 
-  getFooterSetting() {
-    this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${UnitID.Footer設定}`).subscribe(response => {
+  getType2UnitsPromise() {
+    return this.httpService.get<ResponseBase<GetType2UnitsResponse[]>>('unit/getType2Units').toPromise();
+  }
+
+  getSettingByUnitId() {
+    if (this.unitId == null || this.unitId == -1) { return }
+
+    this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${this.unitId}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;
       }
+
+      this.settingEditorId = response.entries?.editorId;
+      this.settingEditorName = response.entries?.editorName;
+      this.settingCreateDt = response.entries?.createDt;
+      this.settingStatus = response.entries?.status;
+      this.settingReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
+
+      this.handleFormStatus()
 
       if (response.entries?.content != null) {
         this.updateFooterSetting(response.entries.content as FooterSettings);
@@ -73,8 +111,30 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
     });
   }
 
+  initForm() {
+    this.footerForm = new FormGroup({
+      address: new FormControl(null),
+      phone: new FormControl(null),
+      email: new FormControl(null),
+      fanpage: new FormControl(null),
+    });
+  }
+
+  handleFormStatus() {
+    if (this.isInputDisabled()) {
+      this.footerForm.disable();
+      return;
+    }
+    this.footerForm.enable();
+  }
+
+  isInputDisabled(): boolean {
+    return this.settingStatus == Status.Review || (this.settingStatus == Status.Reject && this.administrator?.id != this.settingEditorId);
+  }
+
   updateFooterSetting(setting: FooterSettings) {
     this.footerForm.patchValue({ address: setting.address, phone: setting.phone, email: setting.email, fanpage: setting.fanpage });
+
     if (setting.isShowMapUnit) { this.type2Units[0].selected = true; }
 
     setting.showedUnits.forEach(showedUnit => {
@@ -86,15 +146,6 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
     })
 
     this.socialIcons = setting.socialIcons;
-  }
-
-  initForm() {
-    this.footerForm = new FormGroup({
-      address: new FormControl(null),
-      phone: new FormControl(null),
-      email: new FormControl(null),
-      fanpage: new FormControl(null),
-    });
   }
 
   getSelectedDisplayUnits() {
@@ -149,22 +200,12 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
     };
   }
 
-  validateFooterSettings() {
-    let isIconFormatCorrect = true;
-    this.socialIcons.forEach(item => {
-      if (item.url == null || item.url.trim().length == 0 || item.image == null || item.image.trim().length == 0) {
-        isIconFormatCorrect = false;
-        return;
-      }
-    })
-
-    if (!isIconFormatCorrect) {
-      this.snackBarService.showSnackBar('請正確填寫圖片欄位');
+  async updateFooterSettings(status = Status.Review) {
+    if (status == Status.Reject && this.isReviewNoteEmpty()) {
+      this.snackBarService.showSnackBar('請填寫備註');
       return;
     }
-  }
 
-  async updateFooterSettings() {
     let settings = new FooterSettings();
     settings = { ... this.footerForm.value };
 
@@ -175,15 +216,42 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
 
 
     let request = new CreateOrUpdateSetting();
-    request.unitId = UnitID.Footer設定;
+    request.unitId = this.unitId;
     request.content = settings;
+    request.status = status;
+
+    if (status == Status.Reject) {
+      let temp = new ReviewNote();
+      temp.Date = new Date();
+      temp.Note = this.settingReviewNote!;
+      temp.Name = this.administrator!.name
+      request.note = temp;
+    }
+
     this.httpService.post<ResponseBase<string>>('unit/createOrUpdateSetting', request).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText)
+        this.snackBarService.showSnackBar(response.message ?? SnackBarService.RequestFailedText)
         return;
       }
 
+      this.getSettingByUnitId();
       this.snackBarService.showSnackBar(SnackBarService.RequestSuccessText);
     })
+  }
+
+  isReviewNoteEmpty(): boolean {
+    return this.settingReviewNote == null || this.settingReviewNote.trim().length == 0;
+  }
+
+  openReviewNoteDialog() {
+    let data = new ReviewNoteDialogData();
+    data.editorName = this.settingEditorName;
+    data.notes = this.settingReviewNotes;
+    data.createDt = this.settingCreateDt;
+
+    this.dialog.open(ReviewNoteDialogComponent, {
+      width: '474px',
+      data: data
+    });
   }
 }

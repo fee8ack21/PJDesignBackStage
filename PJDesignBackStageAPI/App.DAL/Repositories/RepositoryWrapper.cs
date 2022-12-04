@@ -17,7 +17,8 @@ namespace App.DAL.Repositories
         private IGroupRepository? _group;
         private IGroupUnitRightRepository? _groupUnitRight;
         private IRightRepository? _right;
-        private ISettingRepository? _setting;
+        private ISettingBeforeRepository? _settingBefore;
+        private ISettingAfterRepository? _settingAfter;
 
         public RepositoryWrapper(PjdesignContext context)
         {
@@ -101,16 +102,29 @@ namespace App.DAL.Repositories
             }
         }
 
-        public ISettingRepository Setting
+        public ISettingBeforeRepository SettingBefore
         {
             get
             {
-                if (_setting == null)
+                if (_settingBefore == null)
                 {
-                    _setting = new SettingRepository(_context);
+                    _settingBefore = new SettingBeforeRepository(_context);
                 }
 
-                return _setting;
+                return _settingBefore;
+            }
+        }
+
+        public ISettingAfterRepository SettingAfter
+        {
+            get
+            {
+                if (_settingAfter == null)
+                {
+                    _settingAfter = new SettingAfterRepository(_context);
+                }
+
+                return _settingAfter;
             }
         }
 

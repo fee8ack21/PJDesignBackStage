@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace App.DAL.Repositories
 {
-    public class SettingRepository : GenericRepository<TblSetting>, ISettingRepository
+    public class SettingBeforeRepository : GenericRepository<TblSettingBefore>, ISettingBeforeRepository
     {
-        public SettingRepository(PjdesignContext context) : base(context)
+        public SettingBeforeRepository(PjdesignContext context) : base(context)
         {
         }
     }

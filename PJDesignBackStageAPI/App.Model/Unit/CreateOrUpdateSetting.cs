@@ -10,5 +10,14 @@ namespace App.Model
     {
         public int UnitId { get; set; }
         public object? Content { get; set; }
+        public byte Status { get; set; }
+        public SettingNote? Note { get; set; }
+    }
+
+    public class SettingNote
+    {
+        public string Name { get; set; } = null!;
+        public DateTime Date { get; set; }
+        public string Note { get; set; } = null!;
     }
 }

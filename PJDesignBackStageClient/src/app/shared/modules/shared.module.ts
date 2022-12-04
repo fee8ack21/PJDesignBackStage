@@ -26,11 +26,16 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SafeUrlPipe } from '../pipes/safe-url.pipe';
+import { CategoryDialogComponent } from '../components/category-dialog/category-dialog.component';
+import { ReviewNoteDialogComponent } from '../components/review-note-dialog/review-note-dialog.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
     LayoutComponent,
     SafeUrlPipe,
+    CategoryDialogComponent,
+    ReviewNoteDialogComponent
   ],
   imports: [
     CommonModule,
@@ -56,6 +61,7 @@ import { SafeUrlPipe } from '../pipes/safe-url.pipe';
     MatMenuModule,
     MatSidenavModule,
     MatDividerModule,
+    MatProgressSpinnerModule,
     MatSnackBarModule,
     MatProgressBarModule,
     MatExpansionModule,
@@ -71,6 +77,7 @@ import { SafeUrlPipe } from '../pipes/safe-url.pipe';
     MatInputModule,
     MatSelectModule,
     MatCardModule,
+    MatProgressSpinnerModule,
     MatExpansionModule,
     MatSortModule,
     MatButtonModule,

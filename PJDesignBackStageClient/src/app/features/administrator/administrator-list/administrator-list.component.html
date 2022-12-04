@@ -82,7 +82,7 @@
                 狀態
               </th>
               <td mat-cell *matCellDef="let element">
-                {{element.isEnabled ? '啟用' : '停用'}}
+                {{getEnabledOptionName(element.isEnabled)}}
               </td>
             </ng-container>
             <ng-container matColumnDef="tool">

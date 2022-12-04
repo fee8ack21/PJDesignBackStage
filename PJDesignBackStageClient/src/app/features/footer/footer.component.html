@@ -20,7 +20,7 @@
                   <mat-form-field appearance="fill">
                     <mat-label>客服專線</mat-label>
                     <input matInput formControlName="phone" name="phone" readonly
-                      onfocus="this.removeAttribute('readonly');">
+                      onfocus="this.removeAttribute('readonly');" [disabled]="isInputDisabled()">
                     <mat-error *ngIf="validatorService.isFormControlInvalid(footerForm, 'phone')">
                       {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
                     </mat-error>
@@ -28,7 +28,7 @@
                   <mat-form-field appearance="fill">
                     <mat-label>信箱</mat-label>
                     <input matInput formControlName="email" name="email" readonly
-                      onfocus="this.removeAttribute('readonly');">
+                      onfocus="this.removeAttribute('readonly');" [disabled]="isInputDisabled()">
                     <mat-error *ngIf="validatorService.isFormControlInvalid(footerForm, 'email')">
                       {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
                     </mat-error>
@@ -37,7 +37,8 @@
                 <div>
                   <mat-form-field appearance="fill" class="w-100-i" style="max-width:none;">
                     <mat-label>粉絲專業嵌入</mat-label>
-                    <textarea matInput name="fanpage" formControlName="fanpage"></textarea>
+                    <textarea matInput name="fanpage" formControlName="fanpage"
+                      [disabled]="isInputDisabled()"></textarea>
                   </mat-form-field>
                 </div>
               </form>
@@ -54,20 +55,22 @@
                       style="position: relative;">
 
                       <input class="c-input mr-1-i" placeholder="請輸入URL" type="text" [(ngModel)]="socialIcons[i].url"
-                        [name]="'socialIconsUrl' + i">
+                        [name]="'socialIconsUrl' + i" [disabled]="isInputDisabled()">
 
                       <img *ngIf="item.image != null && item.image.length > 0" [src]="item.image | safeUrl"
                         style="position: absolute;top: 6px;left: 50%;transform: translateX(-50%);max-width: 36px;max-height: 36px;object-fit: contain;object-position: center;" />
 
-                      <label class="c-btn ml-auto-i mr-1-i">
-                        <input style="display:none;" type="file" accept="image/*" (change)="onPhotoUpload($event, i)">
+                      <label class="c-btn ml-auto-i mr-1-i" [ngClass]="{'disabled': isInputDisabled()}">
+                        <input style="display:none;" type="file" accept="image/*" (change)="onPhotoUpload($event, i)"
+                          [disabled]="isInputDisabled()">
                         <i class="fa fa-photo"></i> 上傳圖片
                       </label>
-                      <button (click)="removeSocialIcon(i)" type="button" mat-stroked-button color="basic">移除</button>
+                      <button (click)="removeSocialIcon(i)" type="button" mat-stroked-button color="basic"
+                        [disabled]="isInputDisabled()">移除</button>
                     </mat-list-item>
                     <mat-list-item class="my-1-i">
                       <button (click)="addSocialIcon()" type="button" mat-raised-button color="primary"
-                        class="w-100 m-auto">新增</button>
+                        class="w-100 m-auto" [disabled]="isInputDisabled()">新增</button>
                     </mat-list-item>
                   </mat-list>
                 </mat-expansion-panel>
@@ -82,7 +85,8 @@
                     </mat-panel-title>
                   </mat-expansion-panel-header>
                   <mat-selection-list #displayUnits>
-                    <mat-list-option *ngFor="let item of type2Units" [value]="item.id" [selected]="item.selected">
+                    <mat-list-option *ngFor="let item of type2Units" [value]="item.id" [selected]="item.selected"
+                      [disabled]="isInputDisabled()">
                       {{item.name}}
                     </mat-list-option>
                   </mat-selection-list>
@@ -91,8 +95,48 @@
             </div>
           </div>
           <mat-divider></mat-divider>
+
+          <ng-container *ngIf="settingStatus == Status.Review && administrator?.id != settingEditorId">
+            <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;">
+              <mat-label>備註</mat-label>
+              <textarea matInput [(ngModel)]="settingReviewNote"></textarea>
+            </mat-form-field>
+            <mat-divider></mat-divider>
+          </ng-container>
+
           <div class="d-flex justify-center pt-1">
-            <button type="button" mat-raised-button color="primary" (click)="updateFooterSettings()">送出</button>
+            <ng-container *ngIf="settingStatus != Status.Review && settingStatus != Status.Reject">
+              <button type="button" mat-raised-button color="primary"
+                (click)="updateFooterSettings(Status.Review)">送出</button>
+            </ng-container>
+
+            <ng-container *ngIf="settingStatus == Status.Review && administrator?.id == settingEditorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <button type="button" mat-raised-button color="primary" disabled>審核中</button>
+            </ng-container>
+
+            <ng-container *ngIf="settingStatus == Status.Review && administrator?.id != settingEditorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <button type="button" mat-stroked-button color="primary" (click)="updateFooterSettings(Status.Reject)"
+                class="mr-1-i">駁回</button>
+              <button type="button" mat-raised-button color="primary"
+                (click)="updateFooterSettings(Status.Approve)">批准</button>
+            </ng-container>
+
+            <ng-container *ngIf="settingStatus == Status.Reject && administrator?.id == settingEditorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <button type="button" mat-raised-button color="primary"
+                (click)="updateFooterSettings(Status.Review)">駁回待編輯</button>
+            </ng-container>
+
+            <ng-container *ngIf="settingStatus == Status.Reject && administrator?.id != settingEditorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <button type="button" mat-raised-button color="primary" disabled>駁回待編輯</button>
+            </ng-container>
           </div>
         </div>
       </mat-card-content>

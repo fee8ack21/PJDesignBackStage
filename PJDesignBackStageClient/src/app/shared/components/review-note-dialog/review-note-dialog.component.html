@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>備註</h2>
+<mat-dialog-content class="mat-typography">
+  <div class="d-flex justify-space-between">
+    <span>編輯人員: {{data.editorName}}</span>
+    <span>時間: {{data.createDt | date:'yyyy/MM/dd'}}</span>
+  </div>
+
+  <mat-divider class="my-1-i"></mat-divider>
+
+  <ng-container *ngIf="data?.notes != null">
+    <ng-container *ngFor="let item of data.notes; last as isLast">
+      <div class="d-flex justify-space-between">
+        <span>審核人員: {{item.Name}}</span>
+        <span>時間: {{item.Date | date:'yyyy/MM/dd'}}</span>
+      </div>
+      <p>{{item.Note}}</p>
+      <mat-divider *ngIf="!isLast" class="my-1-i"></mat-divider>
+    </ng-container>
+  </ng-container>
+</mat-dialog-content>

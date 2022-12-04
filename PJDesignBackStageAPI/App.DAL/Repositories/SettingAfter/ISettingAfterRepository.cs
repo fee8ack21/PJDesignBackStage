@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace App.DAL.Repositories
 {
-    public interface ISettingRepository : IGenericRepository<TblSetting>
+    public interface ISettingAfterRepository : IGenericRepository<TblSettingAfter>
     {
     }
 }

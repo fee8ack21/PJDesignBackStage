@@ -4,6 +4,7 @@ export class AuthLoginRequest {
 }
 
 export class AuthLoginResponse {
+  id: number;
   name: string;
   token: string;
 }

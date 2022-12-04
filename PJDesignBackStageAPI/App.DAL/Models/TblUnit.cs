@@ -33,11 +33,6 @@ public partial class TblUnit
     public bool CIsAnotherWindow { get; set; }
 
     /// <summary>
-    /// 單元半結構化資料
-    /// </summary>
-    public int? CSettingId { get; set; }
-
-    /// <summary>
     /// 是否啟用
     /// </summary>
     public bool? CIsEnabled { get; set; }

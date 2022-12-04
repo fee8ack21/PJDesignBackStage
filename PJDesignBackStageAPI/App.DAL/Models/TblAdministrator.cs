@@ -34,4 +34,9 @@ public partial class TblAdministrator
     /// 是否啟用
     /// </summary>
     public bool? CIsEnabled { get; set; }
+
+    /// <summary>
+    /// 嘗試登入次數
+    /// </summary>
+    public int CLoginAttemptCount { get; set; }
 }

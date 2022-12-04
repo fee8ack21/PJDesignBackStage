@@ -55,7 +55,8 @@ namespace App.PL.Controllers
         [JWTFilter]
         public async Task<ResponseBase<string>> CreateOrUpdateSetting(CreateOrUpdateSettingRequest request)
         {
-            return await _service.CreateOrUpdateSetting(request);
+            var payload = (JWTPayload)HttpContext.Items["jwtPayload"]!;
+            return await _service.CreateOrUpdateSetting(request, payload);
         }
     }
 }

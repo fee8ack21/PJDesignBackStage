@@ -92,15 +92,33 @@ namespace App.BLL
 
         public async Task<ResponseBase<GetSettingByUnitIdResponse>> GetSettingByUnitId(int id)
         {
-            var response = new ResponseBase<GetSettingByUnitIdResponse>() { Entries = new GetSettingByUnitIdResponse() };
+            var response = new ResponseBase<GetSettingByUnitIdResponse>() { Entries = new GetSettingByUnitIdResponse() { UnitId = id } };
             try
             {
-                response.Entries.UnitId = id;
-                
-                var contentString = await _repositoryWrapper.Unit.GetByCondition(x => x.CId == id).Join(_repositoryWrapper.Setting.GetAll(), x => x.CSettingId, y => y.CId, (x, y) => y.CContent).FirstOrDefaultAsync();
-                if (!string.IsNullOrEmpty(contentString))
+                var tblSettingBefore = await _repositoryWrapper.SettingBefore.GetByCondition(x => x.CUnitId == id).FirstOrDefaultAsync();
+
+                if (tblSettingBefore != null)
                 {
-                    response.Entries.Content = JsonSerializer.Deserialize<object?>(contentString); ;
+                    response.Entries.UnitId = tblSettingBefore.CUnitId;
+                    response.Entries.Content = tblSettingBefore?.CContent != null ? JsonSerializer.Deserialize<object?>(tblSettingBefore.CContent) : null;
+                    response.Entries.Status = tblSettingBefore!.CStatus;
+                    response.Entries.EditorId = tblSettingBefore.CEditorId;
+                    response.Entries.EditorName = _repositoryWrapper.Administrator.GetByCondition(x => x.CId == tblSettingBefore.CEditorId).FirstOrDefault()?.CName;
+                    response.Entries.ReviewerId = tblSettingBefore.CReviewerId;
+                    response.Entries.Notes = tblSettingBefore.CNotes != null ? JsonSerializer.Deserialize<object?>(tblSettingBefore.CNotes) : null;
+                    response.Entries.CreateDt = tblSettingBefore.CCreateDt;
+                    return response;
+                }
+
+                var tblSettingAfter = await _repositoryWrapper.SettingAfter.GetByCondition(x => x.CUnitId == id).FirstOrDefaultAsync();
+
+                if (tblSettingAfter != null)
+                {
+                    response.Entries.UnitId = tblSettingAfter.CUnitId;
+                    response.Entries.Content = tblSettingAfter?.CContent != null ? JsonSerializer.Deserialize<object?>(tblSettingAfter.CContent) : null;
+                    response.Entries.EditorId = tblSettingAfter!.CEditorId;
+                    response.Entries.EditorName = _repositoryWrapper.Administrator.GetByCondition(x => x.CId == tblSettingAfter.CEditorId).FirstOrDefault()?.CName;
+                    response.Entries.CreateDt = tblSettingAfter.CCreateDt;
                 }
             }
             catch (Exception ex)
@@ -112,43 +130,99 @@ namespace App.BLL
             return response;
         }
 
-        public async Task<ResponseBase<string>> CreateOrUpdateSetting(CreateOrUpdateSettingRequest request)
+        public async Task<ResponseBase<string>> CreateOrUpdateSetting(CreateOrUpdateSettingRequest request, JWTPayload payload)
         {
             var response = new ResponseBase<string>();
             try
             {
-                using (var transaction = _repositoryWrapper.CreateTransaction())
+                var tblUnit = await _repositoryWrapper.Unit.GetByCondition(x => x.CId == request.UnitId).FirstOrDefaultAsync();
+
+                if (tblUnit == null) { throw new Exception("無此單元"); }
+
+                var existedSettingBefore = await _repositoryWrapper.SettingBefore.GetByCondition(x => x.CUnitId == request.UnitId).FirstOrDefaultAsync();
+
+                // 若無before 資料，只允許新增(Status to 審核中)
+                if (existedSettingBefore == null)
                 {
+                    if (request.Status != (int)Status.審核中) { throw new Exception("請求錯誤"); }
                     if (request.Content == null) { throw new Exception("請求錯誤"); }
 
-                    var tblUnit = await _repositoryWrapper.Unit.GetByCondition(x => x.CId == request.UnitId).FirstOrDefaultAsync();
+                    var tblSettingBefore = new TblSettingBefore();
+                    tblSettingBefore.CStatus = 2;
+                    tblSettingBefore.CEditorId = payload.Id;
+                    tblSettingBefore.CUnitId = request.UnitId;
+                    tblSettingBefore.CContent = JsonSerializer.Serialize(request.Content);
 
-                    if (tblUnit == null) { throw new Exception("無此單元"); }
+                    _repositoryWrapper.SettingBefore.Create(tblSettingBefore);
+                    await _repositoryWrapper.SaveAsync();
+                    return response;
+                }
 
-                    var tblSetting = await _repositoryWrapper.Setting.GetByCondition(x => x.CId == tblUnit.CSettingId).FirstOrDefaultAsync();
-
-                    if (tblSetting != null)
+                // 若before 資料為審核狀態，不允許Editor 再進行操作
+                if (existedSettingBefore.CStatus == (int)Status.審核中)
+                {
+                    if (existedSettingBefore.CEditorId == payload.Id)
                     {
-                        tblSetting.CContent = JsonSerializer.Serialize(request.Content);
-                        _repositoryWrapper.Setting.Update(tblSetting);
-                        await _repositoryWrapper.SaveAsync();
-                        transaction.Commit();
+                        throw new Exception("設定處於審核狀態");
+                    }
 
+                    if (request.Status == (int)Status.駁回)
+                    {
+                        if (request.Note == null) { throw new Exception("請填寫備註欄位"); }
+
+                        existedSettingBefore.CStatus = request.Status;
+                        existedSettingBefore.CEditDt = DateTime.UtcNow;
+                        existedSettingBefore.CReviewerId = payload.Id;
+
+                        var existedNotes = existedSettingBefore.CNotes != null ? JsonSerializer.Deserialize<List<SettingNote>>(existedSettingBefore.CNotes) : new List<SettingNote>();
+                        existedNotes!.Add(request.Note);
+                        existedSettingBefore.CNotes = JsonSerializer.Serialize(existedNotes);
+
+                        _repositoryWrapper.SettingBefore.Update(existedSettingBefore);
+                        await _repositoryWrapper.SaveAsync();
                         return response;
                     }
 
-                    tblSetting = new TblSetting();
-                    tblSetting.CContent = JsonSerializer.Serialize(request.Content);
+                    if (request.Status == (int)Status.批准)
+                    {
+                        var tblSettingAfter = await _repositoryWrapper.SettingAfter.GetByCondition(x => x.CUnitId == tblUnit.CId).FirstOrDefaultAsync();
 
-                    _repositoryWrapper.Setting.Create(tblSetting);
+                        if (tblSettingAfter == null)
+                        {
+                            tblSettingAfter = new TblSettingAfter();
+                            tblSettingAfter.CUnitId = existedSettingBefore.CUnitId;
+                            tblSettingAfter.CContent = existedSettingBefore.CContent;
+                            tblSettingAfter.CEditorId = existedSettingBefore.CEditorId;
+                            _repositoryWrapper.SettingAfter.Create(tblSettingAfter);
+                        }
+                        else
+                        {
+                            tblSettingAfter.CContent = existedSettingBefore.CContent;
+                            tblSettingAfter.CEditorId = existedSettingBefore.CEditorId;
+                            tblSettingAfter.CEditDt = DateTime.UtcNow;
+                            _repositoryWrapper.SettingAfter.Update(tblSettingAfter);
+                        }
+
+                        _repositoryWrapper.SettingBefore.Delete(existedSettingBefore);
+                        await _repositoryWrapper.SaveAsync();
+                        return response;
+                    }
+                }
+
+                // 若before 資料為駁回狀態，只允許Editor 再進行操作
+                if (existedSettingBefore.CStatus == (int)Status.駁回)
+                {
+                    if (existedSettingBefore.CEditorId != payload.Id)
+                    {
+                        throw new Exception("設定處於駁回狀態");
+                    }
+
+                    existedSettingBefore.CStatus = (int)Status.審核中;
+                    existedSettingBefore.CContent = JsonSerializer.Serialize(request.Content);
+                    existedSettingBefore.CEditDt = DateTime.UtcNow;
+                    _repositoryWrapper.SettingBefore.Update(existedSettingBefore);
                     await _repositoryWrapper.SaveAsync();
-
-                    tblUnit.CSettingId = tblSetting.CId;
-
-                    _repositoryWrapper.Unit.Update(tblUnit);
-                    await _repositoryWrapper.SaveAsync();
-
-                    transaction.Commit();
+                    return response;
                 }
             }
             catch (Exception ex)

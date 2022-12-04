@@ -9,6 +9,9 @@ export class HttpService {
   private httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+      'Pragma': 'no-cache',
+      'Expires': '0'
       // 'Access-Control-Allow-Origin': 'API Domain',
       // 'Access-Control-Allow-Methods': 'GET, PUT, POST, DELETE, OPTIONS',
       // 'Access-Control-Max-Age': '86400'

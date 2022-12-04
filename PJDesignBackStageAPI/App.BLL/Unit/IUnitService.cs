@@ -13,6 +13,6 @@ namespace App.BLL
         Task<ResponseBase<List<GetBackStageUnitsByGroupIdResponse>>> GetBackStageUnitsByGroupId(JWTPayload payload);
         Task<ResponseBase<List<GetType2UnitsResponse>>> GetType2Units();
         Task<ResponseBase<GetSettingByUnitIdResponse>> GetSettingByUnitId(int id);
-        Task<ResponseBase<string>> CreateOrUpdateSetting(CreateOrUpdateSettingRequest request);
+        Task<ResponseBase<string>> CreateOrUpdateSetting(CreateOrUpdateSettingRequest request, JWTPayload payload);
     }
 }

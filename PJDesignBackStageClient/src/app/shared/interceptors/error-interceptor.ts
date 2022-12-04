@@ -27,6 +27,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
           if (error.status == 401) {
             this.authService.removeToken();
+            this.authService.removeAdministrator();
             this.router.navigate(['/']);
           }
 

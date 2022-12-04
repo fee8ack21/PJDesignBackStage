@@ -12,4 +12,11 @@ public partial class TblPortfolioAfter
     public DateTime? CDate { get; set; }
 
     public DateTime CCreateDt { get; set; }
+
+    /// <summary>
+    /// 0.停用 1.啟用 2.審核中 3.駁回
+    /// </summary>
+    public byte CStatus { get; set; }
+
+    public DateTime CEditDt { get; set; }
 }
