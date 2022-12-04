@@ -7,6 +7,6 @@ namespace App.PL.Controllers
     [ApiController]
     public class ContactController : ControllerBase
     {
-        public
+        
     }
 }

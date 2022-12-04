@@ -9,10 +9,9 @@ namespace App.Common
 {
     public class HashHelper
     {
-        private static string salt = "-r4T8aMmAWdmzo4RZRyXtuD@cyrewk";
         public static string GetPbkdf2Value(string source)
         {
-            byte[] saltBytes = Encoding.UTF8.GetBytes(salt);
+            byte[] saltBytes = Encoding.UTF8.GetBytes(AppSettingHelper.GetSection("HashSalt")?.Value ?? "");
 
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: source,

@@ -1,4 +1,5 @@
-﻿using App.DAL.Models;
+﻿using App.Common;
+using App.DAL.Models;
 using App.DAL.Repositories;
 using App.Enum;
 using App.Model;
@@ -171,7 +172,7 @@ namespace App.BLL
                         if (request.Note == null) { throw new Exception("請填寫備註欄位"); }
 
                         existedSettingBefore.CStatus = request.Status;
-                        existedSettingBefore.CEditDt = DateTime.UtcNow;
+                        existedSettingBefore.CEditDt = DateHelper.GetNowDate();
                         existedSettingBefore.CReviewerId = payload.Id;
 
                         var existedNotes = existedSettingBefore.CNotes != null ? JsonSerializer.Deserialize<List<SettingNote>>(existedSettingBefore.CNotes) : new List<SettingNote>();
@@ -199,7 +200,7 @@ namespace App.BLL
                         {
                             tblSettingAfter.CContent = existedSettingBefore.CContent;
                             tblSettingAfter.CEditorId = existedSettingBefore.CEditorId;
-                            tblSettingAfter.CEditDt = DateTime.UtcNow;
+                            tblSettingAfter.CEditDt = DateHelper.GetNowDate();
                             _repositoryWrapper.SettingAfter.Update(tblSettingAfter);
                         }
 
@@ -219,7 +220,7 @@ namespace App.BLL
 
                     existedSettingBefore.CStatus = (int)Status.審核中;
                     existedSettingBefore.CContent = JsonSerializer.Serialize(request.Content);
-                    existedSettingBefore.CEditDt = DateTime.UtcNow;
+                    existedSettingBefore.CEditDt = DateHelper.GetNowDate();
                     _repositoryWrapper.SettingBefore.Update(existedSettingBefore);
                     await _repositoryWrapper.SaveAsync();
                     return response;

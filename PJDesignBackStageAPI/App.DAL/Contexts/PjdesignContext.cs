@@ -30,8 +30,6 @@ public partial class PjdesignContext : DbContext
 
     public virtual DbSet<TblGroupUnitRight> TblGroupUnitRights { get; set; }
 
-    public virtual DbSet<TblMailQueue> TblMailQueues { get; set; }
-
     public virtual DbSet<TblPortfolioAfter> TblPortfolioAfters { get; set; }
 
     public virtual DbSet<TblPortfolioBefore> TblPortfolioBefores { get; set; }
@@ -152,11 +150,42 @@ public partial class PjdesignContext : DbContext
 
         modelBuilder.Entity<TblContact>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("tblContact");
+            entity.HasKey(e => e.CId);
 
-            entity.Property(e => e.CId).HasColumnName("cId");
+            entity.ToTable("tblContact");
+
+            entity.Property(e => e.CId)
+                .HasComment("流水號")
+                .HasColumnName("cId");
+            entity.Property(e => e.CAutoReplyDt)
+                .HasComment("自動回覆執行時間")
+                .HasColumnType("datetime")
+                .HasColumnName("cAutoReplyDt");
+            entity.Property(e => e.CAutoReplyStatus)
+                .HasComment("自動回覆執行狀態 0.未處理 1.已執行 2.未完成")
+                .HasColumnName("cAutoReplyStatus");
+            entity.Property(e => e.CContent)
+                .HasMaxLength(200)
+                .HasComment("聯絡內容")
+                .HasColumnName("cContent");
+            entity.Property(e => e.CCreateDt)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("創建時間")
+                .HasColumnType("datetime")
+                .HasColumnName("cCreateDt");
+            entity.Property(e => e.CEmail)
+                .HasMaxLength(200)
+                .HasComment("訪客信箱")
+                .HasColumnName("cEmail");
+            entity.Property(e => e.CName)
+                .HasMaxLength(50)
+                .HasComment("訪客名稱")
+                .HasColumnName("cName");
+            entity.Property(e => e.CPhone)
+                .HasMaxLength(200)
+                .IsFixedLength()
+                .HasComment("訪客電話")
+                .HasColumnName("cPhone");
         });
 
         modelBuilder.Entity<TblGroup>(entity =>
@@ -186,15 +215,6 @@ public partial class PjdesignContext : DbContext
                 .HasComment("")
                 .HasColumnName("cRightId");
             entity.Property(e => e.CUnitId).HasColumnName("cUnitId");
-        });
-
-        modelBuilder.Entity<TblMailQueue>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("tblMailQueue");
-
-            entity.Property(e => e.CId).HasColumnName("cId");
         });
 
         modelBuilder.Entity<TblPortfolioAfter>(entity =>

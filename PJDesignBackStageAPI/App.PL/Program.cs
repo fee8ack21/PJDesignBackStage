@@ -1,7 +1,8 @@
 using App.BLL;
+using App.Common;
 using App.DAL.Contexts;
 using App.DAL.Repositories;
-using Microsoft.AspNetCore.Builder;
+using App.PL.HostedServices;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,8 @@ builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+
+builder.Services.AddHostedService<EmailService>();
 
 var app = builder.Build();
 

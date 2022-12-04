@@ -9,6 +9,9 @@ namespace App.BLL
 {
     public class ContactService : IContactService
     {
-        Task<ResponseBase<List<GetContactListResponse>>> GetContactList();
+        //Task<ResponseBase<List<GetContactListResponse>>> GetContactList()
+        //{
+
+        //}
     }
 }
