@@ -7,7 +7,7 @@ import { ListBaseComponent } from 'src/app/shared/components/base/list-base.comp
 import { CategoryDialogComponent } from 'src/app/shared/components/category-dialog/category-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { CategoryDialogData } from 'src/app/shared/models/category-dialog-data';
-import { StatusCode } from 'src/app/shared/models/enums';
+import { EditAndEnabledOptions, EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { GetCategoriesByUnitId } from 'src/app/shared/models/get-categories-by-unit-id';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
@@ -22,7 +22,7 @@ import { QuestionListSearchParams } from '../feature-shared/models/question-list
 })
 export class QuestionListComponent extends ListBaseComponent implements OnInit {
   rawListData: GetQuestionsResponse[] = [];
-  displayedColumns: string[] = ['id', 'name', 'categories', 'createDt', 'isEnabled', 'tool'];
+  displayedColumns: string[] = ['id', 'title', 'categories', 'editDt', 'isEnabled', 'tool'];
   dataSource: MatTableDataSource<GetQuestionsResponse>;
   searchParams = new QuestionListSearchParams();
 
@@ -43,6 +43,7 @@ export class QuestionListComponent extends ListBaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.listenUnitService();
+    this.getQuestions();
   }
 
   listenUnitService() {
@@ -93,10 +94,15 @@ export class QuestionListComponent extends ListBaseComponent implements OnInit {
 
   onSearchFilterFn(data: GetQuestionsResponse): boolean {
     return (this.searchParams.title == null || this.searchParams.title.trim().length == 0 || data.title.includes(this.searchParams.title.trim())) &&
-      // (this.searchParams.categoryId == null || this.searchParams.categoryId == -1 || data.groupId == this.searchParams.groupId) &&
-      (this.searchParams.startDt == null || new Date(data.createDt) >= this.searchParams.startDt) &&
-      (this.searchParams.endDt == null || new Date(data.createDt) <= this.searchParams.endDt)
-    // && (this.searchParams.isEnabled == null || this.searchParams.isEnabled == this.EnabledOptions.全部 || +data.isEnabled == this.searchParams.isEnabled)
+      (this.searchParams.categoryId == null || this.searchParams.categoryId == -1 || (data.categories != null && data.categories.filter(x => x.id == this.searchParams.categoryId).length > 0)) &&
+      (this.searchParams.startDt == null || new Date(data.editDt) >= this.searchParams.startDt) &&
+      (this.searchParams.endDt == null || new Date(data.editDt) <= this.searchParams.endDt) &&
+      (this.searchParams.editAndEnabledStatus == null ||
+        this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.全部 ||
+        (data.editStatus == null && +data.isEnabled == this.searchParams.editAndEnabledStatus) ||
+        (data.editStatus == EditStatus.Review && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.審核中) ||
+        (data.editStatus == EditStatus.Reject && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.駁回)
+      )
   }
 
   resetSearchParams() {

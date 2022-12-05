@@ -32,7 +32,7 @@
             <mat-form-field appearance="fill">
               <mat-label>狀態</mat-label>
               <mat-select>
-                <mat-option *ngFor="let item of statusOptions" [value]="item.value">{{item.name}}</mat-option>
+                <mat-option *ngFor="let item of editAndEnabledOptions" [value]="item.value">{{item.name}}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
@@ -76,7 +76,6 @@
                 狀態
               </th>
               <td mat-cell *matCellDef="let element">
-                {{getStatusOptionName(element.status)}}
               </td>
             </ng-container>
             <ng-container matColumnDef="tool">

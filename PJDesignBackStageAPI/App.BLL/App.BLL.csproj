@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\App.Common\App.Common.csproj" />
     <ProjectReference Include="..\App.DAL\App.DAL.csproj" />
     <ProjectReference Include="..\App.Enum\App.Enum.csproj" />

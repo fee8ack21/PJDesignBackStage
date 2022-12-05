@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace App.Enum
+namespace App.Model
 {
-    public enum UnitID
+    public class Category
     {
-        首頁設定 = 7,
-        Footer設定 = 8,
-        常見問題 = 11,
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
     }
 }

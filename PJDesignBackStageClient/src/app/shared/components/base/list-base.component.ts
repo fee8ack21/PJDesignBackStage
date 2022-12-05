@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { EnabledOptions, FormControlErrorType, PageStatus, EditStatus, StatusOptions } from '../../models/enums';
+import { EnabledOptions, FormControlErrorType, PageStatus, EditStatus, EditAndEnabledOptions } from '../../models/enums';
 
 @Injectable()
 export abstract class ListBaseComponent {
   enabledOptions = [{ name: '全部', value: EnabledOptions.全部 }, { name: '啟用', value: EnabledOptions.啟用 }, { name: '停用', value: EnabledOptions.停用 }]
-  statusOptions = [{ name: '全部', value: StatusOptions.全部 }, { name: '啟用', value: StatusOptions.啟用 }, { name: '停用', value: StatusOptions.停用 }, { name: '審核中', value: StatusOptions.審核中 }, { name: '駁回', value: StatusOptions.駁回 }]
+  editAndEnabledOptions = [{ name: '全部', value: EditAndEnabledOptions.全部 }, { name: '啟用', value: EditAndEnabledOptions.啟用 }, { name: '停用', value: EditAndEnabledOptions.停用 }, { name: '審核中', value: EditAndEnabledOptions.審核中 }, { name: '駁回', value: EditAndEnabledOptions.駁回 }]
 
   constructor() { }
 
@@ -24,27 +24,6 @@ export abstract class ListBaseComponent {
     return FormControlErrorType;
   }
 
-  getEnabledOptionName(value: boolean | number) {
-    return value ? '啟用' : '停用';
-  }
-
-  getStatusOptionName(value: number) {
-    switch (value) {
-      case StatusOptions.全部:
-        return '全部';
-      case StatusOptions.啟用:
-        return '啟用';
-      case StatusOptions.停用:
-        return '停用';
-      case StatusOptions.審核中:
-        return '審核中';
-      case StatusOptions.駁回:
-        return '駁回';
-      default:
-        return '';
-    }
-  }
-
   getPageStatusName(status: number) {
     switch (status) {
       case PageStatus.Create:
@@ -55,6 +34,29 @@ export abstract class ListBaseComponent {
         return '審核'
       default:
         return '新增'
+    }
+  }
+
+  getEnabledOptionName(value: boolean | number) {
+    return value ? '啟用' : '停用';
+  }
+
+  getEditAndEnabledStatusName(status: boolean | number) {
+    if (typeof status == 'boolean') {
+      if (status) {
+        return '啟用';
+      }
+
+      return '停用'
+    }
+
+    switch (status) {
+      case EditStatus.Review:
+        return '審核中';
+      case EditStatus.Reject:
+        return '駁回';
+      default:
+        return '審核中';
     }
   }
 }

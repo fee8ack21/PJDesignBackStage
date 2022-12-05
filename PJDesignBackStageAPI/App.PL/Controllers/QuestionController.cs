@@ -16,6 +16,7 @@ namespace App.PL.Controllers
         {
             _service = service;
         }
+
         /// <summary>
         /// 取得問題列表
         /// </summary>
@@ -25,6 +26,18 @@ namespace App.PL.Controllers
         public async Task<ResponseBase<List<GetQuestionsResponse>>> GetQuestions()
         {
             return await _service.GetQuestions(); ;
+        }
+
+        /// <summary>
+        /// 新增或修改問題
+        /// </summary>
+        [HttpPost]
+        [Route("CreateOrUpdateQuestion")]
+        [JwtFilter]
+        public async Task<ResponseBase<string>> CreateOrUpdateQuestion(CreateOrUpdateQuestionRequest request)
+        {
+            var payload = HttpContext.Items["jwtPayload"] as JwtPayload;
+            return await _service.CreateOrUpdateQuestion(request, payload);
         }
     }
 }

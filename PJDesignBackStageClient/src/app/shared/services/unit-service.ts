@@ -33,7 +33,7 @@ export class UnitService {
     if (this._units == null || this._units.length == 0) { return -1; }
 
     const path = window.location.pathname;
-    const filtededUnits = this._units.filter(x => x.url == path);
+    const filtededUnits = this._units.filter(x => x.url != null ? path.includes(x.url ?? '') : false);
 
     if (filtededUnits.length == 0) { return -1; }
 

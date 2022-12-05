@@ -64,7 +64,7 @@ export enum EnabledOptions {
   停用 = 0
 }
 
-export enum StatusOptions {
+export enum EditAndEnabledOptions {
   全部 = -1,
   停用 = 0,
   啟用 = 1,

@@ -29,6 +29,7 @@ import { SafeUrlPipe } from '../pipes/safe-url.pipe';
 import { CategoryDialogComponent } from '../components/category-dialog/category-dialog.component';
 import { ReviewNoteDialogComponent } from '../components/review-note-dialog/review-note-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AngularEditorModule } from '@kolkov/angular-editor';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     CommonModule,
     FormsModule,
     RouterModule,
+    AngularEditorModule,
     ReactiveFormsModule,
     MatDatepickerModule,
     MatNativeDateModule,
@@ -79,6 +81,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatCardModule,
     MatProgressSpinnerModule,
     MatExpansionModule,
+    AngularEditorModule,
     MatSortModule,
     MatButtonModule,
     MatTreeModule,
