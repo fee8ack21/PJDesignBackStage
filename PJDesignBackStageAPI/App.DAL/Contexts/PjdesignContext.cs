@@ -22,7 +22,9 @@ public partial class PjdesignContext : DbContext
 
     public virtual DbSet<TblCategory> TblCategories { get; set; }
 
-    public virtual DbSet<TblCategoryMapping> TblCategoryMappings { get; set; }
+    public virtual DbSet<TblCategoryMappingAfter> TblCategoryMappingAfters { get; set; }
+
+    public virtual DbSet<TblCategoryMappingBefore> TblCategoryMappingBefores { get; set; }
 
     public virtual DbSet<TblContact> TblContacts { get; set; }
 
@@ -123,6 +125,10 @@ public partial class PjdesignContext : DbContext
                 .HasComment("創建時間")
                 .HasColumnType("datetime")
                 .HasColumnName("cCreateDt");
+            entity.Property(e => e.CEditDt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("cEditDt");
             entity.Property(e => e.CIsEnabled)
                 .IsRequired()
                 .HasDefaultValueSql("((1))")
@@ -137,24 +143,38 @@ public partial class PjdesignContext : DbContext
                 .HasColumnName("cUnitId");
         });
 
-        modelBuilder.Entity<TblCategoryMapping>(entity =>
+        modelBuilder.Entity<TblCategoryMappingAfter>(entity =>
         {
-            entity.HasKey(e => e.CId).HasName("PK_tblCodeMapping");
+            entity.HasKey(e => e.CId);
 
-            entity.ToTable("tblCategoryMapping");
+            entity.ToTable("tblCategoryMappingAfter");
 
             entity.Property(e => e.CId)
                 .HasComment("流水號")
                 .HasColumnName("cId");
-            entity.Property(e => e.CCodeId)
-                .HasComment("CodeID")
-                .HasColumnName("cCodeId");
-            entity.Property(e => e.CTemplateId)
+            entity.Property(e => e.CCategoryId)
+                .HasComment("分類ID")
+                .HasColumnName("cCategoryId");
+            entity.Property(e => e.CContentId)
                 .HasComment("單元內容ID")
-                .HasColumnName("cTemplateId");
-            entity.Property(e => e.CUnitId)
-                .HasComment("單元ID")
-                .HasColumnName("cUnitId");
+                .HasColumnName("cContentId");
+        });
+
+        modelBuilder.Entity<TblCategoryMappingBefore>(entity =>
+        {
+            entity.HasKey(e => e.CId).HasName("PK_tblCodeMapping");
+
+            entity.ToTable("tblCategoryMappingBefore");
+
+            entity.Property(e => e.CId)
+                .HasComment("流水號")
+                .HasColumnName("cId");
+            entity.Property(e => e.CCategoryId)
+                .HasComment("分類ID")
+                .HasColumnName("cCategoryId");
+            entity.Property(e => e.CContentId)
+                .HasComment("單元內容ID")
+                .HasColumnName("cContentId");
         });
 
         modelBuilder.Entity<TblContact>(entity =>
@@ -372,14 +392,15 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CEditorId)
                 .HasComment("最近的編輯人員ID")
                 .HasColumnName("cEditorId");
-            entity.Property(e => e.CName)
-                .HasMaxLength(50)
-                .HasComment("問題名稱")
-                .HasColumnName("cName");
-            entity.Property(e => e.CStatus)
+            entity.Property(e => e.CIsEnabled)
+                .IsRequired()
                 .HasDefaultValueSql("((1))")
-                .HasComment("0.停用 1.啟用 2.審核中 3.駁回 4.批准")
-                .HasColumnName("cStatus");
+                .HasComment("是否啟用")
+                .HasColumnName("cIsEnabled");
+            entity.Property(e => e.CTitle)
+                .HasMaxLength(50)
+                .HasComment("標題")
+                .HasColumnName("cTitle");
         });
 
         modelBuilder.Entity<TblQuestionBefore>(entity =>
@@ -407,23 +428,28 @@ public partial class PjdesignContext : DbContext
                 .HasComment("最近的編輯時間")
                 .HasColumnType("datetime")
                 .HasColumnName("cEditDt");
+            entity.Property(e => e.CEditStatus)
+                .HasDefaultValueSql("((2))")
+                .HasComment("1.審核中 2.駁回 3.批准")
+                .HasColumnName("cEditStatus");
             entity.Property(e => e.CEditorId)
                 .HasComment("編輯人員ID")
                 .HasColumnName("cEditorId");
-            entity.Property(e => e.CName)
-                .HasMaxLength(50)
-                .HasComment("問題名稱")
-                .HasColumnName("cName");
+            entity.Property(e => e.CIsEnabled)
+                .IsRequired()
+                .HasDefaultValueSql("((1))")
+                .HasComment("是否啟用")
+                .HasColumnName("cIsEnabled");
             entity.Property(e => e.CNotes)
                 .HasComment("備註")
                 .HasColumnName("cNotes");
             entity.Property(e => e.CReviewerId)
                 .HasComment("審核人員ID")
                 .HasColumnName("cReviewerId");
-            entity.Property(e => e.CStatus)
-                .HasDefaultValueSql("((2))")
-                .HasComment("0.停用 1.啟用 2.審核中 3.駁回 4.批准")
-                .HasColumnName("cStatus");
+            entity.Property(e => e.CTitle)
+                .HasMaxLength(50)
+                .HasComment("標題")
+                .HasColumnName("cTitle");
         });
 
         modelBuilder.Entity<TblRight>(entity =>
@@ -494,6 +520,10 @@ public partial class PjdesignContext : DbContext
                 .HasComment("最近的編輯時間")
                 .HasColumnType("datetime")
                 .HasColumnName("cEditDt");
+            entity.Property(e => e.CEditStatus)
+                .HasDefaultValueSql("((2))")
+                .HasComment("1.審核中 2.駁回 3.批准")
+                .HasColumnName("cEditStatus");
             entity.Property(e => e.CEditorId)
                 .HasComment("編輯人員ID")
                 .HasColumnName("cEditorId");
@@ -503,10 +533,6 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CReviewerId)
                 .HasComment("審核人員ID")
                 .HasColumnName("cReviewerId");
-            entity.Property(e => e.CStatus)
-                .HasDefaultValueSql("((2))")
-                .HasComment("2.審核中 3.駁回 4.批准")
-                .HasColumnName("cStatus");
             entity.Property(e => e.CUnitId)
                 .HasComment("單元ID")
                 .HasColumnName("cUnitId");

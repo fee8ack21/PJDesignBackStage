@@ -21,6 +21,7 @@ namespace App.DAL.Repositories
         IContactRepository Contact { get; }
         IQuestionAfterRepository QuestionAfter { get; }
         IQuestionBeforeRepository QuestionBefore { get; }
+        ICategoryRepository Category { get; }
 
         IDbContextTransaction CreateTransaction();
         void Save();

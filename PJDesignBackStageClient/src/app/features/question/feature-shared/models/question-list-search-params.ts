@@ -1,5 +1,5 @@
 export class QuestionListSearchParams {
-  name: string;
+  title: string;
   startDt: Date;
   endDt: Date;
   categoryId: number;

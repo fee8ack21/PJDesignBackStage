@@ -10,7 +10,7 @@ namespace App.Model
     {
         public int UnitId { get; set; }
         public object? Content { get; set; }
-        public byte Status { get; set; }
+        public byte EditStatus { get; set; }
         public SettingNote? Note { get; set; }
     }
 

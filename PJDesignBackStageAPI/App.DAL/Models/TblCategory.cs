@@ -29,4 +29,6 @@ public partial class TblCategory
     /// 是否啟用
     /// </summary>
     public bool? CIsEnabled { get; set; }
+
+    public DateTime CEditDt { get; set; }
 }

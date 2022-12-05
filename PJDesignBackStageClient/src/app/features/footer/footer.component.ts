@@ -6,7 +6,7 @@ import { ListBaseComponent } from 'src/app/shared/components/base/list-base.comp
 import { ReviewNoteDialogComponent } from 'src/app/shared/components/review-note-dialog/review-note-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { CreateOrUpdateSetting } from 'src/app/shared/models/create-or-update-setting';
-import { Status, StatusCode } from 'src/app/shared/models/enums';
+import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { GetSettingByUnitIdResponse } from 'src/app/shared/models/get-setting-by-unit-id';
 import { ReviewNote } from 'src/app/shared/models/review-note';
 import { ReviewNoteDialogData } from 'src/app/shared/models/review-note-dialog-data';
@@ -37,7 +37,7 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
   type2Units: { id: number, name: string, selected: boolean }[] = [];
   socialIcons: FooterSocialIcon[] = [];
 
-  settingStatus?: Status;
+  settingStatus?: EditStatus;
 
   @ViewChild('displayUnits') displayUnits: MatSelectionList;
 
@@ -129,7 +129,7 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
   }
 
   isInputDisabled(): boolean {
-    return this.settingStatus == Status.Review || (this.settingStatus == Status.Reject && this.administrator?.id != this.settingEditorId);
+    return this.settingStatus == EditStatus.Review || (this.settingStatus == EditStatus.Reject && this.administrator?.id != this.settingEditorId);
   }
 
   updateFooterSetting(setting: FooterSettings) {
@@ -200,8 +200,8 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
     };
   }
 
-  async updateFooterSettings(status = Status.Review) {
-    if (status == Status.Reject && this.isReviewNoteEmpty()) {
+  async updateFooterSettings(status = EditStatus.Review) {
+    if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
       this.snackBarService.showSnackBar('請填寫備註');
       return;
     }
@@ -218,9 +218,9 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
     let request = new CreateOrUpdateSetting();
     request.unitId = this.unitId;
     request.content = settings;
-    request.status = status;
+    request.editStatus = status;
 
-    if (status == Status.Reject) {
+    if (status == EditStatus.Reject) {
       let temp = new ReviewNote();
       temp.Date = new Date();
       temp.Note = this.settingReviewNote!;

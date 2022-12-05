@@ -42,12 +42,12 @@ namespace App.BLL
                     {
                         Id = item.CId,
                         IsBefore = true,
-                        Name = item.CName,
+                        Title = item.CTitle,
                         CreateDt = item.CCreateDt,
                         EditDt = item.CEditDt,
                         EditorId = item.CEditorId,
                         Content = item.CContent,
-                        Status = item.CStatus
+                        Status = item.CEditStatus
                     };
 
                     if (item.CAfterId != null)

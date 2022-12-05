@@ -5,7 +5,7 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { Status, StatusCode } from 'src/app/shared/models/enums';
+import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { ContactDialogComponent } from '../feature-shared/components/contact-dialog/contact-dialog.component';
@@ -26,7 +26,7 @@ export class ContactListComponent extends ListBaseComponent implements OnInit {
 
   administrator: { id: number, name: string } | null;
   settingEditorId?: number;
-  settingStatus?: Status;
+  settingStatus?: EditStatus;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -43,7 +43,7 @@ export class ContactListComponent extends ListBaseComponent implements OnInit {
   }
 
   isInputDisabled(): boolean {
-    return this.settingStatus == Status.Review || (this.settingStatus == Status.Reject && this.administrator?.id != this.settingEditorId);
+    return this.settingStatus == EditStatus.Review || (this.settingStatus == EditStatus.Reject && this.administrator?.id != this.settingEditorId);
   }
 
   getContacts() {

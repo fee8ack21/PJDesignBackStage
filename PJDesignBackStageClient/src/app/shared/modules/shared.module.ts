@@ -29,6 +29,7 @@ import { SafeUrlPipe } from '../pipes/safe-url.pipe';
 import { CategoryDialogComponent } from '../components/category-dialog/category-dialog.component';
 import { ReviewNoteDialogComponent } from '../components/review-note-dialog/review-note-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatSortModule,
     MatFormFieldModule,
     MatDialogModule,
+    CKEditorModule,
     MatInputModule,
     MatSelectModule,
     MatCardModule,
@@ -81,6 +83,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatExpansionModule,
     MatSortModule,
     MatButtonModule,
+    CKEditorModule,
     MatTreeModule,
     MatCheckboxModule,
     MatMenuModule,

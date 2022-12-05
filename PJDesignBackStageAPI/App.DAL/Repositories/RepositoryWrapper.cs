@@ -22,6 +22,7 @@ namespace App.DAL.Repositories
         private IContactRepository? _contact;
         private IQuestionAfterRepository? _questionAfter;
         private IQuestionBeforeRepository? _questionBefore;
+        private ICategoryRepository? _category;
 
         public RepositoryWrapper(PjdesignContext context)
         {
@@ -167,6 +168,19 @@ namespace App.DAL.Repositories
                 }
 
                 return _questionAfter;
+            }
+        }
+
+        public ICategoryRepository Category
+        {
+            get
+            {
+                if (_category == null)
+                {
+                    _category = new CategoryRepository(_context);
+                }
+
+                return _category;
             }
         }
 

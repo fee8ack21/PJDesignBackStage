@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EnabledOptions, FormControlErrorType, PageStatus, Status, StatusOptions } from '../../models/enums';
+import { EnabledOptions, FormControlErrorType, PageStatus, EditStatus, StatusOptions } from '../../models/enums';
 
 @Injectable()
 export abstract class ListBaseComponent {
@@ -8,8 +8,8 @@ export abstract class ListBaseComponent {
 
   constructor() { }
 
-  public get Status(): typeof Status {
-    return Status;
+  public get Status(): typeof EditStatus {
+    return EditStatus;
   }
 
   public get EnabledOptions(): typeof EnabledOptions {

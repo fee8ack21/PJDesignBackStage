@@ -7,12 +7,13 @@
           <div class="d-flex justify-space-between">
             <mat-form-field appearance="fill">
               <mat-label>名稱</mat-label>
-              <input matInput [(ngModel)]="searchParams.name">
+              <input matInput [(ngModel)]="searchParams.title">
             </mat-form-field>
             <mat-form-field appearance="fill">
               <mat-label>分類</mat-label>
               <mat-select [(ngModel)]="searchParams.categoryId">
                 <mat-option [value]="-1">全部</mat-option>
+                <mat-option *ngFor="let item of unitEnabledCategories" [value]="item.id">{{item.name}}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="fill">
@@ -37,7 +38,8 @@
           <div class="d-flex mb-1-i">
             <button mat-stroked-button color="primary" class="mr-1-i" (click)="resetSearchParams()">預設</button>
             <button mat-raised-button color="primary" (click)="onSearch()">查詢</button>
-            <button mat-stroked-button color="basic" class="ml-auto-i" (click)="openCategoryDialog()">新增分類</button>
+            <button mat-stroked-button color="basic" class="ml-auto-i" (click)="openCategoryDialog(true)">編輯分類</button>
+            <button mat-stroked-button color="basic" class="ml-1-i" (click)="openCategoryDialog()">新增分類</button>
             <a mat-stroked-button color="basic" class="ml-1-i" [routerLink]="['/question','detail']">新增</a>
           </div>
         </div>

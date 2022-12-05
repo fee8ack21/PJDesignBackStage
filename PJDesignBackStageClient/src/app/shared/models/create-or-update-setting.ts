@@ -3,7 +3,7 @@ import { ReviewNote } from "./review-note";
 export class CreateOrUpdateSetting {
   unitId: number;
   content: object;
-  status: number;
+  editStatus: number;
   note?: ReviewNote;
 }
 

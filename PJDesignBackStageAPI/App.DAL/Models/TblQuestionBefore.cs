@@ -11,9 +11,9 @@ public partial class TblQuestionBefore
     public int CId { get; set; }
 
     /// <summary>
-    /// 問題名稱
+    /// 標題
     /// </summary>
-    public string CName { get; set; } = null!;
+    public string CTitle { get; set; } = null!;
 
     /// <summary>
     /// 問題編輯器內容
@@ -41,9 +41,9 @@ public partial class TblQuestionBefore
     public DateTime CEditDt { get; set; }
 
     /// <summary>
-    /// 0.停用 1.啟用 2.審核中 3.駁回 4.批准
+    /// 1.審核中 2.駁回 3.批准
     /// </summary>
-    public byte CStatus { get; set; }
+    public byte CEditStatus { get; set; }
 
     /// <summary>
     /// 備註
@@ -54,4 +54,9 @@ public partial class TblQuestionBefore
     /// 對應After 表的ID
     /// </summary>
     public int? CAfterId { get; set; }
+
+    /// <summary>
+    /// 是否啟用
+    /// </summary>
+    public bool? CIsEnabled { get; set; }
 }

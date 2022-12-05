@@ -1,1 +1,56 @@
-<p>category-dialog works!</p>
+<h2 mat-dialog-title>{{data.isEdit ? '編輯' : '新增'}}分類</h2>
+<form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+  <ng-container *ngIf="data.isEdit">
+    <div *ngIf="data.categories == null || data.categories.length == 0">
+      <p class="text-center">目前無可編輯分類</p>
+    </div>
+    <ng-container *ngIf="!(data.categories == null || data.categories.length == 0)">
+      <div class="d-flex" *ngFor="let item of data.categories;let i = index;">
+        <div class="d-flex w-50">
+          <mat-form-field appearance="fill">
+            <mat-label>名稱</mat-label>
+            <input matInput [formControlName]="'category' + item.id + 'name'">
+            <mat-error *ngIf="validatorService.isFormControlInvalid(categoryForm, 'name')">
+              {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="d-flex w-50">
+          <mat-form-field appearance="fill" class="ml-auto-i">
+            <mat-label>狀態</mat-label>
+            <mat-select [formControlName]="'category' + item.id + 'isEnabled'" [value]="item.isEnabled">
+              <mat-option [value]="true">啟用</mat-option>
+              <mat-option [value]="false">停用</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+  <ng-container *ngIf="!data.isEdit">
+    <div class="d-flex flex-wrap">
+      <div class="d-flex w-50">
+        <mat-form-field appearance="fill">
+          <mat-label>名稱</mat-label>
+          <input matInput formControlName="name" name="name">
+          <mat-error *ngIf="validatorService.isFormControlInvalid(categoryForm, 'name')">
+            {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="d-flex w-50">
+        <mat-form-field appearance="fill" class="ml-auto-i">
+          <mat-label>狀態</mat-label>
+          <mat-select formControlName="isEnabled">
+            <mat-option [value]="true">啟用</mat-option>
+            <mat-option [value]="false">停用</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  </ng-container>
+  <div mat-dialog-actions class="d-flex justify-center">
+    <button mat-button type="button" (click)="onCancelBtnClick()">取消</button>
+    <button mat-button type="submit" cdkFocusInitial>確定</button>
+  </div>
+</form>

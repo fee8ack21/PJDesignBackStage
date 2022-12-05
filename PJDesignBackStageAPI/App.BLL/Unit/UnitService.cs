@@ -102,7 +102,7 @@ namespace App.BLL
                 {
                     response.Entries.UnitId = tblSettingBefore.CUnitId;
                     response.Entries.Content = tblSettingBefore?.CContent != null ? JsonSerializer.Deserialize<object?>(tblSettingBefore.CContent) : null;
-                    response.Entries.Status = tblSettingBefore!.CStatus;
+                    response.Entries.Status = tblSettingBefore!.CEditStatus;
                     response.Entries.EditorId = tblSettingBefore.CEditorId;
                     response.Entries.EditorName = _repositoryWrapper.Administrator.GetByCondition(x => x.CId == tblSettingBefore.CEditorId).FirstOrDefault()?.CName;
                     response.Entries.ReviewerId = tblSettingBefore.CReviewerId;
@@ -145,11 +145,11 @@ namespace App.BLL
                 // 若無before 資料，只允許新增(Status to 審核中)
                 if (existedSettingBefore == null)
                 {
-                    if (request.Status != (int)Status.審核中) { throw new Exception("請求錯誤"); }
+                    if (request.EditStatus != (int)EditStatus.審核中) { throw new Exception("請求錯誤"); }
                     if (request.Content == null) { throw new Exception("請求錯誤"); }
 
                     var tblSettingBefore = new TblSettingBefore();
-                    tblSettingBefore.CStatus = 2;
+                    tblSettingBefore.CEditStatus = (int)EditStatus.審核中;
                     tblSettingBefore.CEditorId = payload.Id;
                     tblSettingBefore.CUnitId = request.UnitId;
                     tblSettingBefore.CContent = JsonSerializer.Serialize(request.Content);
@@ -160,18 +160,18 @@ namespace App.BLL
                 }
 
                 // 若before 資料為審核狀態，不允許Editor 再進行操作
-                if (existedSettingBefore.CStatus == (int)Status.審核中)
+                if (existedSettingBefore.CEditStatus == (int)EditStatus.審核中)
                 {
                     if (existedSettingBefore.CEditorId == payload.Id)
                     {
                         throw new Exception("設定處於審核狀態");
                     }
 
-                    if (request.Status == (int)Status.駁回)
+                    if (request.EditStatus == (int)EditStatus.駁回)
                     {
                         if (request.Note == null) { throw new Exception("請填寫備註欄位"); }
 
-                        existedSettingBefore.CStatus = request.Status;
+                        existedSettingBefore.CEditStatus = request.EditStatus;
                         existedSettingBefore.CEditDt = DateHelper.GetNowDate();
                         existedSettingBefore.CReviewerId = payload.Id;
 
@@ -184,7 +184,7 @@ namespace App.BLL
                         return response;
                     }
 
-                    if (request.Status == (int)Status.批准)
+                    if (request.EditStatus == (int)EditStatus.批准)
                     {
                         var tblSettingAfter = await _repositoryWrapper.SettingAfter.GetByCondition(x => x.CUnitId == tblUnit.CId).FirstOrDefaultAsync();
 
@@ -211,14 +211,14 @@ namespace App.BLL
                 }
 
                 // 若before 資料為駁回狀態，只允許Editor 再進行操作
-                if (existedSettingBefore.CStatus == (int)Status.駁回)
+                if (existedSettingBefore.CEditStatus == (int)EditStatus.駁回)
                 {
                     if (existedSettingBefore.CEditorId != payload.Id)
                     {
                         throw new Exception("設定處於駁回狀態");
                     }
 
-                    existedSettingBefore.CStatus = (int)Status.審核中;
+                    existedSettingBefore.CEditStatus = (int)EditStatus.審核中;
                     existedSettingBefore.CContent = JsonSerializer.Serialize(request.Content);
                     existedSettingBefore.CEditDt = DateHelper.GetNowDate();
                     _repositoryWrapper.SettingBefore.Update(existedSettingBefore);

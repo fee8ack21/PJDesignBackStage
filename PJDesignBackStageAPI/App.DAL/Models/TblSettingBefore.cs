@@ -46,7 +46,7 @@ public partial class TblSettingBefore
     public DateTime CEditDt { get; set; }
 
     /// <summary>
-    /// 2.審核中 3.駁回 4.批准
+    /// 1.審核中 2.駁回 3.批准
     /// </summary>
-    public byte CStatus { get; set; }
+    public byte CEditStatus { get; set; }
 }

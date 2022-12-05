@@ -52,12 +52,10 @@ export enum Right {
   D = 5
 }
 
-export enum Status {
-  Disabled = 0,
-  Enabled = 1,
-  Review = 2,
-  Reject = 3,
-  Approve = 4
+export enum EditStatus {
+  Review = 1,
+  Reject = 2,
+  Approve = 3
 }
 
 export enum EnabledOptions {

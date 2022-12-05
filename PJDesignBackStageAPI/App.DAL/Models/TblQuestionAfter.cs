@@ -11,9 +11,9 @@ public partial class TblQuestionAfter
     public int CId { get; set; }
 
     /// <summary>
-    /// 問題名稱
+    /// 標題
     /// </summary>
-    public string CName { get; set; } = null!;
+    public string CTitle { get; set; } = null!;
 
     /// <summary>
     /// 問題編輯器內容
@@ -41,7 +41,7 @@ public partial class TblQuestionAfter
     public int CCreatorId { get; set; }
 
     /// <summary>
-    /// 0.停用 1.啟用 2.審核中 3.駁回 4.批准
+    /// 是否啟用
     /// </summary>
-    public byte CStatus { get; set; }
+    public bool? CIsEnabled { get; set; }
 }
