@@ -3,7 +3,6 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
-import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-question-detail',
@@ -12,7 +11,6 @@ import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 })
 export class QuestionDetailComponent extends DetailBaseComponent implements OnInit {
   questionForm: FormGroup;
-  public Editor = ClassicEditor;
 
   constructor(
     protected route: ActivatedRoute,

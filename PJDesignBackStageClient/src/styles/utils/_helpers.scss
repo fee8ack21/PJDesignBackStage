@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .flex-wrap {
   flex-wrap: wrap;
 }
@@ -24,16 +26,16 @@ $widthAndHeight: (0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 
     }
   } @else {
     .w-#{$item} {
-      width: round(percentage($item/100));
+      width: round(percentage(math.div($item, 100)));
     }
     .h-#{$item} {
-      width: round(percentage($item/100));
+      width: round(percentage(math.div($item, 100)));
     }
     .w-#{$item}-i {
-      width: round(percentage($item/100)) !important;
+      width: round(percentage(math.div($item, 100))) !important;
     }
     .h-#{$item}-i {
-      width: round(percentage($item/100)) !important;
+      width: round(percentage(math.div($item, 100))) !important;
     }
   }
 }
