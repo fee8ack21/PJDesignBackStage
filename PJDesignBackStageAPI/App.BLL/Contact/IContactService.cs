@@ -1,4 +1,5 @@
-﻿using System;
+﻿using App.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace App.BLL
 {
     public interface IContactService
     {
+        Task<ResponseBase<List<GetContactsResponse>>> GetContacts();
     }
 }

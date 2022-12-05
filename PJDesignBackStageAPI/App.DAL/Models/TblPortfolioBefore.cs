@@ -28,7 +28,7 @@ public partial class TblPortfolioBefore
     public string? CNote { get; set; }
 
     /// <summary>
-    /// 0.停用 1.啟用 2.暫存 3.審核中 4.駁回
+    /// 0.停用 1.啟用 2.審核中 3.駁回
     /// </summary>
     public byte CStatus { get; set; }
 

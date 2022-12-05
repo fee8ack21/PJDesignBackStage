@@ -21,6 +21,8 @@ import { UnitService } from './shared/services/unit-service';
 import { AuthGuard } from './shared/guards/auth-guard';
 import { ProgressBarService } from './shared/services/progress-bar.service';
 import { FooterModule } from './features/footer/footer.module';
+import { ContactModule } from './features/contact/contact.module';
+import { QuestionModule } from './features/question/question.module';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,8 @@ import { FooterModule } from './features/footer/footer.module';
     ReviewModule,
     PortfolioModule,
     FooterModule,
+    ContactModule,
+    QuestionModule,
   ],
   providers: [
     HttpService,

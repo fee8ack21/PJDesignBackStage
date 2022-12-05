@@ -19,6 +19,9 @@ namespace App.DAL.Repositories
         private IRightRepository? _right;
         private ISettingBeforeRepository? _settingBefore;
         private ISettingAfterRepository? _settingAfter;
+        private IContactRepository? _contact;
+        private IQuestionAfterRepository? _questionAfter;
+        private IQuestionBeforeRepository? _questionBefore;
 
         public RepositoryWrapper(PjdesignContext context)
         {
@@ -125,6 +128,45 @@ namespace App.DAL.Repositories
                 }
 
                 return _settingAfter;
+            }
+        }
+
+        public IContactRepository Contact
+        {
+            get
+            {
+                if (_contact == null)
+                {
+                    _contact = new ContactRepository(_context);
+                }
+
+                return _contact;
+            }
+        }
+
+        public IQuestionBeforeRepository QuestionBefore
+        {
+            get
+            {
+                if (_questionBefore == null)
+                {
+                    _questionBefore = new QuestionBeforeRepository(_context);
+                }
+
+                return _questionBefore;
+            }
+        }
+
+        public IQuestionAfterRepository QuestionAfter
+        {
+            get
+            {
+                if (_questionAfter == null)
+                {
+                    _questionAfter = new QuestionAfterRepository(_context);
+                }
+
+                return _questionAfter;
             }
         }
 

@@ -9,17 +9,17 @@ namespace App.Common
 {
     public class JWTHelper
     {
-        public static JWTPayload CreatePayload(int id, string account, int groupId)
+        public static JwtPayload CreatePayload(int id, string account, int groupId)
         {
-            return new JWTPayload { Id = id, Account = account, GroupId = groupId, ExpiredTime = DateHelper.GetNowDate().AddDays(1) };
+            return new JwtPayload { Id = id, Account = account, GroupId = groupId, ExpiredTime = DateHelper.GetNowDate().AddDays(1) };
         }
 
-        public static JWTPayload DecodePayload(string token)
+        public static JwtPayload DecodePayload(string token)
         {
-            return Jose.JWT.Decode<JWTPayload>(token, Encoding.UTF8.GetBytes(AppSettingHelper.GetSection("TokenSecret")?.Value ?? ""), Jose.JwsAlgorithm.HS256);
+            return Jose.JWT.Decode<JwtPayload>(token, Encoding.UTF8.GetBytes(AppSettingHelper.GetSection("TokenSecret")?.Value ?? ""), Jose.JwsAlgorithm.HS256);
         }
 
-        public static string GetToken(JWTPayload payload)
+        public static string GetToken(JwtPayload payload)
         {
             return Jose.JWT.Encode(payload, Encoding.UTF8.GetBytes(AppSettingHelper.GetSection("TokenSecret")?.Value ?? ""), Jose.JwsAlgorithm.HS256); ;
         }

@@ -19,7 +19,7 @@ namespace App.PL.Controllers
 
         [HttpGet]
         [Route("GetReviews")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<List<GetReviewsResponse>>> GetReviews()
         {
             return await _service.GetReviews(); ;

@@ -11,9 +11,12 @@ public partial class TblAdministratorGroup
     public int CId { get; set; }
 
     /// <summary>
-    /// 管理員組別名稱
+    /// 管理員ID
     /// </summary>
     public int CAdministratorId { get; set; }
 
+    /// <summary>
+    /// 管理組別ID
+    /// </summary>
     public int CGroupId { get; set; }
 }

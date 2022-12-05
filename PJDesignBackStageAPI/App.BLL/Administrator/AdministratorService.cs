@@ -186,7 +186,7 @@ namespace App.BLL
             return response;
         }
 
-        public async Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request, JWTPayload? payload)
+        public async Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request, JwtPayload? payload)
         {
             var response = new ResponseBase<string>();
             try

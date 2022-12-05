@@ -38,13 +38,15 @@ public partial class PjdesignContext : DbContext
 
     public virtual DbSet<TblPortfolioPhotoBefore> TblPortfolioPhotoBefores { get; set; }
 
+    public virtual DbSet<TblQuestionAfter> TblQuestionAfters { get; set; }
+
+    public virtual DbSet<TblQuestionBefore> TblQuestionBefores { get; set; }
+
     public virtual DbSet<TblRight> TblRights { get; set; }
 
     public virtual DbSet<TblSettingAfter> TblSettingAfters { get; set; }
 
     public virtual DbSet<TblSettingBefore> TblSettingBefores { get; set; }
-
-    public virtual DbSet<TblType> TblTypes { get; set; }
 
     public virtual DbSet<TblUnit> TblUnits { get; set; }
 
@@ -100,9 +102,11 @@ public partial class PjdesignContext : DbContext
                 .HasComment("流水號")
                 .HasColumnName("cId");
             entity.Property(e => e.CAdministratorId)
-                .HasComment("管理員組別名稱")
+                .HasComment("管理員ID")
                 .HasColumnName("cAdministratorId");
-            entity.Property(e => e.CGroupId).HasColumnName("cGroupId");
+            entity.Property(e => e.CGroupId)
+                .HasComment("管理組別ID")
+                .HasColumnName("cGroupId");
         });
 
         modelBuilder.Entity<TblCategory>(entity =>
@@ -119,12 +123,17 @@ public partial class PjdesignContext : DbContext
                 .HasComment("創建時間")
                 .HasColumnType("datetime")
                 .HasColumnName("cCreateDt");
+            entity.Property(e => e.CIsEnabled)
+                .IsRequired()
+                .HasDefaultValueSql("((1))")
+                .HasComment("是否啟用")
+                .HasColumnName("cIsEnabled");
             entity.Property(e => e.CName)
                 .HasMaxLength(50)
                 .HasComment("標籤/分類名稱")
                 .HasColumnName("cName");
             entity.Property(e => e.CUnitId)
-                .HasComment("所屬單元")
+                .HasComment("所屬單元ID")
                 .HasColumnName("cUnitId");
         });
 
@@ -279,7 +288,7 @@ public partial class PjdesignContext : DbContext
                 .HasComment("審核人員ID")
                 .HasColumnName("cReviewAdministratorId");
             entity.Property(e => e.CStatus)
-                .HasComment("0.停用 1.啟用 2.暫存 3.審核中 4.駁回")
+                .HasComment("0.停用 1.啟用 2.審核中 3.駁回")
                 .HasColumnName("cStatus");
         });
 
@@ -335,15 +344,100 @@ public partial class PjdesignContext : DbContext
                 .HasColumnName("cPortfolioId");
         });
 
+        modelBuilder.Entity<TblQuestionAfter>(entity =>
+        {
+            entity.HasKey(e => e.CId);
+
+            entity.ToTable("tblQuestionAfter");
+
+            entity.Property(e => e.CId)
+                .HasComment("流水號")
+                .HasColumnName("cId");
+            entity.Property(e => e.CContent)
+                .HasComment("問題編輯器內容")
+                .HasColumnName("cContent");
+            entity.Property(e => e.CCreateDt)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("創建時間")
+                .HasColumnType("datetime")
+                .HasColumnName("cCreateDt");
+            entity.Property(e => e.CCreatorId)
+                .HasComment("創建人員ID")
+                .HasColumnName("cCreatorId");
+            entity.Property(e => e.CEditDt)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("最近的編輯時間")
+                .HasColumnType("datetime")
+                .HasColumnName("cEditDt");
+            entity.Property(e => e.CEditorId)
+                .HasComment("最近的編輯人員ID")
+                .HasColumnName("cEditorId");
+            entity.Property(e => e.CName)
+                .HasMaxLength(50)
+                .HasComment("問題名稱")
+                .HasColumnName("cName");
+            entity.Property(e => e.CStatus)
+                .HasDefaultValueSql("((1))")
+                .HasComment("0.停用 1.啟用 2.審核中 3.駁回 4.批准")
+                .HasColumnName("cStatus");
+        });
+
+        modelBuilder.Entity<TblQuestionBefore>(entity =>
+        {
+            entity.HasKey(e => e.CId);
+
+            entity.ToTable("tblQuestionBefore");
+
+            entity.Property(e => e.CId)
+                .HasComment("流水號")
+                .HasColumnName("cId");
+            entity.Property(e => e.CAfterId)
+                .HasComment("對應After 表的ID")
+                .HasColumnName("cAfterId");
+            entity.Property(e => e.CContent)
+                .HasComment("問題編輯器內容")
+                .HasColumnName("cContent");
+            entity.Property(e => e.CCreateDt)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("創建時間")
+                .HasColumnType("datetime")
+                .HasColumnName("cCreateDt");
+            entity.Property(e => e.CEditDt)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("最近的編輯時間")
+                .HasColumnType("datetime")
+                .HasColumnName("cEditDt");
+            entity.Property(e => e.CEditorId)
+                .HasComment("編輯人員ID")
+                .HasColumnName("cEditorId");
+            entity.Property(e => e.CName)
+                .HasMaxLength(50)
+                .HasComment("問題名稱")
+                .HasColumnName("cName");
+            entity.Property(e => e.CNotes)
+                .HasComment("備註")
+                .HasColumnName("cNotes");
+            entity.Property(e => e.CReviewerId)
+                .HasComment("審核人員ID")
+                .HasColumnName("cReviewerId");
+            entity.Property(e => e.CStatus)
+                .HasDefaultValueSql("((2))")
+                .HasComment("0.停用 1.啟用 2.審核中 3.駁回 4.批准")
+                .HasColumnName("cStatus");
+        });
+
         modelBuilder.Entity<TblRight>(entity =>
         {
             entity.HasKey(e => e.CId);
 
             entity.ToTable("tblRight");
 
-            entity.Property(e => e.CId).HasColumnName("cId");
+            entity.Property(e => e.CId)
+                .HasComment("流水號")
+                .HasColumnName("cId");
             entity.Property(e => e.CName)
                 .HasMaxLength(50)
+                .HasComment("權限名稱")
                 .HasColumnName("cName");
         });
 
@@ -355,18 +449,27 @@ public partial class PjdesignContext : DbContext
 
             entity.Property(e => e.CId)
                 .ValueGeneratedNever()
+                .HasComment("流水號")
                 .HasColumnName("cId");
-            entity.Property(e => e.CContent).HasColumnName("cContent");
+            entity.Property(e => e.CContent)
+                .HasComment("單元JSON內容")
+                .HasColumnName("cContent");
             entity.Property(e => e.CCreateDt)
                 .HasDefaultValueSql("(getdate())")
+                .HasComment("創建時間")
                 .HasColumnType("datetime")
                 .HasColumnName("cCreateDt");
             entity.Property(e => e.CEditDt)
                 .HasDefaultValueSql("(getdate())")
+                .HasComment("最近的編輯時間")
                 .HasColumnType("datetime")
                 .HasColumnName("cEditDt");
-            entity.Property(e => e.CEditorId).HasColumnName("cEditorId");
-            entity.Property(e => e.CUnitId).HasColumnName("cUnitId");
+            entity.Property(e => e.CEditorId)
+                .HasComment("編輯人員ID")
+                .HasColumnName("cEditorId");
+            entity.Property(e => e.CUnitId)
+                .HasComment("單元ID")
+                .HasColumnName("cUnitId");
         });
 
         modelBuilder.Entity<TblSettingBefore>(entity =>
@@ -375,38 +478,38 @@ public partial class PjdesignContext : DbContext
 
             entity.ToTable("tblSettingBefore");
 
-            entity.Property(e => e.CId).HasColumnName("cId");
-            entity.Property(e => e.CContent).HasColumnName("cContent");
+            entity.Property(e => e.CId)
+                .HasComment("流水號")
+                .HasColumnName("cId");
+            entity.Property(e => e.CContent)
+                .HasComment("單元JSON內容")
+                .HasColumnName("cContent");
             entity.Property(e => e.CCreateDt)
                 .HasDefaultValueSql("(getdate())")
+                .HasComment("創建時間")
                 .HasColumnType("datetime")
                 .HasColumnName("cCreateDt");
             entity.Property(e => e.CEditDt)
                 .HasDefaultValueSql("(getdate())")
+                .HasComment("最近的編輯時間")
                 .HasColumnType("datetime")
                 .HasColumnName("cEditDt");
-            entity.Property(e => e.CEditorId).HasColumnName("cEditorId");
-            entity.Property(e => e.CNotes).HasColumnName("cNotes");
-            entity.Property(e => e.CReviewerId).HasColumnName("cReviewerId");
+            entity.Property(e => e.CEditorId)
+                .HasComment("編輯人員ID")
+                .HasColumnName("cEditorId");
+            entity.Property(e => e.CNotes)
+                .HasComment("備註")
+                .HasColumnName("cNotes");
+            entity.Property(e => e.CReviewerId)
+                .HasComment("審核人員ID")
+                .HasColumnName("cReviewerId");
             entity.Property(e => e.CStatus)
                 .HasDefaultValueSql("((2))")
                 .HasComment("2.審核中 3.駁回 4.批准")
                 .HasColumnName("cStatus");
-            entity.Property(e => e.CUnitId).HasColumnName("cUnitId");
-        });
-
-        modelBuilder.Entity<TblType>(entity =>
-        {
-            entity.HasKey(e => e.CId);
-
-            entity.ToTable("tblType");
-
-            entity.Property(e => e.CId)
-                .ValueGeneratedNever()
-                .HasColumnName("cId");
-            entity.Property(e => e.CName)
-                .HasMaxLength(50)
-                .HasColumnName("cName");
+            entity.Property(e => e.CUnitId)
+                .HasComment("單元ID")
+                .HasColumnName("cUnitId");
         });
 
         modelBuilder.Entity<TblUnit>(entity =>
@@ -420,7 +523,7 @@ public partial class PjdesignContext : DbContext
                 .HasColumnName("cId");
             entity.Property(e => e.CBackStageUrl)
                 .HasMaxLength(200)
-                .HasComment("單元路徑")
+                .HasComment("後台單元路徑")
                 .HasColumnName("cBackStageUrl");
             entity.Property(e => e.CCreateDt)
                 .HasDefaultValueSql("(getdate())")
@@ -429,6 +532,7 @@ public partial class PjdesignContext : DbContext
                 .HasColumnName("cCreateDt");
             entity.Property(e => e.CFrontStageUrl)
                 .HasMaxLength(200)
+                .HasComment("前台單元路徑")
                 .HasColumnName("cFrontStageUrl");
             entity.Property(e => e.CIsAnotherWindow)
                 .HasComment("是否另開視窗")
@@ -445,7 +549,9 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CParent)
                 .HasComment("母單元")
                 .HasColumnName("cParent");
-            entity.Property(e => e.CSort).HasColumnName("cSort");
+            entity.Property(e => e.CSort)
+                .HasComment("排序")
+                .HasColumnName("cSort");
             entity.Property(e => e.CStageType)
                 .HasDefaultValueSql("((2))")
                 .HasComment("0.前後台 1.僅前台 2.僅後台")

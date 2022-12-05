@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace App.PL.Filters
 {
-    public class JWTFilter : ActionFilterAttribute
+    public class JwtFilter : ActionFilterAttribute
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {

@@ -18,59 +18,80 @@ namespace App.PL.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// 取得所有管理員
+        /// </summary>
         [HttpGet]
         [Route("GetAdministrators")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<List<GetAdministratorsResponse>>> GetAdministrators()
         {
             var payload = HttpContext.Items["jwtPayload"];
             return await _service.GetAdministrators(); ;
         }
 
+        /// <summary>
+        /// 取得所有管理組別
+        /// </summary>
         [HttpGet]
         [Route("GetGroups")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<List<GetGroupsResponse>>> GetGroups()
         {
             return await _service.GetGroups(); ;
         }
 
+        /// <summary>
+        /// 取得所有管理權限選項
+        /// </summary>
         [HttpGet]
         [Route("GetRights")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<List<GetRightsResponse>>> GetRights()
         {
             return await _service.GetRights();
         }
 
+        /// <summary>
+        /// 新增或更改管理員
+        /// </summary>
         [HttpPost]
         [Route("CreateOrUpdateAdministrator")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<string>> CreateOrUpdateAdministrator(CreateOrUpdateAdministratorRequest request)
         {
-            var payload = (JWTPayload)HttpContext.Items["jwtPayload"]!;
+            var payload = (JwtPayload)HttpContext.Items["jwtPayload"]!;
             return await _service.CreateOrUpdateAdministrator(request, payload);
         }
 
+        /// <summary>
+        /// 取得管理員By ID
+        /// </summary>
         [HttpGet]
         [Route("GetAdministratorById")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<GetAdministratorByIdResponse>> GetAdministratorById(int id)
         {
             return await _service.GetAdministratorById(id);
         }
 
+        /// <summary>
+        /// 新增或更改管理組別
+        /// </summary>
         [HttpPost]
         [Route("CreateOrUpdateGroup")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<string>> CreateOrUpdateGroup(CreateOrUpdateGroupRequest request)
         {
             return await _service.CreateOrUpdateGroup(request);
         }
 
+        /// <summary>
+        /// 取得管理組別下各單元權限
+        /// </summary>
         [HttpPost]
         [Route("GetUnitRightsByGroupId")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<List<GetUnitRightsByGroupIdResponse>>> GetUnitRightsByGroupId(GetUnitRightsByGroupIdRequest request)
         {
             return await _service.GetUnitRightsByGroupId(request);

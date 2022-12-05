@@ -19,7 +19,7 @@ namespace App.PL.Controllers
 
         [HttpGet]
         [Route("GetBackStageUnits")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<List<GetBackStageUnitsResponse>>> GetBackStageUnits()
         {
             return await _service.GetBackStageUnits();
@@ -27,16 +27,16 @@ namespace App.PL.Controllers
 
         [HttpGet]
         [Route("GetBackStageUnitsByGroupId")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<List<GetBackStageUnitsByGroupIdResponse>>> GetBackStageUnitsByGroupId()
         {
-            var payload = (JWTPayload)HttpContext.Items["jwtPayload"]!;
+            var payload = (JwtPayload)HttpContext.Items["jwtPayload"]!;
             return await _service.GetBackStageUnitsByGroupId(payload);
         }
 
         [HttpGet]
         [Route("GetType2Units")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<List<GetType2UnitsResponse>>> GetType2Units()
         {
             return await _service.GetType2Units();
@@ -44,7 +44,7 @@ namespace App.PL.Controllers
 
         [HttpGet]
         [Route("GetSettingByUnitId")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<GetSettingByUnitIdResponse>> GetSettingByUnitId(int id)
         {
             return await _service.GetSettingByUnitId(id);
@@ -52,10 +52,10 @@ namespace App.PL.Controllers
 
         [HttpPost]
         [Route("CreateOrUpdateSetting")]
-        [JWTFilter]
+        [JwtFilter]
         public async Task<ResponseBase<string>> CreateOrUpdateSetting(CreateOrUpdateSettingRequest request)
         {
-            var payload = (JWTPayload)HttpContext.Items["jwtPayload"]!;
+            var payload = (JwtPayload)HttpContext.Items["jwtPayload"]!;
             return await _service.CreateOrUpdateSetting(request, payload);
         }
     }

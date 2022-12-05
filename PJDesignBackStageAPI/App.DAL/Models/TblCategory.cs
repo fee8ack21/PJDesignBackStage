@@ -16,7 +16,7 @@ public partial class TblCategory
     public string CName { get; set; } = null!;
 
     /// <summary>
-    /// 所屬單元
+    /// 所屬單元ID
     /// </summary>
     public int CUnitId { get; set; }
 
@@ -24,4 +24,9 @@ public partial class TblCategory
     /// 創建時間
     /// </summary>
     public DateTime CCreateDt { get; set; }
+
+    /// <summary>
+    /// 是否啟用
+    /// </summary>
+    public bool? CIsEnabled { get; set; }
 }

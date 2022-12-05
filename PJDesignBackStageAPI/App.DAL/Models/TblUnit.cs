@@ -16,7 +16,7 @@ public partial class TblUnit
     public string CName { get; set; } = null!;
 
     /// <summary>
-    /// 單元路徑
+    /// 後台單元路徑
     /// </summary>
     public string? CBackStageUrl { get; set; }
 
@@ -25,6 +25,9 @@ public partial class TblUnit
     /// </summary>
     public int CTemplateType { get; set; }
 
+    /// <summary>
+    /// 前台單元路徑
+    /// </summary>
     public string? CFrontStageUrl { get; set; }
 
     /// <summary>
@@ -52,5 +55,8 @@ public partial class TblUnit
     /// </summary>
     public int CStageType { get; set; }
 
+    /// <summary>
+    /// 排序
+    /// </summary>
     public byte? CSort { get; set; }
 }

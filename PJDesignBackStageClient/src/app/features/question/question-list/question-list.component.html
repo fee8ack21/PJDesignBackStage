@@ -1,0 +1,102 @@
+<div class="d-flex justify-center my-1">
+  <div class="w-95">
+    <mat-card>
+      <mat-card-content>
+        <h2>常見問題</h2>
+        <div class="layout-form">
+          <div class="d-flex justify-space-between">
+            <mat-form-field appearance="fill">
+              <mat-label>名稱</mat-label>
+              <input matInput [(ngModel)]="searchParams.name">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>分類</mat-label>
+              <mat-select [(ngModel)]="searchParams.categoryId">
+                <mat-option [value]="-1">全部</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>起始時間</mat-label>
+              <input readonly matInput [matDatepicker]="sDatePicker" readonly [(ngModel)]="searchParams.startDt">
+              <mat-datepicker-toggle matIconSuffix [for]=" sDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #sDatePicker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>結束時間</mat-label>
+              <input matInput [matDatepicker]="eDatePicker" readonly [(ngModel)]="searchParams.endDt">
+              <mat-datepicker-toggle matIconSuffix [for]="eDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #eDatePicker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>狀態</mat-label>
+              <mat-select [(ngModel)]="searchParams.isEnabled">
+                <mat-option *ngFor="let item of enabledOptions" [value]="item.value">{{item.name}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="d-flex mb-1-i">
+            <button mat-stroked-button color="primary" class="mr-1-i" (click)="resetSearchParams()">預設</button>
+            <button mat-raised-button color="primary" (click)="onSearch()">查詢</button>
+            <button mat-stroked-button color="basic" class="ml-auto-i" (click)="openCategoryDialog()">新增分類</button>
+            <a mat-stroked-button color="basic" class="ml-1-i" [routerLink]="['/question','detail']">新增</a>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="pt-1">
+          <table mat-table (matSortChange)="tableSortCb($event)" [dataSource]="dataSource" matSort
+            class="w-100 mat-elevation-z8">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by number">
+                ID
+              </th>
+              <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+            </ng-container>
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
+                問題名稱
+              </th>
+              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+            <ng-container matColumnDef="categories">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by weight">
+                分類
+              </th>
+              <td mat-cell *matCellDef="let element"> {{element.categories}} </td>
+            </ng-container>
+            <ng-container matColumnDef="createDt">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by symbol">
+                創建時間
+              </th>
+              <td mat-cell *matCellDef="let element"> {{element.createDt}} </td>
+            </ng-container>
+            <ng-container matColumnDef="isEnabled">
+              <th mat-header-cell *matHeaderCellDef sortActionDescription="Sort by symbol">
+                狀態
+              </th>
+              <td mat-cell *matCellDef="let element">
+                {{getEnabledOptionName(element.isEnabled)}}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="tool">
+              <th mat-header-cell *matHeaderCellDef>
+                管理
+              </th>
+              <td mat-cell *matCellDef="let element">
+                <a mat-stroked-button [routerLink]="['/question','detail']"
+                  [queryParams]="{id: element.id, status: PageStatus.Edit}">編輯</a>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell text-center" colspan="6">查詢範圍內無內容</td>
+            </tr>
+          </table>
+          <mat-paginator [length]="dataSource != null ? dataSource.data.length : 0" [pageSize]="10"
+            [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+          </mat-paginator>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

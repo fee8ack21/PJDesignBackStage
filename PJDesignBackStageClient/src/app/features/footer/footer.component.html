@@ -60,10 +60,10 @@
                       <img *ngIf="item.image != null && item.image.length > 0" [src]="item.image | safeUrl"
                         style="position: absolute;top: 6px;left: 50%;transform: translateX(-50%);max-width: 36px;max-height: 36px;object-fit: contain;object-position: center;" />
 
-                      <label class="c-btn ml-auto-i mr-1-i" [ngClass]="{'disabled': isInputDisabled()}">
-                        <input style="display:none;" type="file" accept="image/*" (change)="onPhotoUpload($event, i)"
+                      <label class="file-input-btn ml-auto-i mr-1-i" [ngClass]="{'disabled': isInputDisabled()}">
+                        <input type="file" accept="image/*" (change)="onPhotoUpload($event, i)"
                           [disabled]="isInputDisabled()">
-                        <i class="fa fa-photo"></i> 上傳圖片
+                        上傳圖片
                       </label>
                       <button (click)="removeSocialIcon(i)" type="button" mat-stroked-button color="basic"
                         [disabled]="isInputDisabled()">移除</button>

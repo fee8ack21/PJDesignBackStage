@@ -19,6 +19,12 @@ const routes: Routes = [
   },
   {
     path: 'footer', loadChildren: () => import('./features/footer/footer.module').then(m => m.FooterModule),
+  },
+  {
+    path: 'contact', loadChildren: () => import('./features/contact/contact.module').then(m => m.ContactModule),
+  },
+  {
+    path: 'question', loadChildren: () => import('./features/question/question.module').then(m => m.QuestionModule),
   }
 ];
 

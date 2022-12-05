@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace App.Model
 {
-    public class JWTPayload
+    public class JwtPayload
     {
         public int Id { get; set; }
         public string? Account { get; set; }

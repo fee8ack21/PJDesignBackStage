@@ -43,7 +43,7 @@ namespace App.BLL
             return response;
         }
 
-        public async Task<ResponseBase<List<GetBackStageUnitsByGroupIdResponse>>> GetBackStageUnitsByGroupId(JWTPayload payload)
+        public async Task<ResponseBase<List<GetBackStageUnitsByGroupIdResponse>>> GetBackStageUnitsByGroupId(JwtPayload payload)
         {
             var response = new ResponseBase<List<GetBackStageUnitsByGroupIdResponse>>();
             try
@@ -131,7 +131,7 @@ namespace App.BLL
             return response;
         }
 
-        public async Task<ResponseBase<string>> CreateOrUpdateSetting(CreateOrUpdateSettingRequest request, JWTPayload payload)
+        public async Task<ResponseBase<string>> CreateOrUpdateSetting(CreateOrUpdateSettingRequest request, JwtPayload payload)
         {
             var response = new ResponseBase<string>();
             try

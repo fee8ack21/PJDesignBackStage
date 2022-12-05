@@ -18,6 +18,9 @@ namespace App.DAL.Repositories
         IRightRepository Right { get; }
         ISettingBeforeRepository SettingBefore { get; }
         ISettingAfterRepository SettingAfter { get; }
+        IContactRepository Contact { get; }
+        IQuestionAfterRepository QuestionAfter { get; }
+        IQuestionBeforeRepository QuestionBefore { get; }
 
         IDbContextTransaction CreateTransaction();
         void Save();
