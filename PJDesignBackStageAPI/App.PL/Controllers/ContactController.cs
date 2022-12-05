@@ -17,6 +17,9 @@ namespace App.PL.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// 取得所有聯絡資訊
+        /// </summary>
         [HttpGet]
         [Route("GetContacts")]
         [JwtFilter]

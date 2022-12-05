@@ -17,6 +17,9 @@ namespace App.PL.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// 取得審核列表
+        /// </summary>
         [HttpGet]
         [Route("GetReviews")]
         [JwtFilter]

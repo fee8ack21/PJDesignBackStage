@@ -17,6 +17,9 @@ namespace App.PL.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// 取得所有呈現於後台的單元
+        /// </summary>
         [HttpGet]
         [Route("GetBackStageUnits")]
         [JwtFilter]
@@ -25,6 +28,9 @@ namespace App.PL.Controllers
             return await _service.GetBackStageUnits();
         }
 
+        /// <summary>
+        /// 取得所有呈現於後台的單元ByID
+        /// </summary>
         [HttpGet]
         [Route("GetBackStageUnitsByGroupId")]
         [JwtFilter]
@@ -34,6 +40,9 @@ namespace App.PL.Controllers
             return await _service.GetBackStageUnitsByGroupId(payload);
         }
 
+        /// <summary>
+        /// 取得所有Type2 模板單元
+        /// </summary>
         [HttpGet]
         [Route("GetType2Units")]
         [JwtFilter]
@@ -42,6 +51,9 @@ namespace App.PL.Controllers
             return await _service.GetType2Units();
         }
 
+        /// <summary>
+        /// 取得單元設定ByID
+        /// </summary>
         [HttpGet]
         [Route("GetSettingByUnitId")]
         [JwtFilter]
@@ -50,6 +62,9 @@ namespace App.PL.Controllers
             return await _service.GetSettingByUnitId(id);
         }
 
+        /// <summary>
+        /// 新增或修改單元設定
+        /// </summary>
         [HttpPost]
         [Route("CreateOrUpdateSetting")]
         [JwtFilter]

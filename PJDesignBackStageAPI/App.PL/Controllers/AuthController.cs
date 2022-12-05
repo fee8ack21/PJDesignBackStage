@@ -17,6 +17,9 @@ namespace App.PL.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// 管理員登入
+        /// </summary>
         [HttpPost]
         [Route("Login")]
         public async Task<ResponseBase<AuthLoginResponse>> Login(AuthLoginRequest request)
