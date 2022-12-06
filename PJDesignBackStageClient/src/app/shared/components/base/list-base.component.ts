@@ -3,8 +3,8 @@ import { EnabledOptions, FormControlErrorType, PageStatus, EditStatus, EditAndEn
 
 @Injectable()
 export abstract class ListBaseComponent {
-  enabledOptions = [{ name: '全部', value: EnabledOptions.全部 }, { name: '啟用', value: EnabledOptions.啟用 }, { name: '停用', value: EnabledOptions.停用 }]
-  editAndEnabledOptions = [{ name: '全部', value: EditAndEnabledOptions.全部 }, { name: '啟用', value: EditAndEnabledOptions.啟用 }, { name: '停用', value: EditAndEnabledOptions.停用 }, { name: '審核中', value: EditAndEnabledOptions.審核中 }, { name: '駁回', value: EditAndEnabledOptions.駁回 }]
+  readonly enabledOptions = [{ name: '全部', value: EnabledOptions.全部 }, { name: '啟用', value: EnabledOptions.啟用 }, { name: '停用', value: EnabledOptions.停用 }]
+  readonly editAndEnabledOptions = [{ name: '全部', value: EditAndEnabledOptions.全部 }, { name: '啟用', value: EditAndEnabledOptions.啟用 }, { name: '停用', value: EditAndEnabledOptions.停用 }, { name: '審核中', value: EditAndEnabledOptions.審核中 }, { name: '駁回', value: EditAndEnabledOptions.駁回 }]
 
   constructor() { }
 

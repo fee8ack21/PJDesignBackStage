@@ -1,40 +1,54 @@
 <h1 mat-dialog-title>{{data.id != null && data.id != undefined ? '編輯' : '新增'}}</h1>
-<div mat-dialog-content>
-  <mat-form-field appearance="fill">
-    <mat-label>名稱</mat-label>
-    <input matInput [(ngModel)]="data.name">
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>URL</mat-label>
-    <input matInput>
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>模板</mat-label>
-    <mat-select>
-      <mat-option>
-        無
-      </mat-option>
-      <mat-option>
-        單一編輯器
-      </mat-option>
-      <mat-option>
-        列表 + 內頁
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>狀態</mat-label>
-    <mat-select>
-      <mat-option>
-        啟用
-      </mat-option>
-      <mat-option>
-        停用
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-</div>
-<div mat-dialog-actions class="d-flex justify-center">
-  <button mat-button (click)="onCancelBtnClick()">取消</button>
-  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>確定</button>
-</div>
+<form [formGroup]="unitForm">
+  <div mat-dialog-content>
+    <mat-form-field appearance="fill" class="w-100 mb-1">
+      <mat-label>名稱</mat-label>
+      <input matInput formControlName="name">
+      <mat-error *ngIf="validatorService.isFormControlInvalid(unitForm, 'name')">
+        {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>模板</mat-label>
+      <mat-select formControlName="templateType">
+        <mat-option *ngFor="let item of templateOption" [value]="item.value">
+          {{item.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="w-100" *ngIf="unitForm.get('templateType')?.value === 0">
+      <mat-label>URL</mat-label>
+      <input matInput formControlName="url">
+      <mat-error
+        *ngIf="unitForm.get('templateType')?.value === 0 && validatorService.isFormControlInvalid(unitForm, 'name')">
+        {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>另開視窗</mat-label>
+      <mat-select formControlName="isAnotherWindow">
+        <mat-option [value]="true">
+          是
+        </mat-option>
+        <mat-option [value]="false">
+          否
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>狀態</mat-label>
+      <mat-select formControlName="isEnabled">
+        <mat-option [value]="true">
+          啟用
+        </mat-option>
+        <mat-option [value]="false">
+          停用
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions class="d-flex justify-center">
+    <button mat-button (click)="onCancelBtnClick()">取消</button>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>確定</button>
+  </div>
+</form>

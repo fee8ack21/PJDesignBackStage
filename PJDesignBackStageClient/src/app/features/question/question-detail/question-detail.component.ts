@@ -56,7 +56,7 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
   }
 
   getQuestion() {
-    this.httpService.get<ResponseBase<GetQuestionByIdResponse>>(`question/getQuestionById?id=${this.id}`).subscribe(response => {
+    this.httpService.get<ResponseBase<GetQuestionByIdResponse>>(`question/getQuestionById?id=${this.id}&isBefore=${this.isBefore}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;

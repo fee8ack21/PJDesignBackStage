@@ -7,4 +7,5 @@ export class CreateOrUpdateQuestionRequest {
   content: string;
   editStatus: EditStatus;
   categoryIDs: number[] | null | undefined;
+  note?: string;
 }

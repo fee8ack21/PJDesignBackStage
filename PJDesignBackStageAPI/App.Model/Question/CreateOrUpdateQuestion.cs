@@ -13,6 +13,7 @@ namespace App.Model
         public string Title { get; set; } = null!;
         public string Content { get; set; } = null!;
         public byte EditStatus { get; set; }
+        public SettingNote? Note { get; set; }
         public IEnumerable<int>? CategoryIDs { get; set; }
     }
 }

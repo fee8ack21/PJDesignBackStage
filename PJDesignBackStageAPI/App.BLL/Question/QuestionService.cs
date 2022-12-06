@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace App.BLL
@@ -87,6 +88,7 @@ namespace App.BLL
             var response = new ResponseBase<string>();
             try
             {
+                // 新增
                 if (request.Id == null)
                 {
                     var tblQuestionBefore = new TblQuestionBefore()
@@ -101,7 +103,6 @@ namespace App.BLL
                     };
 
                     _repositoryWrapper.QuestionBefore.Create(tblQuestionBefore);
-                    await _repositoryWrapper.SaveAsync();
 
                     if (request.CategoryIDs != null)
                     {
@@ -110,7 +111,85 @@ namespace App.BLL
                             var tblCategoryMappingBefore = new TblCategoryMappingBefore() { CCategoryId = categoryId, CContentId = tblQuestionBefore.CId };
                             _repositoryWrapper.CategoryMappingBefore.Create(tblCategoryMappingBefore);
                         }
-                        await _repositoryWrapper.SaveAsync();
+                    }
+
+                    await _repositoryWrapper.SaveAsync();
+                }
+                else
+                {
+                    TblQuestionBefore tblQuestionBefore;
+                    switch (request.EditStatus)
+                    {
+                        case (int)EditStatus.審核中:
+                            tblQuestionBefore = await _repositoryWrapper.QuestionBefore.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
+
+                            if (tblQuestionBefore == null) { throw new Exception("無此項目"); }
+
+                            tblQuestionBefore.CTitle = request.Title;
+                            tblQuestionBefore.CContent = HtmlHelper.Sanitize(request.Content);
+                            tblQuestionBefore.CIsEnabled = request.IsEnabled;
+                            tblQuestionBefore.CEditStatus = request.EditStatus;
+                            tblQuestionBefore.CEditDt = DateHelper.GetNowDate();
+
+                            _repositoryWrapper.QuestionBefore.Update(tblQuestionBefore);
+
+                            // 既有ID
+                            var tblCategoryMappingBefores = await _repositoryWrapper.CategoryMappingBefore.GetByCondition(x => x.CContentId == request.Id).ToListAsync();
+                            IEnumerable<int> createIDs;
+
+                            if (request.CategoryIDs == null || request.CategoryIDs.Count() == 0)
+                            {
+                                _repositoryWrapper.CategoryMappingBefore.DeleteRange(tblCategoryMappingBefores);
+                            }
+                            else
+                            {
+                                createIDs = request.CategoryIDs.Except(tblCategoryMappingBefores.Select(x => x.CCategoryId).ToList());
+
+                                foreach (var mappingBefore in tblCategoryMappingBefores)
+                                {
+                                    if (request.CategoryIDs.Contains(mappingBefore.CCategoryId))
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        _repositoryWrapper.CategoryMappingBefore.Delete(mappingBefore);
+                                    }
+                                }
+
+                                foreach (var id in createIDs)
+                                {
+                                    var tblCategoryMappingBefore = new TblCategoryMappingBefore() { CCategoryId = id, CContentId = (int)request.Id };
+                                    _repositoryWrapper.CategoryMappingBefore.Create(tblCategoryMappingBefore);
+                                }
+                            }
+
+                            await _repositoryWrapper.SaveAsync();
+                            break;
+                        case (int)EditStatus.駁回:
+                            tblQuestionBefore = await _repositoryWrapper.QuestionBefore.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
+
+                            if (tblQuestionBefore == null) { throw new Exception("無此項目"); }
+
+                            tblQuestionBefore.CEditStatus = request.EditStatus;
+                            tblQuestionBefore.CEditDt = DateHelper.GetNowDate();
+                            tblQuestionBefore.CReviewerId = payload.Id;
+
+                            var existedNotes = tblQuestionBefore.CNotes != null ? JsonSerializer.Deserialize<List<SettingNote>>(tblQuestionBefore.CNotes) : new List<SettingNote>();
+                            existedNotes!.Add(request.Note!);
+                            tblQuestionBefore.CNotes = JsonSerializer.Serialize(existedNotes);
+
+                            _repositoryWrapper.QuestionBefore.Update(tblQuestionBefore);
+                            await _repositoryWrapper.SaveAsync();
+                            
+                            break;
+                        case (int)EditStatus.批准:
+                            tblQuestionBefore = await _repositoryWrapper.QuestionBefore.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
+                            
+                            if (tblQuestionBefore == null) { throw new Exception("無此項目"); }
+
+
+                            break;
                     }
                 }
             }
@@ -128,32 +207,38 @@ namespace App.BLL
             var response = new ResponseBase<GetQuestionByIdResponse>() { Entries = new GetQuestionByIdResponse() };
             try
             {
-
-                var tblQuestionBefore = await _repositoryWrapper.QuestionBefore
+                if (isBefore)
+                {
+                    var tblQuestionBefore = await _repositoryWrapper.QuestionBefore
                     .GetByCondition(x => x.CId == id)
                     .FirstOrDefaultAsync();
 
-                if (tblQuestionBefore != null)
-                {
-                    var categories = _repositoryWrapper.Category
-                   .GetByCondition(x => x.CUnitId == (int)UnitID.常見問題)
-                   .Join(_repositoryWrapper.CategoryMappingBefore.GetByCondition(y => y.CContentId == tblQuestionBefore!.CId), x => x.CId, y => y.CCategoryId, (x, y) => new Category
-                   {
-                       Id = x.CId,
-                       Name = x.CName
-                   }).ToList();
+                    if (tblQuestionBefore != null)
+                    {
+                        var categories = _repositoryWrapper.Category
+                       .GetByCondition(x => x.CUnitId == (int)UnitID.常見問題)
+                       .Join(_repositoryWrapper.CategoryMappingBefore.GetByCondition(y => y.CContentId == tblQuestionBefore!.CId), x => x.CId, y => y.CCategoryId, (x, y) => new Category
+                       {
+                           Id = x.CId,
+                           Name = x.CName
+                       }).ToList();
 
-                    response.Entries.Id = tblQuestionBefore.CId;
-                    response.Entries.IsBefore = true;
-                    response.Entries.Content = tblQuestionBefore.CContent ?? "";
-                    response.Entries.EditStatus = tblQuestionBefore.CEditStatus;
-                    response.Entries.EditorId = tblQuestionBefore.CEditorId;
-                    response.Entries.EditDt = tblQuestionBefore.CEditDt;
-                    response.Entries.CreateDt = tblQuestionBefore.CCreateDt;
-                    response.Entries.Categories = categories;
-                    response.Entries.IsEnabled = tblQuestionBefore.CIsEnabled ?? false;
-                    response.Entries.Title = tblQuestionBefore.CTitle;
-                    response.Entries.Notes = tblQuestionBefore.CNotes;
+                        response.Entries.Id = tblQuestionBefore.CId;
+                        response.Entries.IsBefore = true;
+                        response.Entries.Content = tblQuestionBefore.CContent ?? "";
+                        response.Entries.EditStatus = tblQuestionBefore.CEditStatus;
+                        response.Entries.EditorId = tblQuestionBefore.CEditorId;
+                        response.Entries.EditDt = tblQuestionBefore.CEditDt;
+                        response.Entries.CreateDt = tblQuestionBefore.CCreateDt;
+                        response.Entries.Categories = categories;
+                        response.Entries.IsEnabled = tblQuestionBefore.CIsEnabled ?? false;
+                        response.Entries.Title = tblQuestionBefore.CTitle;
+                        response.Entries.Notes = tblQuestionBefore.CNotes;
+                    }
+                }
+                else
+                {
+
                 }
             }
             catch (Exception ex)

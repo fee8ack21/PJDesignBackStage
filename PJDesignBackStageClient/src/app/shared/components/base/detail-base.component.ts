@@ -59,7 +59,9 @@ export abstract class DetailBaseComponent {
           this.id = parseInt(response[this.idParam]);
         }
         if (response['isBefore'] != undefined) {
-          this.isBefore = response['isBefore'].toLower() === 'true';
+          console.log(response['isBefore'])
+          this.isBefore = response['isBefore'].toLowerCase() === 'true';
+          console.log(this.isBefore)
         }
       } catch (ex) {
       }

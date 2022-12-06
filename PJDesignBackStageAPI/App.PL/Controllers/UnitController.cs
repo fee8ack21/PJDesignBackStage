@@ -73,5 +73,16 @@ namespace App.PL.Controllers
             var payload = (JwtPayload)HttpContext.Items["jwtPayload"]!;
             return await _service.CreateOrUpdateSetting(request, payload);
         }
+
+        /// <summary>
+        /// 取得所有前台單元
+        /// </summary>
+        [HttpGet]
+        [Route("GetFrontStageUnits")]
+        [JwtFilter]
+        public async Task<ResponseBase<List<GetFrontStageUnitsResponse>>> GetFrontStageUnits()
+        {
+            return await _service.GetFrontStageUnits();
+        }
     }
 }

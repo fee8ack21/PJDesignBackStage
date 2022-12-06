@@ -91,6 +91,7 @@ namespace App.BLL
             return response;
         }
 
+
         public async Task<ResponseBase<GetSettingByUnitIdResponse>> GetSettingByUnitId(int id)
         {
             var response = new ResponseBase<GetSettingByUnitIdResponse>() { Entries = new GetSettingByUnitIdResponse() { UnitId = id } };
@@ -225,6 +226,35 @@ namespace App.BLL
                     await _repositoryWrapper.SaveAsync();
                     return response;
                 }
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseBase<List<GetFrontStageUnitsResponse>>> GetFrontStageUnits()
+        {
+            var response = new ResponseBase<List<GetFrontStageUnitsResponse>>() { Entries = new List<GetFrontStageUnitsResponse>() };
+            try
+            {
+                response.Entries = await _repositoryWrapper.Unit
+                    .GetByCondition(x => x.CStageType == (int)StageType.前台 || x.CStageType == (int)StageType.前後台)
+                    .Select(x => new GetFrontStageUnitsResponse
+                    {
+                        Id = x.CId,
+                        Name = x.CName,
+                        TemplateType = x.CTemplateType,
+                        IsAnotherWindow = x.CIsAnotherWindow,
+                        IsEnabled = x.CIsEnabled,
+                        CreateDt = x.CCreateDt,
+                        Parent = x.CParent,
+                        StageType = x.CStageType,
+                        Sort = x.CSort,
+                    }).ToListAsync();
             }
             catch (Exception ex)
             {
