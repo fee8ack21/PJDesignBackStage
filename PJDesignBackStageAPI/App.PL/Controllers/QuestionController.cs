@@ -29,6 +29,17 @@ namespace App.PL.Controllers
         }
 
         /// <summary>
+        /// 取得問題ById
+        /// </summary>
+        [HttpGet]
+        [Route("GetQuestionById")]
+        [JwtFilter]
+        public async Task<ResponseBase<GetQuestionByIdResponse>> GetQuestionById(int id, bool isBefore)
+        {
+            return await _service.GetQuestionById(id, isBefore);
+        }
+
+        /// <summary>
         /// 新增或修改問題
         /// </summary>
         [HttpPost]

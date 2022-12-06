@@ -1,18 +1,43 @@
-import { Inject, Injectable, OnInit } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { FormControlErrorType, PageStatus } from '../../models/enums';
+import { EditStatus, FormControlErrorType, PageStatus } from '../../models/enums';
+import { ReviewNote } from '../../models/review-note';
+import { AuthService } from '../../services/auth.service';
+import { UnitService } from '../../services/unit-service';
 
 @Injectable()
 export abstract class DetailBaseComponent {
   id: number;
   idParam: string;
+  isBefore: boolean | undefined | null;
   pageStatus: number;
   pageStatusName: string;
 
-  constructor(protected route: ActivatedRoute, @Inject(String) idParam = 'id') {
+  unitId: number;
+  administrator: { id: number, name: string } | null;
+  editStatus?: EditStatus;
+  editorId?: number;
+  editorName?: string;
+  editCreateDt: Date;
+  editReviewNote: string | null;
+  editReviewNotes: ReviewNote[] = [];
+  contentCreateDt?: Date | null;
+
+  constructor(
+    protected route: ActivatedRoute,
+    protected authService: AuthService,
+    protected unitService: UnitService,
+    @Inject(String) idParam = 'id') {
     this.idParam = idParam;
-    this.setId();
+
+    this.getQueryParams();
+    this.setAdministrator();
     this.setPageStatus();
+  }
+
+  public get EditStatus(): typeof EditStatus {
+    return EditStatus;
   }
 
   public get PageStatus(): typeof PageStatus {
@@ -23,17 +48,29 @@ export abstract class DetailBaseComponent {
     return FormControlErrorType;
   }
 
-  setId() {
+  getQueryParams(): void {
     this.route.queryParams.subscribe(response => {
       try {
-        if (response[this.idParam] == undefined) { return; }
-        this.id = parseInt(response[this.idParam]);
+        if (response[this.idParam] != undefined) {
+          this.id = parseInt(response[this.idParam]);
+        }
+        if (response['isBefore'] != undefined) {
+          this.isBefore = response['isBefore'].toLower() === 'true';
+        }
       } catch (ex) {
       }
     })
   }
 
-  setPageStatus() {
+  setUnitId(): void {
+    this.unitId = this.unitService.getCurrentUnit();
+  }
+
+  setAdministrator() {
+    this.administrator = this.authService.getAdministrator();
+  }
+
+  setPageStatus(): void {
     this.route.queryParams.subscribe(response => {
       try {
         const _pageStatus = parseInt(response['status']);
@@ -46,7 +83,7 @@ export abstract class DetailBaseComponent {
     })
   }
 
-  getPageStatusName(status: number) {
+  getPageStatusName(status: number): string {
     switch (status) {
       case PageStatus.Create:
         return '新增';
@@ -57,5 +94,21 @@ export abstract class DetailBaseComponent {
       default:
         return '新增'
     }
+  }
+
+  handleFormStatus(form: FormGroup) {
+    if (this.isPreventEdit()) {
+      form.disable();
+      return;
+    }
+    form.enable();
+  }
+
+  isReviewNoteEmpty(): boolean {
+    return this.editReviewNote == null || this.editReviewNote.trim().length == 0;
+  }
+
+  isPreventEdit(): boolean {
+    return this.editStatus == EditStatus.Review || (this.editStatus == EditStatus.Reject && this.administrator?.id != this.editorId);
   }
 }

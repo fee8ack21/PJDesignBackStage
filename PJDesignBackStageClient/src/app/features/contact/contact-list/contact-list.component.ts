@@ -42,7 +42,7 @@ export class ContactListComponent extends ListBaseComponent implements OnInit {
     this.getContacts();
   }
 
-  isInputDisabled(): boolean {
+  isPreventEdit(): boolean {
     return this.settingStatus == EditStatus.Review || (this.settingStatus == EditStatus.Reject && this.administrator?.id != this.settingEditorId);
   }
 

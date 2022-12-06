@@ -5,7 +5,7 @@
         <h2>常見問題 - {{pageStatusName}}</h2>
         <mat-divider></mat-divider>
         <div class="pt-1">
-          <form [formGroup]="questionForm" (ngSubmit)="onSubmit()">
+          <form [formGroup]="questionForm">
             <div class="py-1">
               <input formControlName="id" name="id" [value]="null" type="hidden">
               <mat-form-field appearance="fill">
@@ -32,8 +32,9 @@
                     選擇分類
                   </mat-panel-title>
                 </mat-expansion-panel-header>
-                <mat-selection-list #categories>
-                  <mat-list-option *ngFor="let item of unitCategories" [value]="item.id">
+                <mat-selection-list #categorySelectEle>
+                  <mat-list-option *ngFor="let item of unitCategories" [value]="item.id" [selected]="item.selected"
+                    [disabled]="isPreventEdit()">
                     {{item.name}}
                   </mat-list-option>
                 </mat-selection-list>
@@ -41,14 +42,57 @@
             </div>
             <mat-divider></mat-divider>
             <div class="pt-1">
-              <angular-editor
-                [ngClass]="{'editor-invalid': validatorService.isFormControlInvalid(questionForm, 'content')}"
-                [config]="editorConfig" formControlName="content">
-              </angular-editor>
+              <ng-container *ngIf="!isPreventEdit()">
+                <angular-editor
+                  [ngClass]="{'editor-invalid': validatorService.isFormControlInvalid(questionForm, 'content')}"
+                  [config]="editorConfig" formControlName="content">
+                </angular-editor>
+              </ng-container>
+              <div *ngIf="isPreventEdit()">
+                <mat-card>
+                  <mat-card-content>
+                    <div [innerHTML]="questionForm.get('content')?.value"></div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
             </div>
             <div class="d-flex justify-center pt-1">
-              <a mat-stroked-button class="mr-1-i" [routerLink]="['/question']">取消</a>
-              <button type="submit" mat-raised-button color="primary">送出</button>
+              <ng-container *ngIf="editStatus != EditStatus.Review && editStatus != EditStatus.Reject">
+                <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/question']">取消</a>
+                <button type="button" mat-raised-button color="primary" (click)="onSubmit($event)">送出</button>
+              </ng-container>
+
+              <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id == editorId">
+                <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                  (click)="openReviewNoteDialog()">查看備註</button>
+                <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/question']">取消</a>
+                <button type="button" mat-raised-button color="primary" disabled>審核中</button>
+              </ng-container>
+
+              <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+                <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                  (click)="openReviewNoteDialog()">查看備註</button>
+                <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/question']">取消</a>
+                <button type="button" mat-stroked-button color="primary" (click)="onSubmit($event, EditStatus.Reject)"
+                  class="mr-1-i">駁回</button>
+                <button type="button" mat-raised-button color="primary"
+                  (click)="onSubmit($event, EditStatus.Approve)">批准</button>
+              </ng-container>
+
+              <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id == editorId">
+                <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                  (click)="openReviewNoteDialog()">查看備註</button>
+                <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/question']">取消</a>
+                <button type="button" mat-raised-button color="primary"
+                  (click)="onSubmit($event, EditStatus.Review)">駁回待編輯</button>
+              </ng-container>
+
+              <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id != editorId">
+                <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                  (click)="openReviewNoteDialog()">查看備註</button>
+                <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/question']">取消</a>
+                <button type="button" mat-raised-button color="primary" disabled>駁回待編輯</button>
+              </ng-container>
             </div>
           </form>
         </div>

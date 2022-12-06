@@ -8,7 +8,7 @@ export abstract class ListBaseComponent {
 
   constructor() { }
 
-  public get Status(): typeof EditStatus {
+  public get EditStatus(): typeof EditStatus {
     return EditStatus;
   }
 

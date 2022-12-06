@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectionList } from '@angular/material/list';
+import { ActivatedRoute } from '@angular/router';
+import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
 import { ReviewNoteDialogComponent } from 'src/app/shared/components/review-note-dialog/review-note-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
@@ -24,42 +26,28 @@ import { FooterSocialIcon, FooterSettings } from './feature-shared/update-footer
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss']
 })
-export class FooterComponent extends ListBaseComponent implements OnInit {
-  administrator: { id: number, name: string } | null;
-  settingEditorId?: number;
-  settingEditorName?: string;
-  settingCreateDt?: Date | null;
-  settingReviewNote: string | null;
-  settingReviewNotes: ReviewNote[] = [];
-  unitId: number;
-
+export class FooterComponent extends DetailBaseComponent implements OnInit {
   footerForm: FormGroup;
   type2Units: { id: number, name: string, selected: boolean }[] = [];
   socialIcons: FooterSocialIcon[] = [];
 
-  settingStatus?: EditStatus;
-
-  @ViewChild('displayUnits') displayUnits: MatSelectionList;
+  @ViewChild('unitSelectEle') unitSelectEle: MatSelectionList;
 
   constructor(
     private httpService: HttpService,
     public validatorService: ValidatorService,
     private snackBarService: SnackBarService,
-    private unitService: UnitService,
-    private authService: AuthService,
+    protected route: ActivatedRoute,
+    protected unitService: UnitService,
+    protected authService: AuthService,
     private progressBarService: ProgressBarService,
     public dialog: MatDialog) {
-    super();
+    super(route, authService, unitService);
   }
 
   ngOnInit(): void {
-    this.setAdministrator();
-    this.listenUnitService();
     this.initForm();
-  }
-
-  setAdministrator() {
-    this.administrator = this.authService.getAdministrator();
+    this.listenUnitService();
   }
 
   listenUnitService() {
@@ -68,10 +56,6 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
       await this.setType2Units();
       this.getSettingByUnitId();
     });
-  }
-
-  setUnitId() {
-    this.unitId = this.unitService.getCurrentUnit();
   }
 
   async setType2Units() {
@@ -97,13 +81,13 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
         return;
       }
 
-      this.settingEditorId = response.entries?.editorId;
-      this.settingEditorName = response.entries?.editorName;
-      this.settingCreateDt = response.entries?.createDt;
-      this.settingStatus = response.entries?.status;
-      this.settingReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
+      this.editorId = response.entries?.editorId;
+      this.editorName = response.entries?.editorName;
+      this.contentCreateDt = response.entries?.createDt;
+      this.editStatus = response.entries?.editStatus;
+      this.editReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
 
-      this.handleFormStatus()
+      this.handleFormStatus(this.footerForm);
 
       if (response.entries?.content != null) {
         this.updateFooterSetting(response.entries.content as FooterSettings);
@@ -118,18 +102,6 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
       email: new FormControl(null),
       fanpage: new FormControl(null),
     });
-  }
-
-  handleFormStatus() {
-    if (this.isInputDisabled()) {
-      this.footerForm.disable();
-      return;
-    }
-    this.footerForm.enable();
-  }
-
-  isInputDisabled(): boolean {
-    return this.settingStatus == EditStatus.Review || (this.settingStatus == EditStatus.Reject && this.administrator?.id != this.settingEditorId);
   }
 
   updateFooterSetting(setting: FooterSettings) {
@@ -150,9 +122,9 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
 
   getSelectedDisplayUnits() {
     let units: number[] = [];
-    if (this.displayUnits?.selectedOptions?.selected == null) { return units };
+    if (this.unitSelectEle?.selectedOptions?.selected == null) { return units };
 
-    this.displayUnits.selectedOptions.selected.forEach(item => {
+    this.unitSelectEle.selectedOptions.selected.forEach(item => {
       units.push(item.value)
     })
     return units;
@@ -223,7 +195,7 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
     if (status == EditStatus.Reject) {
       let temp = new ReviewNote();
       temp.Date = new Date();
-      temp.Note = this.settingReviewNote!;
+      temp.Note = this.editReviewNote!;
       temp.Name = this.administrator!.name
       request.note = temp;
     }
@@ -239,15 +211,11 @@ export class FooterComponent extends ListBaseComponent implements OnInit {
     })
   }
 
-  isReviewNoteEmpty(): boolean {
-    return this.settingReviewNote == null || this.settingReviewNote.trim().length == 0;
-  }
-
   openReviewNoteDialog() {
     let data = new ReviewNoteDialogData();
-    data.editorName = this.settingEditorName;
-    data.notes = this.settingReviewNotes;
-    data.createDt = this.settingCreateDt;
+    data.editorName = this.editorName;
+    data.notes = this.editReviewNotes;
+    data.createDt = this.contentCreateDt;
 
     this.dialog.open(ReviewNoteDialogComponent, {
       width: '474px',

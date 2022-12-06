@@ -102,7 +102,7 @@ namespace App.BLL
                 {
                     response.Entries.UnitId = tblSettingBefore.CUnitId;
                     response.Entries.Content = tblSettingBefore?.CContent != null ? JsonSerializer.Deserialize<object?>(tblSettingBefore.CContent) : null;
-                    response.Entries.Status = tblSettingBefore!.CEditStatus;
+                    response.Entries.EditStatus = tblSettingBefore!.CEditStatus;
                     response.Entries.EditorId = tblSettingBefore.CEditorId;
                     response.Entries.EditorName = _repositoryWrapper.Administrator.GetByCondition(x => x.CId == tblSettingBefore.CEditorId).FirstOrDefault()?.CName;
                     response.Entries.ReviewerId = tblSettingBefore.CReviewerId;

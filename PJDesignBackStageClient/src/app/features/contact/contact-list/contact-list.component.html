@@ -42,8 +42,8 @@
             <input matInput>
           </mat-form-field>
           <label class="file-input-btn ml-1-i" style="position: relative;top: -9px;"
-            [ngClass]="{'disabled': isInputDisabled()}">
-            <input type="file" accept="image/*" [disabled]="isInputDisabled()">
+            [ngClass]="{'disabled': isPreventEdit()}">
+            <input type="file" accept="image/*" [disabled]="isPreventEdit()">
             上傳單元背景圖片
           </label>
           <button mat-raised-button class="ml-1-i" color="primary" style="position: relative;top: -9px;">送出</button>

@@ -1,17 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSelectionList } from '@angular/material/list';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
+import { ReviewNoteDialogComponent } from 'src/app/shared/components/review-note-dialog/review-note-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { defaultEditorConfig } from 'src/app/shared/models/editor-config';
 import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { GetCategoriesByUnitId } from 'src/app/shared/models/get-categories-by-unit-id';
+import { ReviewNoteDialogData } from 'src/app/shared/models/review-note-dialog-data';
+import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
 import { CreateOrUpdateQuestionRequest } from '../feature-shared/models/create-or-update-question';
+import { GetQuestionByIdResponse } from '../feature-shared/models/get-question-by-id';
 
 @Component({
   selector: 'app-question-detail',
@@ -21,19 +26,20 @@ import { CreateOrUpdateQuestionRequest } from '../feature-shared/models/create-o
 export class QuestionDetailComponent extends DetailBaseComponent implements OnInit {
   questionForm: FormGroup;
   editorConfig = defaultEditorConfig;
-  unitId: number;
-  unitCategories: GetCategoriesByUnitId[] = [];
+  unitCategories: { id: number, name: string, selected: boolean }[] = [];
 
-  @ViewChild('categories') categoriesEle: MatSelectionList;
+  @ViewChild('categorySelectEle') categorySelectEle: MatSelectionList;
 
   constructor(
     protected route: ActivatedRoute,
     private snackBarService: SnackBarService,
     private httpService: HttpService,
     public validatorService: ValidatorService,
-    private unitService: UnitService,
-    private router: Router) {
-    super(route);
+    protected unitService: UnitService,
+    private router: Router,
+    public dialog: MatDialog,
+    protected authService: AuthService) {
+    super(route, authService, unitService);
   }
 
   ngOnInit(): void {
@@ -42,26 +48,32 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
   }
 
   listenUnitService() {
-    this.unitService.isBackStageUnitsInit.subscribe(response => {
+    this.unitService.isBackStageUnitsInit.subscribe(async response => {
       this.setUnitId();
       this.getCategories();
+      this.getQuestion();
     });
   }
 
-  setUnitId() {
-    this.unitId = this.unitService.getCurrentUnit();
-  }
-
-  getCategories() {
-    if (this.unitId == -1) { return; }
-
-    this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unitId}`).subscribe(response => {
+  getQuestion() {
+    this.httpService.get<ResponseBase<GetQuestionByIdResponse>>(`question/getQuestionById?id=${this.id}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;
       }
 
-      this.unitCategories = response.entries ?? [];
+      this.editStatus = response.entries?.editStatus;
+      this.editorId = response.entries?.editorId;
+
+      this.handleFormStatus(this.questionForm);
+      this.updateForm(response.entries!);
+      response.entries!.categories?.forEach(item => {
+        this.unitCategories.forEach(item2 => {
+          if (item2.id == item.id) {
+            item2.selected = true;
+          }
+        })
+      })
     });
   }
 
@@ -74,24 +86,50 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
     });
   }
 
+  updateForm(data: GetQuestionByIdResponse) {
+    this.questionForm.patchValue({
+      id: data.id,
+      title: data.title,
+      isEnabled: data.isEnabled,
+      content: data.content
+    })
+  }
+
+  getCategories() {
+    if (this.unitId == -1) { return; }
+
+    this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unitId}`).subscribe(response => {
+      if (response.statusCode == StatusCode.Fail) {
+        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+        return;
+      }
+
+      if (response.entries != null) {
+        response.entries.forEach(item => {
+          let temp = { id: item.id, name: item.name, selected: false }
+          this.unitCategories.push(temp);
+        })
+      }
+    });
+  }
+
   getSelectedCategoryIDs() {
     let categoryIDs: number[] = [];
-    if (this.categoriesEle?.selectedOptions?.selected == null) { return categoryIDs };
+    if (this.categorySelectEle?.selectedOptions?.selected == null) { return categoryIDs };
 
-    this.categoriesEle.selectedOptions.selected.forEach(item => {
+    this.categorySelectEle.selectedOptions.selected.forEach(item => {
       categoryIDs.push(item.value)
     })
     return categoryIDs;
   }
 
-  onSubmit() {
-    if (this.questionForm.invalid) {
-      this.questionForm.markAllAsTouched();
+  onSubmit(e: any, status: EditStatus = EditStatus.Review) {
+    if (e !== undefined) {
+      e.preventDefault();
     }
 
-    let status = EditStatus.Review;
-    if (this.questionForm.get('id')?.value != null) {
-
+    if (this.questionForm.invalid) {
+      this.questionForm.markAllAsTouched();
     }
 
     let request: CreateOrUpdateQuestionRequest = { ...this.questionForm.value, editStatus: status, categoryIDs: this.getSelectedCategoryIDs() };
@@ -103,6 +141,18 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
 
       this.snackBarService.showSnackBar(SnackBarService.RequestSuccessText);
       this.router.navigate(['/question']);
+    });
+  }
+
+  openReviewNoteDialog() {
+    let data = new ReviewNoteDialogData();
+    // data.editorName = this.editorName;
+    // data.notes = this.settingReviewNotes;
+    // data.createDt = this.settingCreateDt;
+
+    this.dialog.open(ReviewNoteDialogComponent, {
+      width: '474px',
+      data: data
     });
   }
 }

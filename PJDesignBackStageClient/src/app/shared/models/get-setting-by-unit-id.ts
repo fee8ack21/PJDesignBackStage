@@ -3,7 +3,7 @@ import { ReviewNote } from "./review-note";
 export class GetSettingByUnitIdResponse {
   unitId: number;
   content: object;
-  status?: number;
+  editStatus?: number;
   editorId: number;
   editorName: string;
   reviewId: number;

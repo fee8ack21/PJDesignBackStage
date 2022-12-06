@@ -4,8 +4,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { PageStatus, StatusCode } from 'src/app/shared/models/enums';
+import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
 import { CreateOrUpdateAdministratorRequest } from '../feature-shared/models/create-or-update-administrator';
 import { GetAdministratorByIdResponse } from '../feature-shared/models/get-administrator-by-id';
@@ -22,11 +24,13 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
 
   constructor(
     protected route: ActivatedRoute,
+    protected authService: AuthService,
+    protected unitService: UnitService,
     private router: Router,
     private httpService: HttpService,
     private snackBarService: SnackBarService,
     public validatorService: ValidatorService) {
-    super(route);
+    super(route, authService, unitService);
   }
 
   ngOnInit(): void {

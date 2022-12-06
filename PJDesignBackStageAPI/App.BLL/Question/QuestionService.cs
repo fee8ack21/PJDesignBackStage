@@ -122,5 +122,47 @@ namespace App.BLL
 
             return response;
         }
+
+        public async Task<ResponseBase<GetQuestionByIdResponse>> GetQuestionById(int id, bool isBefore)
+        {
+            var response = new ResponseBase<GetQuestionByIdResponse>() { Entries = new GetQuestionByIdResponse() };
+            try
+            {
+
+                var tblQuestionBefore = await _repositoryWrapper.QuestionBefore
+                    .GetByCondition(x => x.CId == id)
+                    .FirstOrDefaultAsync();
+
+                if (tblQuestionBefore != null)
+                {
+                    var categories = _repositoryWrapper.Category
+                   .GetByCondition(x => x.CUnitId == (int)UnitID.常見問題)
+                   .Join(_repositoryWrapper.CategoryMappingBefore.GetByCondition(y => y.CContentId == tblQuestionBefore!.CId), x => x.CId, y => y.CCategoryId, (x, y) => new Category
+                   {
+                       Id = x.CId,
+                       Name = x.CName
+                   }).ToList();
+
+                    response.Entries.Id = tblQuestionBefore.CId;
+                    response.Entries.IsBefore = true;
+                    response.Entries.Content = tblQuestionBefore.CContent ?? "";
+                    response.Entries.EditStatus = tblQuestionBefore.CEditStatus;
+                    response.Entries.EditorId = tblQuestionBefore.CEditorId;
+                    response.Entries.EditDt = tblQuestionBefore.CEditDt;
+                    response.Entries.CreateDt = tblQuestionBefore.CCreateDt;
+                    response.Entries.Categories = categories;
+                    response.Entries.IsEnabled = tblQuestionBefore.CIsEnabled ?? false;
+                    response.Entries.Title = tblQuestionBefore.CTitle;
+                    response.Entries.Notes = tblQuestionBefore.CNotes;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+
+            return response;
+        }
     }
 }
