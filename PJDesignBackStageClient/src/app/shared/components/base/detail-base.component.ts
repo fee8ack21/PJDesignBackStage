@@ -1,10 +1,13 @@
 import { Inject, Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { EditStatus, FormControlErrorType, PageStatus } from '../../models/enums';
 import { ReviewNote } from '../../models/review-note';
+import { ReviewNoteDialogData } from '../../models/review-note-dialog-data';
 import { AuthService } from '../../services/auth.service';
 import { UnitService } from '../../services/unit-service';
+import { ReviewNoteDialogComponent } from '../review-note-dialog/review-note-dialog.component';
 
 @Injectable()
 export abstract class DetailBaseComponent {
@@ -28,6 +31,7 @@ export abstract class DetailBaseComponent {
     protected route: ActivatedRoute,
     protected authService: AuthService,
     protected unitService: UnitService,
+    protected dialog: MatDialog,
     @Inject(String) idParam = 'id') {
     this.idParam = idParam;
 
@@ -110,5 +114,17 @@ export abstract class DetailBaseComponent {
 
   isPreventEdit(): boolean {
     return this.editStatus == EditStatus.Review || (this.editStatus == EditStatus.Reject && this.administrator?.id != this.editorId);
+  }
+
+  openReviewNoteDialog() {
+    let data = new ReviewNoteDialogData();
+    data.editorName = this.editorName;
+    data.notes = this.editReviewNotes;
+    data.createDt = this.contentCreateDt;
+
+    this.dialog.open(ReviewNoteDialogComponent, {
+      width: '474px',
+      data: data
+    });
   }
 }

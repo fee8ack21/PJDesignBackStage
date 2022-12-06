@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
@@ -26,11 +27,12 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
     protected route: ActivatedRoute,
     protected authService: AuthService,
     protected unitService: UnitService,
+    protected dialog: MatDialog,
     private router: Router,
     private httpService: HttpService,
     private snackBarService: SnackBarService,
     public validatorService: ValidatorService) {
-    super(route, authService, unitService);
+    super(route, authService, unitService, dialog);
   }
 
   ngOnInit(): void {

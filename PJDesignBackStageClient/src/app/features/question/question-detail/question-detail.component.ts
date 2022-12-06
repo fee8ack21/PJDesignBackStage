@@ -37,9 +37,9 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
     public validatorService: ValidatorService,
     protected unitService: UnitService,
     private router: Router,
-    public dialog: MatDialog,
+    protected dialog: MatDialog,
     protected authService: AuthService) {
-    super(route, authService, unitService);
+    super(route, authService, unitService, dialog);
   }
 
   ngOnInit(): void {
@@ -141,18 +141,6 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
 
       this.snackBarService.showSnackBar(SnackBarService.RequestSuccessText);
       this.router.navigate(['/question']);
-    });
-  }
-
-  openReviewNoteDialog() {
-    let data = new ReviewNoteDialogData();
-    // data.editorName = this.editorName;
-    // data.notes = this.settingReviewNotes;
-    // data.createDt = this.settingCreateDt;
-
-    this.dialog.open(ReviewNoteDialogComponent, {
-      width: '474px',
-      data: data
     });
   }
 }

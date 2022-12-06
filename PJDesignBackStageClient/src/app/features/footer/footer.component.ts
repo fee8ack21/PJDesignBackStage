@@ -41,8 +41,8 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
     protected unitService: UnitService,
     protected authService: AuthService,
     private progressBarService: ProgressBarService,
-    public dialog: MatDialog) {
-    super(route, authService, unitService);
+    protected dialog: MatDialog) {
+    super(route, authService, unitService, dialog);
   }
 
   ngOnInit(): void {
@@ -172,7 +172,7 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
     };
   }
 
-  async updateFooterSettings(status = EditStatus.Review) {
+  async onSubmit(status = EditStatus.Review) {
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
       this.snackBarService.showSnackBar('請填寫備註');
       return;
@@ -211,15 +211,4 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
     })
   }
 
-  openReviewNoteDialog() {
-    let data = new ReviewNoteDialogData();
-    data.editorName = this.editorName;
-    data.notes = this.editReviewNotes;
-    data.createDt = this.contentCreateDt;
-
-    this.dialog.open(ReviewNoteDialogComponent, {
-      width: '474px',
-      data: data
-    });
-  }
 }

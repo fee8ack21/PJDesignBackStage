@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -13,8 +14,9 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
   constructor(
     protected route: ActivatedRoute,
     protected authService: AuthService,
-    protected unitService: UnitService) {
-    super(route, authService, unitService);
+    protected unitService: UnitService,
+    protected dialog: MatDialog) {
+    super(route, authService, unitService, dialog);
   }
 
   ngOnInit(): void {
