@@ -14,7 +14,7 @@ namespace App.Model
         public DateTime CreateDt { get; set; }
         public DateTime EditDt { get; set; }
         public int EditorId { get; set; }
-        public byte EditStatus { get; set; }
+        public byte? EditStatus { get; set; }
         public bool IsEnabled { get; set; }
         public string Content { get; set; } = null!;
         public string? Notes { get; set; }

@@ -8,8 +8,9 @@ import { ListBaseComponent } from 'src/app/shared/components/base/list-base.comp
 import { ReviewNoteDialogComponent } from 'src/app/shared/components/review-note-dialog/review-note-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { CreateOrUpdateSetting } from 'src/app/shared/models/create-or-update-setting';
-import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
+import { EditStatus, StatusCode, TemplateType } from 'src/app/shared/models/enums';
 import { GetSettingByUnitIdResponse } from 'src/app/shared/models/get-setting-by-unit-id';
+import { GetUnitsRequest, GetUnitsResponse } from 'src/app/shared/models/get-units';
 import { ReviewNote } from 'src/app/shared/models/review-note';
 import { ReviewNoteDialogData } from 'src/app/shared/models/review-note-dialog-data';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -18,7 +19,6 @@ import { ProgressBarService } from 'src/app/shared/services/progress-bar.service
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
-import { GetType2UnitsResponse } from './feature-shared/models/get-type2-units';
 import { FooterSocialIcon, FooterSettings } from './feature-shared/update-footer-settings';
 
 @Component({
@@ -69,7 +69,9 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
   }
 
   getType2UnitsPromise() {
-    return this.httpService.get<ResponseBase<GetType2UnitsResponse[]>>('unit/getType2Units').toPromise();
+    let request = new GetUnitsRequest();
+    request.templateType = TemplateType.模板二;
+    return this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
   }
 
   getSettingByUnitId() {

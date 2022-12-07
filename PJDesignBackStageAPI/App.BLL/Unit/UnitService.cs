@@ -3,6 +3,7 @@ using App.DAL.Models;
 using App.DAL.Repositories;
 using App.Enum;
 using App.Model;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,66 +22,62 @@ namespace App.BLL
             _repositoryWrapper = repositoryWrapper;
         }
 
-        public async Task<ResponseBase<List<GetBackStageUnitsResponse>>> GetBackStageUnits()
+        public async Task<ResponseBase<List<GetUnitsResponse>>> GetUnits(GetUnitsRequest request, JwtPayload payload)
         {
-            var response = new ResponseBase<List<GetBackStageUnitsResponse>>() { Entries = new List<GetBackStageUnitsResponse>() };
+            var response = new ResponseBase<List<GetUnitsResponse>>() { Entries = new List<GetUnitsResponse>() };
             try
             {
-                var query = _repositoryWrapper.Unit.GetByCondition(x => x.CStageType == (int)StageType.後台 || x.CStageType == (int)StageType.前後台).Select(x => new GetBackStageUnitsResponse
+                var predicate = PredicateBuilder.True<TblUnit>();
+
+                if (request.StageType != null)
                 {
-                    Id = x.CId,
-                    Name = x.CName
-                });
-
-                response.Entries = await query.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-                response.StatusCode = StatusCode.Fail;
-            }
-
-            return response;
-        }
-
-        public async Task<ResponseBase<List<GetBackStageUnitsByGroupIdResponse>>> GetBackStageUnitsByGroupId(JwtPayload payload)
-        {
-            var response = new ResponseBase<List<GetBackStageUnitsByGroupIdResponse>>();
-            try
-            {
-                var query = _repositoryWrapper.GroupUnitRight.GetByCondition(x => x.CGroupId == payload.GroupId)
-                    .Join(_repositoryWrapper.Unit.GetByCondition(y => y.CStageType == (int)StageType.後台 || y.CStageType == (int)StageType.前後台), x => x.CUnitId, y => y.CId, (x, y) => new GetBackStageUnitsByGroupIdResponse
-                    {
-                        Id = y.CId,
-                        Name = y.CName,
-                        Url = y.CBackStageUrl,
-                        Parent = y.CParent,
-                        TemplateType = y.CTemplateType
-                    });
-
-                response.Entries = await query.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-                response.StatusCode = StatusCode.Fail;
-            }
-
-            return response;
-        }
-
-        public async Task<ResponseBase<List<GetType2UnitsResponse>>> GetType2Units()
-        {
-            var response = new ResponseBase<List<GetType2UnitsResponse>>() { Entries = new List<GetType2UnitsResponse>() };
-            try
-            {
-                var query = _repositoryWrapper.Unit.GetByCondition(x => x.CTemplateType == (int)TemplateType.模板二).Select(x => new GetType2UnitsResponse
+                    predicate = predicate.And(x => x.CStageType == request.StageType || x.CStageType == (int)StageType.前後台);
+                }
+                if (request.TemplateType != null)
                 {
-                    Id = x.CId,
-                    Name = x.CName
-                });
+                    predicate = predicate.And(x => x.CTemplateType == request.TemplateType);
+                }
 
-                response.Entries = await query.ToListAsync();
+                if (request.GroupId == null)
+                {
+                    response.Entries = await _repositoryWrapper.Unit
+                        .GetByCondition(predicate)
+                        .Select(x => new GetUnitsResponse
+                        {
+                            Id = x.CId,
+                            Name = x.CName,
+                            BackStageUrl = x.CBackStageUrl,
+                            TemplateType = x.CTemplateType,
+                            FrontStageUrl = x.CFrontStageUrl,
+                            IsAnotherWindow = x.CIsAnotherWindow,
+                            IsEnabled = x.CIsEnabled,
+                            CreateDt = x.CCreateDt,
+                            Parent = x.CParent,
+                            StageType = x.CStageType,
+                            Sort = x.CSort
+                        }).ToListAsync();
+                }
+                else
+                {
+                    response.Entries = await _repositoryWrapper.Unit
+                        .GetByCondition(predicate)
+                        .Join(_repositoryWrapper.GroupUnitRight.GetByCondition(a => a.CGroupId == request.GroupId),
+                        x => x.CId,
+                        y => y.CUnitId, (x, y) => new GetUnitsResponse
+                        {
+                            Id = x.CId,
+                            Name = x.CName,
+                            BackStageUrl = x.CBackStageUrl,
+                            TemplateType = x.CTemplateType,
+                            FrontStageUrl = x.CFrontStageUrl,
+                            IsAnotherWindow = x.CIsAnotherWindow,
+                            IsEnabled = x.CIsEnabled,
+                            CreateDt = x.CCreateDt,
+                            Parent = x.CParent,
+                            StageType = x.CStageType,
+                            Sort = x.CSort
+                        }).ToListAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -90,7 +87,6 @@ namespace App.BLL
 
             return response;
         }
-
 
         public async Task<ResponseBase<GetSettingByUnitIdResponse>> GetSettingByUnitId(int id)
         {
@@ -234,35 +230,6 @@ namespace App.BLL
             }
 
             return response;
-        }
-
-        public async Task<ResponseBase<List<GetFrontStageUnitsResponse>>> GetFrontStageUnits()
-        {
-            var response = new ResponseBase<List<GetFrontStageUnitsResponse>>() { Entries = new List<GetFrontStageUnitsResponse>() };
-            try
-            {
-                response.Entries = await _repositoryWrapper.Unit
-                    .GetByCondition(x => x.CStageType == (int)StageType.前台 || x.CStageType == (int)StageType.前後台)
-                    .Select(x => new GetFrontStageUnitsResponse
-                    {
-                        Id = x.CId,
-                        Name = x.CName,
-                        TemplateType = x.CTemplateType,
-                        IsAnotherWindow = x.CIsAnotherWindow,
-                        IsEnabled = x.CIsEnabled,
-                        CreateDt = x.CCreateDt,
-                        Parent = x.CParent,
-                        StageType = x.CStageType,
-                        Sort = x.CSort,
-                    }).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-                response.StatusCode = StatusCode.Fail;
-            }
-
-            return response;
-        }
+        }        
     }
 }

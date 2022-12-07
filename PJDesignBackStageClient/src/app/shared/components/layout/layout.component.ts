@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { GetBackStageUnitsByGroupIdResponse } from '../../models/get-back-stage-units-by-group-id';
+import { GetUnitsResponse, UnitList } from '../../models/get-units';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
 import { ProgressBarService } from '../../services/progress-bar.service';
@@ -14,8 +14,8 @@ import { UnitService } from '../../services/unit-service';
 export class LayoutComponent implements OnInit {
   administratorName = ''
 
-  fixedUnits: GetBackStageUnitsByGroupIdResponse[] = [];
-  customUnits: GetBackStageUnitsByGroupIdResponse[] = [];
+  fixedUnits: UnitList[] = [];
+  customUnits: UnitList[] = [];
 
   isShowProgressBar = false;
 

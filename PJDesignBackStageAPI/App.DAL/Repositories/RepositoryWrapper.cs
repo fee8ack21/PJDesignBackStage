@@ -24,6 +24,7 @@ namespace App.DAL.Repositories
         private IQuestionBeforeRepository? _questionBefore;
         private ICategoryRepository? _category;
         private ICategoryMappingBeforeRepository? _categoryMappingBefore;
+        private ICategoryMappingAfterRepository? _categoryMappingAfter;
 
         public RepositoryWrapper(PjdesignContext context)
         {
@@ -195,6 +196,19 @@ namespace App.DAL.Repositories
                 }
 
                 return _categoryMappingBefore;
+            }
+        }
+
+        public ICategoryMappingAfterRepository CategoryMappingAfter
+        {
+            get
+            {
+                if (_categoryMappingAfter == null)
+                {
+                    _categoryMappingAfter = new CategoryMappingAfterRepository(_context);
+                }
+
+                return _categoryMappingAfter;
             }
         }
 

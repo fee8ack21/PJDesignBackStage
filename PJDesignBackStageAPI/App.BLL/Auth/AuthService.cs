@@ -65,6 +65,7 @@ namespace App.BLL
                 response.Entries.Id = administrator.CId;
                 response.Entries.Name = administrator.CName;
                 response.Entries.Token = token;
+                response.Entries.GroupId = tblAdministratorGroup.CGroupId;
                 response.Message = "登入成功";
             }
             catch (Exception ex)

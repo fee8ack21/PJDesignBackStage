@@ -18,37 +18,15 @@ namespace App.PL.Controllers
         }
 
         /// <summary>
-        /// 取得所有呈現於後台的單元
+        /// 取得所有單元ByCondition
         /// </summary>
-        [HttpGet]
-        [Route("GetBackStageUnits")]
+        [HttpPost]
+        [Route("GetUnits")]
         [JwtFilter]
-        public async Task<ResponseBase<List<GetBackStageUnitsResponse>>> GetBackStageUnits()
-        {
-            return await _service.GetBackStageUnits();
-        }
-
-        /// <summary>
-        /// 取得所有呈現於後台的單元ByID
-        /// </summary>
-        [HttpGet]
-        [Route("GetBackStageUnitsByGroupId")]
-        [JwtFilter]
-        public async Task<ResponseBase<List<GetBackStageUnitsByGroupIdResponse>>> GetBackStageUnitsByGroupId()
+        public async Task<ResponseBase<List<GetUnitsResponse>>> GetUnits(GetUnitsRequest request)
         {
             var payload = (JwtPayload)HttpContext.Items["jwtPayload"]!;
-            return await _service.GetBackStageUnitsByGroupId(payload);
-        }
-
-        /// <summary>
-        /// 取得所有Type2 模板單元
-        /// </summary>
-        [HttpGet]
-        [Route("GetType2Units")]
-        [JwtFilter]
-        public async Task<ResponseBase<List<GetType2UnitsResponse>>> GetType2Units()
-        {
-            return await _service.GetType2Units();
+            return await _service.GetUnits(request, payload);
         }
 
         /// <summary>
@@ -72,17 +50,6 @@ namespace App.PL.Controllers
         {
             var payload = (JwtPayload)HttpContext.Items["jwtPayload"]!;
             return await _service.CreateOrUpdateSetting(request, payload);
-        }
-
-        /// <summary>
-        /// 取得所有前台單元
-        /// </summary>
-        [HttpGet]
-        [Route("GetFrontStageUnits")]
-        [JwtFilter]
-        public async Task<ResponseBase<List<GetFrontStageUnitsResponse>>> GetFrontStageUnits()
-        {
-            return await _service.GetFrontStageUnits();
         }
     }
 }

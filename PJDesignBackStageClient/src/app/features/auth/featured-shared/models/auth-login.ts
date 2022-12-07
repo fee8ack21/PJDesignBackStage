@@ -5,6 +5,7 @@ export class AuthLoginRequest {
 
 export class AuthLoginResponse {
   id: number;
+  groupId: number;
   name: string;
   token: string;
 }

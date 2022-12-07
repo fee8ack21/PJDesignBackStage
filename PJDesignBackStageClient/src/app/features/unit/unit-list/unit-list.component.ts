@@ -3,11 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { StatusCode, TemplateType } from 'src/app/shared/models/enums';
+import { StageType, StatusCode } from 'src/app/shared/models/enums';
+import { GetUnitsRequest, GetUnitsResponse } from 'src/app/shared/models/get-units';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitDialogComponent } from '../feature-shared/components/unit-dialog/unit-dialog.component';
-import { GetFrontStageUnits } from '../feature-shared/models/get-front-stage-units';
 import { UnitFlatNode } from '../feature-shared/models/unit-flat-node';
 import { UnitNode } from '../feature-shared/models/unit-node';
 
@@ -108,7 +108,10 @@ export class UnitListComponent implements OnInit {
   }
 
   getFrontStageUnits() {
-    this.httpService.get<ResponseBase<GetFrontStageUnits>>('unit/getFrontStageUnits').subscribe(response => {
+    let request = new GetUnitsRequest();
+    request.stageType == StageType.前台;
+
+    this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         return;
       }

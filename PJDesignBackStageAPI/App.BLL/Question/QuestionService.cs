@@ -181,11 +181,11 @@ namespace App.BLL
 
                             _repositoryWrapper.QuestionBefore.Update(tblQuestionBefore);
                             await _repositoryWrapper.SaveAsync();
-                            
+
                             break;
                         case (int)EditStatus.批准:
                             tblQuestionBefore = await _repositoryWrapper.QuestionBefore.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
-                            
+
                             if (tblQuestionBefore == null) { throw new Exception("無此項目"); }
 
 
@@ -207,39 +207,79 @@ namespace App.BLL
             var response = new ResponseBase<GetQuestionByIdResponse>() { Entries = new GetQuestionByIdResponse() };
             try
             {
+                GetQuestionByIdResponse? question;
+
                 if (isBefore)
                 {
-                    var tblQuestionBefore = await _repositoryWrapper.QuestionBefore
-                    .GetByCondition(x => x.CId == id)
-                    .FirstOrDefaultAsync();
-
-                    if (tblQuestionBefore != null)
-                    {
-                        var categories = _repositoryWrapper.Category
-                       .GetByCondition(x => x.CUnitId == (int)UnitID.常見問題)
-                       .Join(_repositoryWrapper.CategoryMappingBefore.GetByCondition(y => y.CContentId == tblQuestionBefore!.CId), x => x.CId, y => y.CCategoryId, (x, y) => new Category
-                       {
-                           Id = x.CId,
-                           Name = x.CName
-                       }).ToList();
-
-                        response.Entries.Id = tblQuestionBefore.CId;
-                        response.Entries.IsBefore = true;
-                        response.Entries.Content = tblQuestionBefore.CContent ?? "";
-                        response.Entries.EditStatus = tblQuestionBefore.CEditStatus;
-                        response.Entries.EditorId = tblQuestionBefore.CEditorId;
-                        response.Entries.EditDt = tblQuestionBefore.CEditDt;
-                        response.Entries.CreateDt = tblQuestionBefore.CCreateDt;
-                        response.Entries.Categories = categories;
-                        response.Entries.IsEnabled = tblQuestionBefore.CIsEnabled ?? false;
-                        response.Entries.Title = tblQuestionBefore.CTitle;
-                        response.Entries.Notes = tblQuestionBefore.CNotes;
-                    }
+                    question = await _repositoryWrapper.QuestionBefore
+                       .GetByCondition(x => x.CId == id)
+                       .GroupJoin(
+                           _repositoryWrapper.Category
+                           .GetByCondition(a => a.CUnitId == (int)UnitID.常見問題)
+                           .Join(
+                               _repositoryWrapper.CategoryMappingBefore.GetAll(),
+                               a => a.CId,
+                               b => b.CCategoryId,
+                               (a, b) => new
+                               {
+                                   Id = a.CId,
+                                   Name = a.CName,
+                                   ContentId = b.CContentId,
+                               }),
+                           x => x.CId,
+                           y => y.ContentId,
+                           (x, y) => new GetQuestionByIdResponse
+                           {
+                               Id = x.CId,
+                               IsBefore = true,
+                               Content = x.CContent ?? "",
+                               EditStatus = x.CEditStatus,
+                               EditorId = x.CEditorId,
+                               EditDt = x.CEditDt,
+                               CreateDt = x.CCreateDt,
+                               Categories = y.Select(a => new Category { Id = a.Id, Name = a.Name }).ToList(),
+                               IsEnabled = x.CIsEnabled ?? false,
+                               Title = x.CTitle,
+                               Notes = x.CNotes,
+                           }).FirstOrDefaultAsync();
                 }
                 else
                 {
-
+                    question = await _repositoryWrapper.QuestionAfter
+                       .GetByCondition(x => x.CId == id)
+                       .GroupJoin(
+                           _repositoryWrapper.Category
+                           .GetByCondition(a => a.CUnitId == (int)UnitID.常見問題)
+                           .Join(
+                               _repositoryWrapper.CategoryMappingAfter.GetAll(),
+                               a => a.CId,
+                               b => b.CCategoryId,
+                               (a, b) => new
+                               {
+                                   Id = a.CId,
+                                   Name = a.CName,
+                                   ContentId = b.CContentId,
+                               }),
+                           x => x.CId,
+                           y => y.ContentId,
+                           (x, y) => new GetQuestionByIdResponse
+                           {
+                               Id = x.CId,
+                               IsBefore = true,
+                               Content = x.CContent ?? "",
+                               EditStatus = null,
+                               EditorId = x.CEditorId,
+                               EditDt = x.CEditDt,
+                               CreateDt = x.CCreateDt,
+                               Categories = y.Select(a => new Category { Id = a.Id, Name = a.Name }).ToList(),
+                               IsEnabled = x.CIsEnabled ?? false,
+                               Title = x.CTitle,
+                               Notes = null,
+                           }).FirstOrDefaultAsync();
                 }
+
+                if (question == null) { throw new Exception("無此問題"); }
+                response.Entries = question;
             }
             catch (Exception ex)
             {

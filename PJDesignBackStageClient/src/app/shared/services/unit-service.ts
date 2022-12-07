@@ -1,26 +1,31 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ResponseBase } from '../models/bases';
-import { StatusCode, TemplateType, UnitID } from '../models/enums';
-import { GetBackStageUnitsByGroupIdResponse } from '../models/get-back-stage-units-by-group-id';
+import { StageType, StatusCode, TemplateType, UnitID } from '../models/enums';
+import { GetUnitsRequest, GetUnitsResponse, UnitList } from '../models/get-units';
+import { AuthService } from './auth.service';
 import { HttpService } from './http.service';
 @Injectable()
 
 export class UnitService {
   isBackStageUnitsInit = new BehaviorSubject<boolean>(false);
-  private _units: GetBackStageUnitsByGroupIdResponse[];
-  private _fixedUnits: GetBackStageUnitsByGroupIdResponse[] = [];
-  private _customUnits: GetBackStageUnitsByGroupIdResponse[] = [];
+  private _units: GetUnitsResponse[];
+  private _fixedUnits: UnitList[] = [];
+  private _customUnits: UnitList[] = [];
 
-  constructor(private httpService: HttpService) { }
+  constructor(private httpService: HttpService, private authService: AuthService) { }
 
-  async getBackStageUnitsByGroupId(): Promise<{ fixedUnits: GetBackStageUnitsByGroupIdResponse[], customUnits: GetBackStageUnitsByGroupIdResponse[] }> {
+  async getBackStageUnitsByGroupId(): Promise<{ fixedUnits: UnitList[], customUnits: UnitList[] }> {
     if (this._units != undefined) { return { fixedUnits: this._fixedUnits, customUnits: this._customUnits } };
 
-    const response = await this.httpService.get<ResponseBase<GetBackStageUnitsByGroupIdResponse[]>>('unit/getBackStageUnitsByGroupId').toPromise();
+    let request = new GetUnitsRequest();
+    request.groupId = this.authService.getAdministrator()?.groupId;
+    request.stageType = StageType.後台;
+
+    const response = await this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
     if (response.statusCode == StatusCode.Success) {
       this._units = response.entries!;
-      this._setFormattedUnits(response.entries!)
+      this._setFormattedUnits(response.entries! as UnitList[])
 
       this.isBackStageUnitsInit.next(true);
       return { fixedUnits: this._fixedUnits, customUnits: this._customUnits };
@@ -33,17 +38,17 @@ export class UnitService {
     if (this._units == null || this._units.length == 0) { return -1; }
 
     const path = window.location.pathname;
-    const filtededUnits = this._units.filter(x => x.url != null ? path.includes(x.url ?? '') : false);
+    const filtededUnits = this._units.filter(x => x.backStageUrl != null ? path.includes(x.backStageUrl ?? '') : false);
 
     if (filtededUnits.length == 0) { return -1; }
 
     return filtededUnits[0].id;
   }
 
-  private _setFormattedUnits(units: GetBackStageUnitsByGroupIdResponse[]) {
-    let fixedUnits: GetBackStageUnitsByGroupIdResponse[] = []
-    let customUnits: GetBackStageUnitsByGroupIdResponse[] = []
-    let childUnits: GetBackStageUnitsByGroupIdResponse[] = []
+  private _setFormattedUnits(units: UnitList[]) {
+    let fixedUnits: UnitList[] = []
+    let customUnits: UnitList[] = []
+    let childUnits: UnitList[] = []
 
     units.forEach(unit => {
       if (unit.parent) {

@@ -15,6 +15,7 @@ namespace App.Model
     public class AuthLoginResponse
     {
         public int Id { get; set; }
+        public int GroupId { get; set; }
         public string Name { get; set; } = null!;
         public string Token { get; set; } = null!;
     }

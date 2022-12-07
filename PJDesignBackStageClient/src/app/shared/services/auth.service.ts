@@ -22,12 +22,12 @@ export class AuthService {
     localStorage.removeItem(this.tokenItemName);
   }
 
-  getAdministrator(): { id: number, name: string } | null {
+  getAdministrator(): { id: number, name: string, groupId: number } | null {
     const administratorJSON = localStorage.getItem(this.administratorItemName)
     return administratorJSON != null ? JSON.parse(administratorJSON) : null;
   }
 
-  setAdministrator(value: { id: number, name: string }) {
+  setAdministrator(value: { id: number, name: string, groupId: number }) {
     localStorage.setItem(this.administratorItemName, JSON.stringify(value));
   }
 

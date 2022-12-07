@@ -5,8 +5,8 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { Group, StatusCode } from 'src/app/shared/models/enums';
-import { GetBackStageUnitsResponse } from 'src/app/shared/models/get-back-stage-units';
+import { Group, StageType, StatusCode } from 'src/app/shared/models/enums';
+import { GetUnitsRequest, GetUnitsResponse } from 'src/app/shared/models/get-units';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { GroupDialogComponent } from '../feature-shared/components/group-dialog/group-dialog.component';
@@ -68,7 +68,10 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
   }
 
   getBackStageUnitsPromise() {
-    return this.httpService.get<ResponseBase<GetBackStageUnitsResponse[]>>('unit/getBackStageUnits').toPromise();
+    let request = new GetUnitsRequest();
+    request.stageType = StageType.後台;
+
+    return this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
   }
 
   getRightsPromise() {
@@ -76,7 +79,7 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
   }
 
   async getDialogData() {
-    let units: GetBackStageUnitsResponse[] = [];
+    let units: GetUnitsResponse[] = [];
     let rights: GetRightsResponse[] = [];
 
     await Promise.all([
@@ -85,7 +88,7 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
     ]).then(([unitsResponse, rightsResponse]) => {
       if (unitsResponse.statusCode == StatusCode.Success) {
         unitsResponse.entries!.forEach(unit => {
-          let temp = new GetBackStageUnitsResponse();
+          let temp = new GetUnitsResponse();
           temp = { ...unit };
           units.push(temp);
         })

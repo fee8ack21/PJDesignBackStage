@@ -57,7 +57,7 @@ export class AuthLoginComponent implements OnInit {
         return;
       }
 
-      this.authService.setAdministrator({ id: response.entries!.id, name: response.entries!.name });
+      this.authService.setAdministrator({ id: response.entries!.id, name: response.entries!.name, groupId: response.entries!.groupId });
       this.authService.setToken(response.entries!.token);
       this.snackBarService.showSnackBar(response.message ?? "登入成功");
       this.router.navigate(['/administrator']);
