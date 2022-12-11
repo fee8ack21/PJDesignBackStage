@@ -17,8 +17,9 @@ export abstract class DetailBaseComponent {
   pageStatus: number;
   pageStatusName: string;
 
-  unitId: number;
+  unit: { id: number, name: string };
   administrator: { id: number, name: string } | null;
+  afterId: number | null | undefined;
   editStatus?: EditStatus;
   editorId?: number;
   editorName?: string;
@@ -59,17 +60,15 @@ export abstract class DetailBaseComponent {
           this.id = parseInt(response[this.idParam]);
         }
         if (response['isBefore'] != undefined) {
-          console.log(response['isBefore'])
           this.isBefore = response['isBefore'].toLowerCase() === 'true';
-          console.log(this.isBefore)
         }
       } catch (ex) {
       }
     })
   }
 
-  setUnitId(): void {
-    this.unitId = this.unitService.getCurrentUnit();
+  setUnit(): void {
+    this.unit = this.unitService.getCurrentUnit();
   }
 
   setAdministrator() {

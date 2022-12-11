@@ -22,7 +22,6 @@ namespace App.PL.Controllers
         /// </summary>
         [HttpGet]
         [Route("GetQuestions")]
-        [JwtFilter]
         public async Task<ResponseBase<List<GetQuestionsResponse>>> GetQuestions()
         {
             return await _service.GetQuestions(); ;
@@ -33,7 +32,6 @@ namespace App.PL.Controllers
         /// </summary>
         [HttpGet]
         [Route("GetQuestionById")]
-        [JwtFilter]
         public async Task<ResponseBase<GetQuestionByIdResponse>> GetQuestionById(int id, bool isBefore)
         {
             return await _service.GetQuestionById(id, isBefore);

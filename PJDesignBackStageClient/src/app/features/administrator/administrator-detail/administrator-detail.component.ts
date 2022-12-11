@@ -36,6 +36,7 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
   }
 
   ngOnInit(): void {
+    this.unitService.isBackStageUnitsInit.subscribe(() => { this.setUnit(); });
     this.initForm();
     this.getGroups();
     this.getAdministratorById();

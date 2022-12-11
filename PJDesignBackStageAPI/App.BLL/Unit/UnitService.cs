@@ -156,71 +156,61 @@ namespace App.BLL
                     return response;
                 }
 
-                // 若before 資料為審核狀態，不允許Editor 再進行操作
-                if (existedSettingBefore.CEditStatus == (int)EditStatus.審核中)
+                switch (existedSettingBefore.CEditStatus)
                 {
-                    if (existedSettingBefore.CEditorId == payload.Id)
-                    {
-                        throw new Exception("設定處於審核狀態");
-                    }
+                    case (int)EditStatus.審核中:
+                        // 若before 資料為審核狀態，不允許Editor 再進行操作
+                        if (existedSettingBefore.CEditorId == payload.Id) { throw new Exception("設定處於審核狀態"); }
 
-                    if (request.EditStatus == (int)EditStatus.駁回)
-                    {
-                        if (request.Note == null) { throw new Exception("請填寫備註欄位"); }
+                        if (request.EditStatus == (int)EditStatus.駁回)
+                        {
+                            if (request.Note == null) { throw new Exception("請填寫備註欄位"); }
 
-                        existedSettingBefore.CEditStatus = request.EditStatus;
+                            existedSettingBefore.CEditStatus = request.EditStatus;
+                            existedSettingBefore.CEditDt = DateHelper.GetNowDate();
+                            existedSettingBefore.CReviewerId = payload.Id;
+
+                            var existedNotes = existedSettingBefore.CNotes != null ? JsonSerializer.Deserialize<List<ReviewNote>>(existedSettingBefore.CNotes) : new List<ReviewNote>();
+                            existedNotes!.Add(request.Note);
+                            existedSettingBefore.CNotes = JsonSerializer.Serialize(existedNotes);
+
+                            _repositoryWrapper.SettingBefore.Update(existedSettingBefore);
+                            await _repositoryWrapper.SaveAsync();
+                        }
+                        else if (request.EditStatus == (int)EditStatus.批准)
+                        {
+                            var tblSettingAfter = await _repositoryWrapper.SettingAfter.GetByCondition(x => x.CUnitId == tblUnit.CId).FirstOrDefaultAsync();
+
+                            if (tblSettingAfter == null)
+                            {
+                                tblSettingAfter = new TblSettingAfter();
+                                tblSettingAfter.CUnitId = existedSettingBefore.CUnitId;
+                                tblSettingAfter.CContent = existedSettingBefore.CContent;
+                                tblSettingAfter.CEditorId = existedSettingBefore.CEditorId;
+                                _repositoryWrapper.SettingAfter.Create(tblSettingAfter);
+                            }
+                            else
+                            {
+                                tblSettingAfter.CContent = existedSettingBefore.CContent;
+                                tblSettingAfter.CEditorId = existedSettingBefore.CEditorId;
+                                tblSettingAfter.CEditDt = DateHelper.GetNowDate();
+                                _repositoryWrapper.SettingAfter.Update(tblSettingAfter);
+                            }
+
+                            _repositoryWrapper.SettingBefore.Delete(existedSettingBefore);
+                            await _repositoryWrapper.SaveAsync();
+                        }
+                        break;
+                    case (int)EditStatus.駁回:
+                        // 若before 資料為駁回狀態，只允許Editor 再進行操作
+                        if (existedSettingBefore.CEditorId != payload.Id) { throw new Exception("設定處於駁回狀態"); }
+
+                        existedSettingBefore.CEditStatus = (int)EditStatus.審核中;
+                        existedSettingBefore.CContent = JsonSerializer.Serialize(request.Content);
                         existedSettingBefore.CEditDt = DateHelper.GetNowDate();
-                        existedSettingBefore.CReviewerId = payload.Id;
-
-                        var existedNotes = existedSettingBefore.CNotes != null ? JsonSerializer.Deserialize<List<SettingNote>>(existedSettingBefore.CNotes) : new List<SettingNote>();
-                        existedNotes!.Add(request.Note);
-                        existedSettingBefore.CNotes = JsonSerializer.Serialize(existedNotes);
-
                         _repositoryWrapper.SettingBefore.Update(existedSettingBefore);
                         await _repositoryWrapper.SaveAsync();
-                        return response;
-                    }
-
-                    if (request.EditStatus == (int)EditStatus.批准)
-                    {
-                        var tblSettingAfter = await _repositoryWrapper.SettingAfter.GetByCondition(x => x.CUnitId == tblUnit.CId).FirstOrDefaultAsync();
-
-                        if (tblSettingAfter == null)
-                        {
-                            tblSettingAfter = new TblSettingAfter();
-                            tblSettingAfter.CUnitId = existedSettingBefore.CUnitId;
-                            tblSettingAfter.CContent = existedSettingBefore.CContent;
-                            tblSettingAfter.CEditorId = existedSettingBefore.CEditorId;
-                            _repositoryWrapper.SettingAfter.Create(tblSettingAfter);
-                        }
-                        else
-                        {
-                            tblSettingAfter.CContent = existedSettingBefore.CContent;
-                            tblSettingAfter.CEditorId = existedSettingBefore.CEditorId;
-                            tblSettingAfter.CEditDt = DateHelper.GetNowDate();
-                            _repositoryWrapper.SettingAfter.Update(tblSettingAfter);
-                        }
-
-                        _repositoryWrapper.SettingBefore.Delete(existedSettingBefore);
-                        await _repositoryWrapper.SaveAsync();
-                        return response;
-                    }
-                }
-
-                // 若before 資料為駁回狀態，只允許Editor 再進行操作
-                if (existedSettingBefore.CEditStatus == (int)EditStatus.駁回)
-                {
-                    if (existedSettingBefore.CEditorId != payload.Id)
-                    {
-                        throw new Exception("設定處於駁回狀態");
-                    }
-
-                    existedSettingBefore.CEditStatus = (int)EditStatus.審核中;
-                    existedSettingBefore.CContent = JsonSerializer.Serialize(request.Content);
-                    existedSettingBefore.CEditDt = DateHelper.GetNowDate();
-                    _repositoryWrapper.SettingBefore.Update(existedSettingBefore);
-                    await _repositoryWrapper.SaveAsync();
-                    return response;
+                        break;
                 }
             }
             catch (Exception ex)
@@ -230,6 +220,6 @@ namespace App.BLL
             }
 
             return response;
-        }        
+        }
     }
 }

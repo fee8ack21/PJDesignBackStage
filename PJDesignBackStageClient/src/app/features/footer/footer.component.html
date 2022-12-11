@@ -2,7 +2,7 @@
   <div class="w-95">
     <mat-card>
       <mat-card-content>
-        <h2>Footer設定</h2>
+        <h2>{{unit.name}}</h2>
         <mat-divider></mat-divider>
         <div class="pt-1">
           <div class="d-flex justify-space-between py-1">
@@ -37,8 +37,7 @@
                 <div>
                   <mat-form-field appearance="fill" class="w-100-i" style="max-width:none;">
                     <mat-label>粉絲專業嵌入</mat-label>
-                    <textarea matInput name="fanpage" formControlName="fanpage"
-                      [disabled]="isPreventEdit()"></textarea>
+                    <textarea matInput name="fanpage" formControlName="fanpage" [disabled]="isPreventEdit()"></textarea>
                   </mat-form-field>
                 </div>
               </form>
@@ -106,8 +105,7 @@
 
           <div class="d-flex justify-center pt-1">
             <ng-container *ngIf="editStatus != EditStatus.Review && editStatus != EditStatus.Reject">
-              <button type="button" mat-raised-button color="primary"
-                (click)="onSubmit(EditStatus.Review)">送出</button>
+              <button type="button" mat-raised-button color="primary" (click)="onSubmit(EditStatus.Review)">送出</button>
             </ng-container>
 
             <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id == editorId">
@@ -121,8 +119,7 @@
                 (click)="openReviewNoteDialog()">查看備註</button>
               <button type="button" mat-stroked-button color="primary" (click)="onSubmit(EditStatus.Reject)"
                 class="mr-1-i">駁回</button>
-              <button type="button" mat-raised-button color="primary"
-                (click)="onSubmit(EditStatus.Approve)">批准</button>
+              <button type="button" mat-raised-button color="primary" (click)="onSubmit(EditStatus.Approve)">批准</button>
             </ng-container>
 
             <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id == editorId">

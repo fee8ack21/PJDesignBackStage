@@ -24,6 +24,8 @@ namespace App.DAL.Repositories
         ICategoryRepository Category { get; }
         ICategoryMappingBeforeRepository CategoryMappingBefore { get; }
         ICategoryMappingAfterRepository CategoryMappingAfter { get; }
+        IPortfolioAfterRepository PortfolioAfter { get; }
+        IPortfolioBeforeRepository PortfolioBefore { get; }
 
         IDbContextTransaction CreateTransaction();
         void Save();

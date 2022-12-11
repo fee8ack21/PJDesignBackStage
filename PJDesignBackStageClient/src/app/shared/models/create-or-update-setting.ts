@@ -1,9 +1,10 @@
+import { EditStatus } from "./enums";
 import { ReviewNote } from "./review-note";
 
-export class CreateOrUpdateSetting {
+export class CreateOrUpdateSettingRequest {
   unitId: number;
   content: object;
-  editStatus: number;
+  editStatus: EditStatus | undefined;
   note?: ReviewNote;
 }
 

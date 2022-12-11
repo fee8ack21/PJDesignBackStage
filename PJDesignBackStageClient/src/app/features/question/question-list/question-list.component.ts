@@ -6,6 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
 import { CategoryDialogComponent } from 'src/app/shared/components/category-dialog/category-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
+import { Category } from 'src/app/shared/models/category';
 import { CategoryDialogData } from 'src/app/shared/models/category-dialog-data';
 import { EditAndEnabledOptions, EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { GetCategoriesByUnitId } from 'src/app/shared/models/get-categories-by-unit-id';
@@ -26,52 +27,27 @@ export class QuestionListComponent extends ListBaseComponent implements OnInit {
   dataSource: MatTableDataSource<GetQuestionsResponse>;
   searchParams = new QuestionListSearchParams();
 
-  unitId: number;
-  unitCategories: GetCategoriesByUnitId[] = [];
-  unitEnabledCategories: GetCategoriesByUnitId[] = [];
-
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(
-    private httpService: HttpService,
-    private snackBarService: SnackBarService,
-    private unitService: UnitService,
-    public dialog: MatDialog) {
-    super();
+    protected httpService: HttpService,
+    protected snackBarService: SnackBarService,
+    protected unitService: UnitService,
+    protected dialog: MatDialog) {
+    super(unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
-    this.listenUnitService();
     this.getQuestions();
-  }
 
-  listenUnitService() {
     this.unitService.isBackStageUnitsInit.subscribe(response => {
-      this.setUnitId();
+      this.setUnit();
       this.getCategories();
     });
   }
 
-  setUnitId() {
-    this.unitId = this.unitService.getCurrentUnit();
-  }
-
-  getCategories() {
-    if (this.unitId == -1) { return; }
-
-    this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unitId}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
-
-      this.unitCategories = response.entries ?? [];
-      this.unitEnabledCategories = response.entries?.filter(x => x.isEnabled) ?? [];
-    });
-  }
-
-  getQuestions() {
+  getQuestions(): void {
     this.httpService.get<ResponseBase<GetQuestionsResponse[]>>('question/getQuestions').subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
@@ -85,7 +61,7 @@ export class QuestionListComponent extends ListBaseComponent implements OnInit {
     });
   }
 
-  onSearch() {
+  onSearch(): void {
     const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
     this.dataSource = new MatTableDataSource(newData);
     this.dataSource.sort = this.sort;
@@ -105,31 +81,11 @@ export class QuestionListComponent extends ListBaseComponent implements OnInit {
       )
   }
 
-  resetSearchParams() {
+  resetSearchParams(): void {
     this.searchParams = new QuestionListSearchParams();
   }
 
-  tableSortCb(state: Sort) {
+  tableSortCb(state: Sort): void {
     this.paginator.firstPage();
-  }
-
-  openCategoryDialog(isEdit = false) {
-    let data = new CategoryDialogData();
-    data.isEdit = isEdit;
-    data.unitId = this.unitId;
-    data.categories = this.unitCategories;
-
-    const dialogRef = this.dialog.open(CategoryDialogComponent, {
-      width: '474px',
-      data: data
-    });
-
-    console.log('data', data);
-
-    dialogRef.afterClosed().subscribe(doRefresh => {
-      if (!doRefresh) { return; }
-
-      this.getCategories();
-    });
   }
 }

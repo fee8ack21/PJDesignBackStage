@@ -3,6 +3,7 @@ using App.Model;
 using App.PL.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 
 namespace App.PL.Controllers
 {

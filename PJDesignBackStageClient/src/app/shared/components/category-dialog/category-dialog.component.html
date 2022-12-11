@@ -51,6 +51,7 @@
   </ng-container>
   <div mat-dialog-actions class="d-flex justify-center">
     <button mat-button type="button" (click)="onCancelBtnClick()">取消</button>
-    <button mat-button type="submit" cdkFocusInitial>確定</button>
+    <button mat-button type="submit" *ngIf="!data.isEdit || !(data.categories == null || data.categories.length == 0)"
+      cdkFocusInitial>確定</button>
   </div>
 </form>

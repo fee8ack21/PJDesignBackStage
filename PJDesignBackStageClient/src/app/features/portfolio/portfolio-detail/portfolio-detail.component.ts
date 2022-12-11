@@ -20,6 +20,7 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
   }
 
   ngOnInit(): void {
+    this.unitService.isBackStageUnitsInit.subscribe(() => { this.setUnit(); })
     this.setPageStatus();
   }
 }

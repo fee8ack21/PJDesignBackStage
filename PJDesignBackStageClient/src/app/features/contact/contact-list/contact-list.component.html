@@ -2,7 +2,7 @@
   <div class="w-95">
     <mat-card>
       <mat-card-content>
-        <h2>聯絡我們</h2>
+        <h2>{{unit.name}}</h2>
         <div class="layout-form">
           <div class="d-flex justify-space-between">
             <mat-form-field appearance="fill">
@@ -36,18 +36,7 @@
           </div>
         </div>
         <mat-divider></mat-divider>
-        <div class="pt-1">
-          <mat-form-field appearance="fill">
-            <mat-label>單元英文名稱</mat-label>
-            <input matInput>
-          </mat-form-field>
-          <label class="file-input-btn ml-1-i" style="position: relative;top: -9px;"
-            [ngClass]="{'disabled': isPreventEdit()}">
-            <input type="file" accept="image/*" [disabled]="isPreventEdit()">
-            上傳單元背景圖片
-          </label>
-          <button mat-raised-button class="ml-1-i" color="primary" style="position: relative;top: -9px;">送出</button>
-        </div>
+        <app-unit-setting-form [unitId]="unit.id"></app-unit-setting-form>
         <mat-divider></mat-divider>
         <div class=" pt-1">
           <table mat-table (matSortChange)="tableSortCb($event)" [dataSource]="dataSource" matSort

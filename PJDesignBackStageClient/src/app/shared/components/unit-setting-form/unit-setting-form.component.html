@@ -1,0 +1,58 @@
+<div class="d-flex items-center pt-1">
+  <mat-form-field appearance="fill">
+    <mat-label>單元英文名稱</mat-label>
+    <input matInput [(ngModel)]="enName" [disabled]="isPreventEdit()">
+  </mat-form-field>
+  <img class="ml-1-i"
+    style="position: relative;top:-9px;max-width: 100px;object-position: center;object-fit: cover;max-height: 52px;"
+    *ngIf="imagePath != undefined && imagePath.length > 0" [src]="imagePath" alt="">
+  <span style="max-width: 100px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;"
+    class="ml-1-i" *ngIf="imageName != undefined && imageName.length > 0">{{imageName}}</span>
+  <label *ngIf="!isPreventEdit()" class="file-input-btn ml-1-i" style="position: relative;top: -9px;"
+    [ngClass]="{'disabled': isPreventEdit()}">
+    <input type="file" accept="image/*" [disabled]="isPreventEdit()" (change)="onPhotoUpload($event)">
+    上傳單元背景圖片
+  </label>
+
+  <div class="d-flex justify-center ml-1-i" style="position: relative;top: -9px;">
+    <ng-container *ngIf="editStatus != EditStatus.Review && editStatus != EditStatus.Reject">
+      <button type="button" mat-raised-button color="primary" (click)="onSubmit(EditStatus.Review)">送出</button>
+    </ng-container>
+
+    <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id == editorId">
+      <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+        (click)="openReviewNoteDialog()">查看備註</button>
+      <button type="button" mat-raised-button color="primary" disabled>審核中</button>
+    </ng-container>
+
+    <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+      <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+        (click)="openReviewNoteDialog()">查看備註</button>
+      <button type="button" mat-stroked-button color="primary" (click)="onSubmit(EditStatus.Reject)"
+        class="mr-1-i">駁回</button>
+      <button type="button" mat-raised-button color="primary" (click)="onSubmit(EditStatus.Approve)">批准</button>
+    </ng-container>
+
+    <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id == editorId">
+      <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+        (click)="openReviewNoteDialog()">查看備註</button>
+      <button type="button" mat-raised-button color="primary" (click)="onSubmit(EditStatus.Review)">駁回待編輯</button>
+    </ng-container>
+
+    <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id != editorId">
+      <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+        (click)="openReviewNoteDialog()">查看備註</button>
+      <button type="button" mat-raised-button color="primary" disabled>駁回待編輯</button>
+    </ng-container>
+  </div>
+
+</div>
+
+<ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+  <mat-divider></mat-divider>
+  <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;">
+    <mat-label>備註</mat-label>
+    <textarea matInput [(ngModel)]="editReviewNote"></textarea>
+  </mat-form-field>
+  <mat-divider></mat-divider>
+</ng-container>

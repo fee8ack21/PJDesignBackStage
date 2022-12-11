@@ -7,16 +7,23 @@ public partial class TblPortfolioAfter
 {
     public int CId { get; set; }
 
-    public string CName { get; set; } = null!;
+    public string CTitle { get; set; } = null!;
 
+    /// <summary>
+    /// 作品日期
+    /// </summary>
     public DateTime? CDate { get; set; }
 
     public DateTime CCreateDt { get; set; }
 
     /// <summary>
-    /// 0.停用 1.啟用 2.審核中 3.駁回
+    /// 是否啟用
     /// </summary>
-    public byte CStatus { get; set; }
+    public bool? CIsEnabled { get; set; }
 
     public DateTime CEditDt { get; set; }
+
+    public int CEditorId { get; set; }
+
+    public int CCreatorId { get; set; }
 }

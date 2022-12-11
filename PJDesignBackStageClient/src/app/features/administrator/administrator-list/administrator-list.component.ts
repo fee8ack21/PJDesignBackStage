@@ -7,8 +7,10 @@ import { ListBaseComponent } from 'src/app/shared/components/base/list-base.comp
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { Group, StageType, StatusCode } from 'src/app/shared/models/enums';
 import { GetUnitsRequest, GetUnitsResponse } from 'src/app/shared/models/get-units';
+import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { UnitService } from 'src/app/shared/services/unit-service';
 import { GroupDialogComponent } from '../feature-shared/components/group-dialog/group-dialog.component';
 import { AdministratorListSearchParams } from '../feature-shared/models/administrator-list-search-params';
 import { GetAdministratorsResponse } from '../feature-shared/models/get-administrators';
@@ -33,13 +35,15 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(
-    private httpService: HttpService,
-    private snackBarService: SnackBarService,
-    public dialog: MatDialog) {
-    super();
+    protected httpService: HttpService,
+    protected unitService: UnitService,
+    protected snackBarService: SnackBarService,
+    protected dialog: MatDialog) {
+    super(unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
+    this.unitService.isBackStageUnitsInit.subscribe(() => { this.setUnit(); });
     this.getGroups();
     this.getAdministrators();
   }

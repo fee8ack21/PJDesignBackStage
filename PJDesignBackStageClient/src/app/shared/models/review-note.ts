@@ -1,5 +1,5 @@
 export class ReviewNote {
-  Name: string;
-  Date: Date;
-  Note: string;
+  name: string;
+  date?: Date;
+  note: string;
 }

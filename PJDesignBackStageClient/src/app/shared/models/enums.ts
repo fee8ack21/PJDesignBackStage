@@ -71,3 +71,10 @@ export enum EditAndEnabledOptions {
   審核中 = 2,
   駁回 = 3,
 }
+
+export enum UploadPhotoType{
+  單元背景圖 = 1,
+  常見問題 = 2,
+  Type1 = 3,
+  Type2 = 4,
+}

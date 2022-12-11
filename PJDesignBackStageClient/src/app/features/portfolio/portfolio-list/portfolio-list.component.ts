@@ -1,9 +1,15 @@
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
+import { ResponseBase } from 'src/app/shared/models/bases';
+import { StatusCode } from 'src/app/shared/models/enums';
+import { HttpService } from 'src/app/shared/services/http.service';
+import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { UnitService } from 'src/app/shared/services/unit-service';
+import { GetPortfoliosResponse } from '../feature-shared/models/get-portfolios';
 import { PortfolioListSearchParams } from '../feature-shared/models/portfolio-list-search-params';
 
 @Component({
@@ -12,38 +18,71 @@ import { PortfolioListSearchParams } from '../feature-shared/models/portfolio-li
   styleUrls: ['./portfolio-list.component.scss']
 })
 export class PortfolioListComponent extends ListBaseComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'name', 'date', 'editDt', 'status', 'tool'];
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
+  rawListData: GetPortfoliosResponse[] = [];
+  displayedColumns: string[] = ['id', 'title', 'categories', 'date', 'editDt', 'isEnabled', 'tool'];
+  dataSource: MatTableDataSource<GetPortfoliosResponse>;
   searchParams = new PortfolioListSearchParams();
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private _liveAnnouncer: LiveAnnouncer) {
-    super();
+  constructor(
+    protected httpService: HttpService,
+    protected snackBarService: SnackBarService,
+    protected dialog: MatDialog,
+    protected unitService: UnitService) {
+    super(unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
+    this.getPortfolios();
+
+    this.unitService.isBackStageUnitsInit.subscribe(() => {
+      this.setUnit();
+      this.getCategories();
+    })
   }
 
-  ngAfterViewInit() {
+  getPortfolios(): void {
+    this.httpService.get<ResponseBase<GetPortfoliosResponse[]>>('portfolio/getPortfolios').subscribe(response => {
+      if (response.statusCode == StatusCode.Fail) {
+        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+        return;
+      }
+
+      this.rawListData = response.entries!;
+      this.dataSource = new MatTableDataSource(this.rawListData);
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+    });
+  }
+
+  onSearch(): void {
+    const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
+    this.dataSource = new MatTableDataSource(newData);
     this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
-  /** Announce the change in sort state for assistive technology. */
-  announceSortChange(sortState: Sort) {
-    // This example uses English messages. If your application supports
-    // multiple language, you would internationalize these strings.
-    // Furthermore, you can customize the message to add additional
-    // details about the values being sorted.
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
+  onSearchFilterFn(data: GetPortfoliosResponse): boolean {
+    // return (this.searchParams.title == null || this.searchParams.title.trim().length == 0 || data.title.includes(this.searchParams.title.trim())) &&
+    //   (this.searchParams.categoryId == null || this.searchParams.categoryId == -1 || (data.categories != null && data.categories.filter(x => x.id == this.searchParams.categoryId).length > 0)) &&
+    //   (this.searchParams.startDt == null || new Date(data.editDt) >= this.searchParams.startDt) &&
+    //   (this.searchParams.endDt == null || new Date(data.editDt) <= this.searchParams.endDt) &&
+    //   (this.searchParams.editAndEnabledStatus == null ||
+    //     this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.全部 ||
+    //     (data.editStatus == null && +data.isEnabled == this.searchParams.editAndEnabledStatus) ||
+    //     (data.editStatus == EditStatus.Review && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.審核中) ||
+    //     (data.editStatus == EditStatus.Reject && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.駁回)
+    //   )
+    return true;
+  }
+
+  resetSearchParams(): void {
+    this.searchParams = new PortfolioListSearchParams();
+  }
+
+  tableSortCb(state: Sort): void {
+    this.paginator.firstPage();
   }
 }
-
-const ELEMENT_DATA = [
-  { id: 1, name: 'Hydrogen', date: new Date(), editDt: new Date(), status: 1 },
-];

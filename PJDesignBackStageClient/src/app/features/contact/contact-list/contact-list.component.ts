@@ -8,6 +8,7 @@ import { ResponseBase } from 'src/app/shared/models/bases';
 import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { UnitService } from 'src/app/shared/services/unit-service';
 import { ContactDialogComponent } from '../feature-shared/components/contact-dialog/contact-dialog.component';
 import { ContactDialogData } from '../feature-shared/models/contact-dialog-data';
 import { ContactListSearchParams } from '../feature-shared/models/contact-list-search-params';
@@ -32,13 +33,15 @@ export class ContactListComponent extends ListBaseComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(
-    private httpService: HttpService,
-    private snackBarService: SnackBarService,
-    public dialog: MatDialog) {
-    super();
+    protected unitService: UnitService,
+    protected httpService: HttpService,
+    protected snackBarService: SnackBarService,
+    protected dialog: MatDialog) {
+    super(unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
+    this.unitService.isBackStageUnitsInit.subscribe(() => { this.setUnit(); })
     this.getContacts();
   }
 

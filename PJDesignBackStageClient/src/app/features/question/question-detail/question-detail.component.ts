@@ -1,20 +1,24 @@
+import { HttpEvent } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectionList } from '@angular/material/list';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AngularEditorConfig, UploadResponse } from '@kolkov/angular-editor';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
-import { ReviewNoteDialogComponent } from 'src/app/shared/components/review-note-dialog/review-note-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { defaultEditorConfig } from 'src/app/shared/models/editor-config';
 import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { GetCategoriesByUnitId } from 'src/app/shared/models/get-categories-by-unit-id';
-import { ReviewNoteDialogData } from 'src/app/shared/models/review-note-dialog-data';
+import { ReviewNote } from 'src/app/shared/models/review-note';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
+import { environment } from 'src/environments/environment';
 import { CreateOrUpdateQuestionRequest } from '../feature-shared/models/create-or-update-question';
 import { GetQuestionByIdResponse } from '../feature-shared/models/get-question-by-id';
 
@@ -25,7 +29,19 @@ import { GetQuestionByIdResponse } from '../feature-shared/models/get-question-b
 })
 export class QuestionDetailComponent extends DetailBaseComponent implements OnInit {
   questionForm: FormGroup;
-  editorConfig = defaultEditorConfig;
+  editorConfig: AngularEditorConfig = {
+    ...defaultEditorConfig,
+    upload: (file: File): Observable<HttpEvent<UploadResponse>> => {
+      return this.httpService
+        .postPhoto<ResponseBase<string>>('upload/uploadPhoto', file)
+        .pipe(
+          map((x: any) => {
+            x.body = { imageUrl: x.entries };
+            return x;
+          })
+        );
+    },
+  };
   unitCategories: { id: number, name: string, selected: boolean }[] = [];
 
   @ViewChild('categorySelectEle') categorySelectEle: MatSelectionList;
@@ -44,18 +60,16 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
 
   ngOnInit(): void {
     this.initForm();
-    this.listenUnitService();
-  }
-
-  listenUnitService() {
     this.unitService.isBackStageUnitsInit.subscribe(async response => {
-      this.setUnitId();
+      this.setUnit();
       this.getCategories();
       this.getQuestion();
     });
   }
 
   getQuestion() {
+    if (this.id == null || this.id == -1) { return; }
+
     this.httpService.get<ResponseBase<GetQuestionByIdResponse>>(`question/getQuestionById?id=${this.id}&isBefore=${this.isBefore}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
@@ -63,7 +77,11 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
       }
 
       this.editStatus = response.entries?.editStatus;
+      this.contentCreateDt = response.entries?.createDt;
       this.editorId = response.entries?.editorId;
+      this.editReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
+      this.editorName = response.entries?.editorName;
+      this.afterId = response.entries?.afterId;
 
       this.handleFormStatus(this.questionForm);
       this.updateForm(response.entries!);
@@ -88,7 +106,8 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
 
   updateForm(data: GetQuestionByIdResponse) {
     this.questionForm.patchValue({
-      id: data.id,
+      // id 為before id
+      id: this.isBefore ? data.id : null,
       title: data.title,
       isEnabled: data.isEnabled,
       content: data.content
@@ -96,9 +115,9 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
   }
 
   getCategories() {
-    if (this.unitId == -1) { return; }
+    if (this.unit.id == -1) { return; }
 
-    this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unitId}`).subscribe(response => {
+    this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unit.id}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;
@@ -128,11 +147,30 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
       e.preventDefault();
     }
 
-    if (this.questionForm.invalid) {
-      this.questionForm.markAllAsTouched();
+    if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
+      this.snackBarService.showSnackBar('請填寫備註');
+      return;
     }
 
-    let request: CreateOrUpdateQuestionRequest = { ...this.questionForm.value, editStatus: status, categoryIDs: this.getSelectedCategoryIDs() };
+    if (this.questionForm.invalid) {
+      this.questionForm.markAllAsTouched();
+      return;
+    }
+
+    let request: CreateOrUpdateQuestionRequest = {
+      ...this.questionForm.value,
+      editStatus: status,
+      categoryIDs: this.getSelectedCategoryIDs(),
+      afterId: this.isBefore ? this.afterId : this.id
+    };
+
+    if (status == EditStatus.Reject) {
+      let temp = new ReviewNote();
+      temp.note = this.editReviewNote!;
+      temp.name = this.administrator!.name
+      request.note = temp;
+    }
+
     this.httpService.post<ResponseBase<string>>('question/createOrUpdateQuestion', request).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);

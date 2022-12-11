@@ -34,15 +34,15 @@ export class UnitService {
     return { fixedUnits: [], customUnits: [] };
   }
 
-  getCurrentUnit() {
-    if (this._units == null || this._units.length == 0) { return -1; }
+  getCurrentUnit(): { id: number, name: string } {
+    if (this._units == null || this._units.length == 0) { return { id: -1, name: '' }; }
 
     const path = window.location.pathname;
     const filtededUnits = this._units.filter(x => x.backStageUrl != null ? path.includes(x.backStageUrl ?? '') : false);
 
-    if (filtededUnits.length == 0) { return -1; }
+    if (filtededUnits.length == 0) { return { id: -1, name: '' }; }
 
-    return filtededUnits[0].id;
+    return { id: filtededUnits[0].id, name: filtededUnits[0].name };
   }
 
   private _setFormattedUnits(units: UnitList[]) {

@@ -4,6 +4,7 @@ using App.DAL.Contexts;
 using App.DAL.Repositories;
 using App.PL.HostedServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
@@ -53,6 +54,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 
 builder.Services.AddHostedService<EmailService>();
 
@@ -67,6 +69,11 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "PJ Design");
     });
 }
+app.UseStaticFiles(new StaticFileOptions()
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
+    RequestPath = "/Images"
+});
 
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();

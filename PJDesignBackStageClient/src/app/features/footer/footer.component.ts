@@ -7,7 +7,7 @@ import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
 import { ReviewNoteDialogComponent } from 'src/app/shared/components/review-note-dialog/review-note-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { CreateOrUpdateSetting } from 'src/app/shared/models/create-or-update-setting';
+import { CreateOrUpdateSettingRequest } from 'src/app/shared/models/create-or-update-setting';
 import { EditStatus, StatusCode, TemplateType } from 'src/app/shared/models/enums';
 import { GetSettingByUnitIdResponse } from 'src/app/shared/models/get-setting-by-unit-id';
 import { GetUnitsRequest, GetUnitsResponse } from 'src/app/shared/models/get-units';
@@ -46,16 +46,13 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initForm();
-    this.listenUnitService();
-  }
-
-  listenUnitService() {
     this.unitService.isBackStageUnitsInit.subscribe(async response => {
-      this.setUnitId();
+      this.setUnit();
       await this.setType2Units();
       this.getSettingByUnitId();
     });
+
+    this.initForm();
   }
 
   async setType2Units() {
@@ -75,9 +72,9 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
   }
 
   getSettingByUnitId() {
-    if (this.unitId == null || this.unitId == -1) { return }
+    if (this.unit.id == null || this.unit.id == -1) { return }
 
-    this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${this.unitId}`).subscribe(response => {
+    this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${this.unit.id}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;
@@ -189,16 +186,16 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
     settings.socialIcons = this.socialIcons.filter(x => x.url != null && x.url.trim().length > 0 && x.image != null && x.image.trim().length > 0);
 
 
-    let request = new CreateOrUpdateSetting();
-    request.unitId = this.unitId;
+    let request = new CreateOrUpdateSettingRequest();
+    request.unitId = this.unit.id;
     request.content = settings;
     request.editStatus = status;
 
     if (status == EditStatus.Reject) {
       let temp = new ReviewNote();
-      temp.Date = new Date();
-      temp.Note = this.editReviewNote!;
-      temp.Name = this.administrator!.name
+      temp.date = new Date();
+      temp.note = this.editReviewNote!;
+      temp.name = this.administrator!.name
       request.note = temp;
     }
 

@@ -30,13 +30,18 @@ import { CategoryDialogComponent } from '../components/category-dialog/category-
 import { ReviewNoteDialogComponent } from '../components/review-note-dialog/review-note-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AngularEditorModule } from '@kolkov/angular-editor';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkAccordionModule } from '@angular/cdk/accordion';
+import { UnitSettingFormComponent } from '../components/unit-setting-form/unit-setting-form.component';
 
 @NgModule({
   declarations: [
     LayoutComponent,
     SafeUrlPipe,
     CategoryDialogComponent,
-    ReviewNoteDialogComponent
+    ReviewNoteDialogComponent,
+    UnitSettingFormComponent
   ],
   imports: [
     CommonModule,
@@ -44,11 +49,13 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
     RouterModule,
     AngularEditorModule,
     ReactiveFormsModule,
+    CdkAccordionModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatCheckboxModule,
     MatTreeModule,
     MatTableModule,
+    DragDropModule,
     MatSortModule,
     MatFormFieldModule,
     MatDialogModule,
@@ -58,6 +65,7 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
     MatButtonModule,
     MatPaginatorModule,
     MatListModule,
+    MatTooltipModule,
     MatToolbarModule,
     MatIconModule,
     MatMenuModule,
@@ -80,9 +88,11 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
     MatSelectModule,
     MatCardModule,
     MatProgressSpinnerModule,
+    CdkAccordionModule,
     MatExpansionModule,
     AngularEditorModule,
     MatSortModule,
+    DragDropModule,
     MatButtonModule,
     MatTreeModule,
     MatCheckboxModule,
@@ -97,7 +107,9 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
     MatSidenavModule,
     MatProgressBarModule,
     MatIconModule,
-    SafeUrlPipe
+    MatTooltipModule,
+    SafeUrlPipe,
+    UnitSettingFormComponent
   ]
 })
 

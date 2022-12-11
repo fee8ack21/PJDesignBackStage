@@ -13,7 +13,7 @@ public partial class TblPortfolioBefore
     /// <summary>
     /// 名稱
     /// </summary>
-    public string CName { get; set; } = null!;
+    public string CTitle { get; set; } = null!;
 
     /// <summary>
     /// 作品日期
@@ -25,24 +25,29 @@ public partial class TblPortfolioBefore
     /// </summary>
     public DateTime CCreateDt { get; set; }
 
-    public string? CNote { get; set; }
+    public string? CNotes { get; set; }
 
     /// <summary>
-    /// 0.停用 1.啟用 2.審核中 3.駁回
+    /// 1.審核中 2.駁回 3.批准
     /// </summary>
-    public byte CStatus { get; set; }
+    public byte CEditStatus { get; set; }
 
     /// <summary>
     /// 編輯人員ID
     /// </summary>
-    public int CEditAdministratorId { get; set; }
+    public int CEditorId { get; set; }
 
     /// <summary>
     /// 審核人員ID
     /// </summary>
-    public int CReviewAdministratorId { get; set; }
+    public int? CReviewerId { get; set; }
 
-    public int CAfterId { get; set; }
+    public int? CAfterId { get; set; }
 
     public DateTime CEditDt { get; set; }
+
+    /// <summary>
+    /// 是否啟用
+    /// </summary>
+    public bool? CIsEnabled { get; set; }
 }

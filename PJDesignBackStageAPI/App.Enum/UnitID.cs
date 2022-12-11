@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace App.Enum
 {
-    public enum UnitID
+    public enum UnitId
     {
         首頁設定 = 7,
         Footer設定 = 8,
         常見問題 = 11,
+        作品集 = 9,
     }
 }
