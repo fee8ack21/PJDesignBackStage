@@ -13,20 +13,10 @@ public partial class TblPortfolioPhotoAfter
     /// <summary>
     /// 圖片檔案名稱
     /// </summary>
-    public string CFilename { get; set; } = null!;
-
-    /// <summary>
-    /// 圖片檔案路徑
-    /// </summary>
-    public string CPath { get; set; } = null!;
+    public string CUrl { get; set; } = null!;
 
     /// <summary>
     /// 作品集ID
     /// </summary>
     public int CPortfolioId { get; set; }
-
-    /// <summary>
-    /// 是否啟用
-    /// </summary>
-    public string CContentHash { get; set; } = null!;
 }

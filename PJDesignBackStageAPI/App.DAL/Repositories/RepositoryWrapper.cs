@@ -27,6 +27,8 @@ namespace App.DAL.Repositories
         private ICategoryMappingAfterRepository? _categoryMappingAfter;
         private IPortfolioBeforeRepository? _portfolioBefore;
         private IPortfolioAfterRepository? _portfolioAfter;
+        private IPortfolioPhotoBeforeRepository? _portfolioPhotoBefore;
+        private IPortfolioPhotoAfterRepository? _portfolioPhotoAfter;
 
         public RepositoryWrapper(PjdesignContext context)
         {
@@ -237,6 +239,32 @@ namespace App.DAL.Repositories
                 }
 
                 return _portfolioAfter;
+            }
+        }
+
+        public IPortfolioPhotoBeforeRepository PortfolioPhotoBefore
+        {
+            get
+            {
+                if (_portfolioPhotoBefore == null)
+                {
+                    _portfolioPhotoBefore = new PortfolioPhotoBeforeRepository(_context);
+                }
+
+                return _portfolioPhotoBefore;
+            }
+        }
+
+        public IPortfolioPhotoAfterRepository PortfolioPhotoAfter
+        {
+            get
+            {
+                if (_portfolioPhotoAfter == null)
+                {
+                    _portfolioPhotoAfter = new PortfolioPhotoAfterRepository(_context);
+                }
+
+                return _portfolioPhotoAfter;
             }
         }
 

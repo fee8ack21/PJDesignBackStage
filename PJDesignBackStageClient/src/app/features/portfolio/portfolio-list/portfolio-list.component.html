@@ -53,7 +53,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by number">
                 ID
               </th>
-              <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+              <td mat-cell *matCellDef="let element;let i = index;"> {{i + 1}} </td>
             </ng-container>
             <ng-container matColumnDef="title">
               <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by title">
@@ -82,7 +82,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by date">
                 作品完成時間
               </th>
-              <td mat-cell *matCellDef="let element"> {{element.date | date:'yyyy/MM/dd'}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.date == null ? '無' : element.date | date:'yyyy/MM/dd'}} </td>
             </ng-container>
             <ng-container matColumnDef="editDt">
               <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by symbol">
@@ -103,7 +103,7 @@
                 管理
               </th>
               <td mat-cell *matCellDef="let element">
-                <a mat-stroked-button [routerLink]="['/question','detail']"
+                <a mat-stroked-button [routerLink]="['/portfolio','detail']"
                   [queryParams]="{id: element.id, status: PageStatus.Edit, isBefore: element.isBefore}">編輯</a>
               </td>
             </ng-container>

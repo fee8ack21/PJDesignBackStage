@@ -330,22 +330,13 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CId)
                 .HasComment("流水號")
                 .HasColumnName("cId");
-            entity.Property(e => e.CContentHash)
-                .HasMaxLength(200)
-                .HasDefaultValueSql("((1))")
-                .HasComment("是否啟用")
-                .HasColumnName("cContentHash");
-            entity.Property(e => e.CFilename)
-                .HasMaxLength(200)
-                .HasComment("圖片檔案名稱")
-                .HasColumnName("cFilename");
-            entity.Property(e => e.CPath)
-                .HasMaxLength(200)
-                .HasComment("圖片檔案路徑")
-                .HasColumnName("cPath");
             entity.Property(e => e.CPortfolioId)
                 .HasComment("作品集ID")
                 .HasColumnName("cPortfolioId");
+            entity.Property(e => e.CUrl)
+                .HasMaxLength(200)
+                .HasComment("圖片檔案名稱")
+                .HasColumnName("cUrl");
         });
 
         modelBuilder.Entity<TblPortfolioPhotoBefore>(entity =>
@@ -357,20 +348,13 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CId)
                 .HasComment("流水號")
                 .HasColumnName("cId");
-            entity.Property(e => e.CContentHash)
-                .HasMaxLength(200)
-                .HasColumnName("cContentHash");
-            entity.Property(e => e.CFilename)
-                .HasMaxLength(200)
-                .HasComment("圖片檔案名稱")
-                .HasColumnName("cFilename");
-            entity.Property(e => e.CPath)
-                .HasMaxLength(200)
-                .HasComment("圖片檔案路徑")
-                .HasColumnName("cPath");
             entity.Property(e => e.CPortfolioId)
                 .HasComment("作品集ID")
                 .HasColumnName("cPortfolioId");
+            entity.Property(e => e.CUrl)
+                .HasMaxLength(200)
+                .HasComment("圖片檔案名稱")
+                .HasColumnName("cUrl");
         });
 
         modelBuilder.Entity<TblQuestionAfter>(entity =>

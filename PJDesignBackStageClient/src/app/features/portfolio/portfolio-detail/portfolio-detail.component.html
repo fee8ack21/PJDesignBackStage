@@ -5,42 +5,121 @@
         <h2>{{unit.name}} - {{pageStatusName}}</h2>
         <mat-divider></mat-divider>
         <div class="pt-1">
-          <form>
-            <div class="d-flex justify-space-between">
+          <form [formGroup]="portfolioForm">
+            <div class="py-1">
               <mat-form-field appearance="fill">
-                <mat-label>帳戶</mat-label>
-                <input matInput>
+                <mat-label>標題</mat-label>
+                <input matInput formControlName="title" name="title" readonly
+                  onfocus="this.removeAttribute('readonly');">
+                <mat-error *ngIf="validatorService.isFormControlInvalid(portfolioForm, 'title')">
+                  {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+                </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>名稱</mat-label>
-                <input matInput>
+              <mat-form-field appearance="fill" class="ml-1-i">
+                <mat-label>作品時間</mat-label>
+                <input readonly matInput [matDatepicker]="dataPicker" readonly formControlName="date" name="date">
+                <mat-datepicker-toggle matIconSuffix [for]=" dataPicker"></mat-datepicker-toggle>
+                <mat-datepicker #dataPicker></mat-datepicker>
               </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>密碼</mat-label>
-                <input matInput>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>身份</mat-label>
-                <mat-select>
-                  <mat-option value="one">管理員</mat-option>
-                  <mat-option value="two">一般用戶</mat-option>
-                </mat-select>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="fill" class="ml-1-i">
                 <mat-label>狀態</mat-label>
-                <mat-select>
-                  <mat-option value="one">啟用</mat-option>
-                  <mat-option value="two">停用</mat-option>
+                <mat-select formControlName="isEnabled" name="isEnabled">
+                  <mat-option [value]="true">啟用</mat-option>
+                  <mat-option [value]="false">停用</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
             <mat-divider></mat-divider>
-
-            <div class="d-flex justify-center pt-1">
-              <a mat-stroked-button class="mr-1-i" [routerLink]="['/portfolio',]">取消</a>
-              <button mat-raised-button color="primary">送出</button>
+            <div class="py-1">
+              <mat-expansion-panel hideToggle [expanded]="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    選擇分類
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-selection-list #categorySelectEle>
+                  <mat-list-option *ngFor="let item of unitCategories" [value]="item.id" [selected]="item.selected"
+                    [disabled]="isPreventEdit()">
+                    {{item.name}}
+                  </mat-list-option>
+                </mat-selection-list>
+              </mat-expansion-panel>
             </div>
+            <mat-divider></mat-divider>
+            <mat-expansion-panel hideToggle [expanded]="true" class="mt-1-i">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <span>作品集照片</span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-list role="list">
+                <mat-list-item role="listitem" *ngFor="let item of photos;let i = index;" class="my-2-i"
+                  style="position: relative;overflow-y: hidden;height: 100px;">
+
+                  <img *ngIf="item != null && item.length > 0" [src]="item | safeUrl" style="width: 90%;max-height: 100px;object-fit: cover;object-position: center;"/>
+
+                  <button (click)="removePhoto(i)" type="button" class="ml-auto-i" mat-stroked-button color="basic"
+                    [disabled]="isPreventEdit()">移除</button>
+                </mat-list-item>
+                <mat-list-item class="">
+                  <label class="file-input-btn w-100" [ngClass]="{'disabled': isPreventEdit()}">
+                    <input type="file" accept="image/*" (change)="onPhotoUpload($event)"
+                      [disabled]="isPreventEdit()">
+                    上傳圖片
+                  </label>
+                </mat-list-item>
+              </mat-list>
+            </mat-expansion-panel>
+
           </form>
+
+          <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+            <mat-divider class="mt-1"></mat-divider>
+            <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;">
+              <mat-label>備註</mat-label>
+              <textarea matInput [(ngModel)]="editReviewNote"></textarea>
+            </mat-form-field>
+            <mat-divider></mat-divider>
+          </ng-container>
+
+          <div class="d-flex justify-center pt-1">
+            <ng-container *ngIf="editStatus != EditStatus.Review && editStatus != EditStatus.Reject">
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <button type="button" mat-raised-button color="primary" (click)="onSubmit($event)">送出</button>
+            </ng-container>
+
+            <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id == editorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <button type="button" mat-raised-button color="primary" disabled>審核中</button>
+            </ng-container>
+
+            <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <button type="button" mat-stroked-button color="primary" (click)="onSubmit($event, EditStatus.Reject)"
+                class="mr-1-i">駁回</button>
+              <button type="button" mat-raised-button color="primary"
+                (click)="onSubmit($event, EditStatus.Approve)">批准</button>
+            </ng-container>
+
+            <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id == editorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <button type="button" mat-raised-button color="primary"
+                (click)="onSubmit($event, EditStatus.Review)">駁回待編輯</button>
+            </ng-container>
+
+            <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id != editorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <button type="button" mat-raised-button color="primary" disabled>駁回待編輯</button>
+            </ng-container>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
