@@ -18,7 +18,9 @@ export class ValidatorService {
   getFormControlErrorText(type: number): string {
     switch (type) {
       case FormControlErrorType.Required:
-        return '欄位不得為空'
+        return '欄位不得為空';
+      case FormControlErrorType.Pattern:
+        return '欄位格式錯誤'
       default:
         return ''
     }

@@ -571,7 +571,6 @@ public partial class PjdesignContext : DbContext
                 .HasComment("排序")
                 .HasColumnName("cSort");
             entity.Property(e => e.CStageType)
-                .HasDefaultValueSql("((2))")
                 .HasComment("0.前後台 1.僅前台 2.僅後台")
                 .HasColumnName("cStageType");
             entity.Property(e => e.CTemplateType)

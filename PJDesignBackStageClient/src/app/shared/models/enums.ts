@@ -1,5 +1,6 @@
 export enum FormControlErrorType {
   Required = 0,
+  Pattern
 }
 
 export enum PageStatus {

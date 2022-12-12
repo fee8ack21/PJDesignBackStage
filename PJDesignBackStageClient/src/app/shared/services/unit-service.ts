@@ -64,36 +64,29 @@ export class UnitService {
       customUnits.push(unit);
     })
 
-    while (childUnits.length > 0) {
-      childUnits.forEach((cUnit, i) => {
-        if (cUnit.templateType == TemplateType.固定單元) {
-          fixedUnits.forEach(pUnit => {
-            if (pUnit.id == cUnit.parent) {
-
-              if (pUnit.children == null) {
-                pUnit.children = [];
-              }
-
-              pUnit.children.push(cUnit)
-              childUnits.splice(i, 1);
-            }
-          })
-          return;
-        }
-
-        customUnits.forEach(pUnit => {
-          if (pUnit.id == cUnit.parent) {
-
-            if (pUnit.children == null) {
-              pUnit.children = [];
-            }
-
-            pUnit.children.push(cUnit)
-            childUnits.splice(i, 1);
+    childUnits.forEach(c => {
+      let hasMatched = false;
+      fixedUnits.forEach(f => {
+        if (f.id == c.parent) {
+          if (f.children == null) {
+            f.children = [c];
+          } else {
+            f.children.push(c);
           }
-        })
+        }
       })
-    }
+
+      if (hasMatched) { return; }
+      customUnits.forEach(cs => {
+        if (cs.id == c.parent) {
+          if (cs.children == null) {
+            cs.children = [c];
+          } else {
+            cs.children.push(c);
+          }
+        }
+      })
+    })
 
     this._fixedUnits = fixedUnits;
     this._customUnits = customUnits;

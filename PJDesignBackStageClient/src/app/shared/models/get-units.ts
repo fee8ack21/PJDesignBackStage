@@ -19,5 +19,5 @@ export class GetUnitsResponse {
 }
 
 export class UnitList extends GetUnitsResponse {
-  children: GetUnitsResponse[];
+  children: UnitList[];
 }

@@ -221,5 +221,111 @@ namespace App.BLL
 
             return response;
         }
+
+        public async Task<ResponseBase<string>> CreateOrUpdateUnit(CreateOrUpdateUnitRequest request)
+        {
+            var response = new ResponseBase<string>();
+            try
+            {
+                if (request.Id == null)
+                {
+                    using (var transaction = _repositoryWrapper.CreateTransaction())
+                    {
+                        var tblUnit = new TblUnit();
+                        tblUnit.CName = request.Name;
+                        tblUnit.CTemplateType = request.TemplateType;
+                        tblUnit.CIsAnotherWindow = request.IsAnotherWindow;
+                        tblUnit.CIsEnabled = request.IsEnabled;
+                        tblUnit.CParent = request.Parent;
+                        tblUnit.CStageType = (int)StageType.前後台;
+
+                        _repositoryWrapper.Unit.Create(tblUnit);
+                        await _repositoryWrapper.SaveAsync();
+
+                        var id = tblUnit.CId;
+                        switch (request.TemplateType)
+                        {
+                            case (int)TemplateType.無:
+                                tblUnit.CBackStageUrl = request.Url;
+                                tblUnit.CFrontStageUrl = request.Url;
+                                break;
+                            case (int)TemplateType.模板一:
+                                tblUnit.CBackStageUrl = $"/type1?uid={id}";
+                                tblUnit.CFrontStageUrl = $"/Unit/Type1?uid={id}";
+                                break;
+                            case (int)TemplateType.模板二:
+                                tblUnit.CBackStageUrl = $"/type2?uid={id}";
+                                tblUnit.CFrontStageUrl = $"/Unit/Type2?uid={id}";
+                                break;
+                        }
+
+                        _repositoryWrapper.Unit.Update(tblUnit);
+                        _repositoryWrapper.GroupUnitRight.Create(new TblGroupUnitRight() { CGroupId = (int)Group.系統管理員, CRightId = (int)Right.C_R_U_D, CUnitId = id });
+                        await _repositoryWrapper.SaveAsync();
+
+                        transaction.Commit();
+                    }
+                }
+                else
+                {
+                    var tblUnit = await _repositoryWrapper.Unit.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
+
+                    tblUnit.CName = request.Name;
+                    tblUnit.CTemplateType = request.TemplateType;
+                    tblUnit.CIsAnotherWindow = request.IsAnotherWindow;
+                    tblUnit.CIsEnabled = request.IsEnabled;
+
+                    switch (request.TemplateType)
+                    {
+                        case (int)TemplateType.無:
+                            tblUnit.CBackStageUrl = request.Url;
+                            tblUnit.CFrontStageUrl = request.Url;
+                            break;
+                        case (int)TemplateType.模板一:
+                            tblUnit.CBackStageUrl = $"/type1?uid={tblUnit.CId}";
+                            tblUnit.CFrontStageUrl = $"/Unit/Type1?uid={tblUnit.CId}";
+                            break;
+                        case (int)TemplateType.模板二:
+                            tblUnit.CBackStageUrl = $"/type2?uid={tblUnit.CId}";
+                            tblUnit.CFrontStageUrl = $"/Unit/Type2?uid={tblUnit.CId}";
+                            break;
+                    }
+
+                    _repositoryWrapper.Unit.Update(tblUnit);
+                    await _repositoryWrapper.SaveAsync();
+
+                    // Todo: 若更改TemplateType，比對當前是否尚有該單元的模板內容，有則失敗。
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseBase<string>> UpdateUnitsSort(IEnumerable<UpdateUnitsSortRequest> request)
+        {
+            var response = new ResponseBase<string>();
+            try
+            {
+                var tblUnits = await _repositoryWrapper.Unit.GetByCondition(x => x.CStageType == (int)StageType.前台 || x.CStageType == (int)StageType.前後台).ToListAsync();
+                foreach (var unit in tblUnits)
+                {
+                    unit.CSort = request.Where(x => x.UnitId == unit.CId).FirstOrDefault()?.Sort;
+                }
+
+                _repositoryWrapper.Unit.UpdateRange(tblUnits);
+                await _repositoryWrapper.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.StatusCode = StatusCode.Fail;
+            }
+            return response;
+        }
     }
 }

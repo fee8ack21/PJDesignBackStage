@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>{{data.id != null && data.id != undefined ? '編輯' : '新增'}}</h1>
+<h1 mat-dialog-title>{{data?.unit?.id != null && data?.unit?.id != undefined ? '編輯' : '新增'}}</h1>
 <form [formGroup]="unitForm">
   <div mat-dialog-content>
     <mat-form-field appearance="fill" class="w-100 mb-1">
@@ -49,6 +49,6 @@
   </div>
   <div mat-dialog-actions class="d-flex justify-center">
     <button mat-button (click)="onCancelBtnClick()">取消</button>
-    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>確定</button>
+    <button mat-button (click)="onSubmit()" cdkFocusInitial>確定</button>
   </div>
 </form>

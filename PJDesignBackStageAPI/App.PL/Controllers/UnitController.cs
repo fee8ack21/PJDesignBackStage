@@ -52,5 +52,27 @@ namespace App.PL.Controllers
             var payload = (JwtPayload)HttpContext.Items["jwtPayload"]!;
             return await _service.CreateOrUpdateSetting(request, payload);
         }
+
+        /// <summary>
+        /// 新增或修改單元
+        /// </summary>
+        [HttpPost]
+        [Route("CreateOrUpdateUnit")]
+        [JwtFilter]
+        public async Task<ResponseBase<string>> CreateOrUpdateUnit(CreateOrUpdateUnitRequest request)
+        {
+            return await _service.CreateOrUpdateUnit(request);
+        }
+
+        /// <summary>
+        /// 修改前台單元排序
+        /// </summary>
+        [HttpPost]
+        [Route("UpdateUnitsSort")]
+        [JwtFilter]
+        public async Task<ResponseBase<string>> UpdateUnitsSort(IEnumerable<UpdateUnitsSortRequest> request)
+        {
+            return await _service.UpdateUnitsSort(request);
+        }
     }
 }

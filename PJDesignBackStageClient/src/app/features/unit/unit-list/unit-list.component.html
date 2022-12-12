@@ -4,14 +4,15 @@
       <mat-card-content>
         <h2>{{unit.name}}</h2>
         <mat-divider></mat-divider>
-        <button mat-stroked-button class="my-1-i" (click)="addChildNode()">新增母節點</button>
+        <button mat-stroked-button class="my-1-i" (click)="openDialog()">新增母節點</button>
 
         <div cdkDropList class="example-list mb-1-i" (cdkDropListDropped)="drop($event, units)">
           <cdk-accordion class="example-accordion">
             <cdk-accordion-item *ngFor="let item of units; let index = index;" cdkDrag #accordionItem="cdkAccordionItem"
               class="example-accordion-item" role="button" tabindex="0" [attr.id]="'accordion-header-' + index"
               [attr.aria-expanded]="accordionItem.expanded" [attr.aria-controls]="'accordion-body-' + index">
-              <div class="example-accordion-item-header" [ngStyle]="{'border-bottom': ((item.children != null && item.children.length > 0) && accordionItem.expanded) || index == units.length - 1 ? 'none' : 'solid 1px #ccc'}">
+              <div class="example-accordion-item-header"
+                [ngStyle]="{'text-decoration': item.isEnabled ? 'none' : 'line-through'}">
                 <button mat-icon-button *ngIf="item.children != null && item.children.length > 0" class="mr-1-i"
                   (click)="accordionItem.toggle()">
                   <mat-icon>{{accordionItem.expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}</mat-icon>
@@ -22,14 +23,13 @@
                   <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #unitMenu="matMenu" xPosition="after" yPosition="above" [overlapTrigger]="false">
-                  <a class="d-flex-i items-center-i " mat-menu-item (click)="addChildNode(item.id)">
+                  <a class="d-flex-i items-center-i " mat-menu-item (click)="openDialog(item)">
+                    <mat-icon style="margin-right: 5px !important;">edit</mat-icon>
+                    <span>編輯</span>
+                  </a>
+                  <a class="d-flex-i items-center-i " mat-menu-item (click)="openDialog(undefined, item.id)">
                     <mat-icon style="margin-right: 5px !important;">add</mat-icon>
                     <span>新增節點</span>
-                  </a>
-                  <a class="d-flex-i items-center-i " mat-menu-item (click)="toggleNodeStatus(item.id)">
-                    <mat-icon style="margin-right: 5px !important;">{{item.status ? 'block' : 'check_circle'}}
-                    </mat-icon>
-                    <span>{{item.status ? '停用' : '啟用'}}</span>
                   </a>
                 </mat-menu>
               </div>
@@ -37,16 +37,16 @@
                 (cdkDropListDropped)="drop($event, item.children)" class="example-accordion-item-body" role="region"
                 [style.display]="accordionItem.expanded ? '' : 'none'" [attr.id]="'accordion-body-' + index"
                 [attr.aria-labelledby]="'accordion-header-' + index">
-                <div class="example-box" *ngFor="let child of item.children" cdkDrag>
+                <div class="example-box" *ngFor="let child of item.children" cdkDrag
+                  [ngStyle]="{'text-decoration': child.isEnabled ? 'none' : 'line-through'}">
                   {{child.name}}
                   <button mat-icon-button [matMenuTriggerFor]="unitMenu" class="ml-2-i">
                     <mat-icon>more_vert</mat-icon>
                   </button>
                   <mat-menu #unitMenu="matMenu" xPosition="after" yPosition="above" [overlapTrigger]="false">
-                    <a class="d-flex-i items-center-i " mat-menu-item (click)="toggleNodeStatus(item.id)">
-                      <mat-icon style="margin-right: 5px !important;">{{item.status ? 'block' : 'check_circle'}}
-                      </mat-icon>
-                      <span>{{item.status ? '停用' : '啟用'}}</span>
+                    <a class="d-flex-i items-center-i " mat-menu-item (click)="openDialog(child, item.id)">
+                      <mat-icon style="margin-right: 5px !important;">edit</mat-icon>
+                      <span>編輯</span>
                     </a>
                   </mat-menu>
                 </div>
@@ -56,7 +56,7 @@
         </div>
         <mat-divider></mat-divider>
         <div class="d-flex justify-center pt-1">
-          <button type="button" mat-raised-button color="primary">送出</button>
+          <button type="button" mat-raised-button color="primary" (click)="updateUnitsSort()">更新排序</button>
         </div>
       </mat-card-content>
     </mat-card>
