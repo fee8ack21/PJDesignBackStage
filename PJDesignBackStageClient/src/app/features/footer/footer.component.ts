@@ -19,7 +19,7 @@ import { ProgressBarService } from 'src/app/shared/services/progress-bar.service
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
-import { FooterSocialIcon, FooterSettings } from './feature-shared/update-footer-settings';
+import { FooterSocialIcon, FooterSettings } from './feature-shared/models/update-footer-settings';
 
 @Component({
   selector: 'app-footer',

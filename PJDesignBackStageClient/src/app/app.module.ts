@@ -23,6 +23,7 @@ import { ProgressBarService } from './shared/services/progress-bar.service';
 import { FooterModule } from './features/footer/footer.module';
 import { ContactModule } from './features/contact/contact.module';
 import { QuestionModule } from './features/question/question.module';
+import { HomeModule } from './features/home/home.module';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { QuestionModule } from './features/question/question.module';
     FooterModule,
     ContactModule,
     QuestionModule,
+    HomeModule,
   ],
   providers: [
     HttpService,

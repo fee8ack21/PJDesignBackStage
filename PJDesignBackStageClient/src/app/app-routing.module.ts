@@ -21,6 +21,9 @@ const routes: Routes = [
     path: 'footer', loadChildren: () => import('./features/footer/footer.module').then(m => m.FooterModule),
   },
   {
+    path: 'home', loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule),
+  },
+  {
     path: 'contact', loadChildren: () => import('./features/contact/contact.module').then(m => m.ContactModule),
   },
   {

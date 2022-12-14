@@ -1,4 +1,4 @@
 1.安裝EFCore.Tools 才能用Scaffold 指令
 2.在DAL 專案安裝EFCore.Tools and EFCore.SqlServer
 3.切換Startup project to DAL project
-Scaffold-DbContext "Server=(localdb)\mssqllocaldb;Database=PJDesign;Trusted_Connection=True;Integrated Security=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir "Models" -ContextDir "Contexts" -force
+Scaffold-DbContext "Server=(localdb)\mssqllocaldb;Database=PJDesign;Trusted_Connection=True;Integrated Security=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir "Models" -ContextDir "Contexts" -DataAnnotation -force
