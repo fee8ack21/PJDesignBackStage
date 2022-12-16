@@ -1,0 +1,143 @@
+<div class="d-flex justify-center my-1">
+  <div class="w-95">
+    <mat-card>
+      <mat-card-content>
+        <h2>{{unit.name}} - {{pageStatusName}}</h2>
+        <mat-divider></mat-divider>
+        <div class="pt-1">
+          <form [formGroup]="type2Form">
+            <div class="d-flex py-1">
+              <input formControlName="id" name="id" [value]="null" type="hidden">
+              <mat-form-field appearance="fill">
+                <mat-label>標題</mat-label>
+                <input matInput formControlName="title" name="title" readonly
+                  onfocus="this.removeAttribute('readonly');">
+                <mat-error *ngIf="validatorService.isFormControlInvalid(type2Form, 'title')">
+                  {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="ml-1-i">
+                <mat-label>狀態</mat-label>
+                <mat-select formControlName="isEnabled" name="isEnabled">
+                  <mat-option [value]="true">啟用</mat-option>
+                  <mat-option [value]="false">停用</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="d-flex ml-1-i">
+                <img *ngIf="thumbnailUrl.length > 0" [src]="thumbnailUrl" alt="" class="mr-1-i"
+                  style="max-height:52px;max-width: 70px;object-fit: cover;object-position: center;">
+                <span *ngIf="thumbnailName.length > 0"
+                  style="max-width: 60px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;align-self: baseline;position: relative;top: 8px;"
+                  class="mr-1-i">{{thumbnailName}}</span>
+                <label style="position: relative;top: 8px; align-self: baseline;" class="file-input-btn"
+                  [ngClass]="{'disabled': isPreventEdit()}">
+                  <input type="file" accept="image/*" (change)="onPhotoUpload($event, 'thumbnail')"
+                    [disabled]="isPreventEdit()">
+                  上傳縮圖
+                </label>
+              </div>
+              <div class="d-flex ml-1-i">
+                <img *ngIf="imageUrl.length > 0" [src]="imageUrl" alt="" class="mr-1-i"
+                  style="max-height:52px;max-width: 70px;object-fit: cover;object-position: center;">
+                <span *ngIf="imageName.length > 0"
+                  style="max-width: 60px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;align-self: baseline;position: relative;top: 8px;"
+                  class="mr-1-i">{{imageName}}</span>
+                <label style="position: relative;top: 8px;align-self: baseline;" class="file-input-btn"
+                  [ngClass]="{'disabled': isPreventEdit()}">
+                  <input type="file" accept="image/*" (change)="onPhotoUpload($event, 'image')"
+                    [disabled]="isPreventEdit()">
+                  上傳Banner圖
+                </label>
+              </div>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="py-1" *ngIf="unitCategories != null && unitCategories.length > 0">
+              <mat-expansion-panel hideToggle [expanded]="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    選擇分類
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-selection-list #categorySelectEle>
+                  <mat-list-option *ngFor="let item of unitCategories" [value]="item.id" [selected]="item.selected"
+                    [disabled]="isPreventEdit()">
+                    {{item.name}}
+                  </mat-list-option>
+                </mat-selection-list>
+              </mat-expansion-panel>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="pt-1" [ngClass]="{'pb-1': editStatus == EditStatus.Review && administrator?.id != editorId}">
+              <ng-container *ngIf="!isPreventEdit()">
+                <angular-editor
+                  [ngClass]="{'editor-invalid': validatorService.isFormControlInvalid(type2Form, 'content')}"
+                  [config]="editorConfig" formControlName="content">
+                </angular-editor>
+              </ng-container>
+              <div *ngIf="isPreventEdit()">
+                <mat-card>
+                  <mat-card-content>
+                    <div [innerHTML]="type2Form.get('content')?.value"></div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+          </form>
+
+          <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+            <mat-divider class="mt-1"></mat-divider>
+            <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;">
+              <mat-label>備註</mat-label>
+              <textarea matInput [(ngModel)]="editReviewNote"></textarea>
+            </mat-form-field>
+            <mat-divider></mat-divider>
+          </ng-container>
+
+          <div class="d-flex justify-center pt-1">
+            <ng-container *ngIf="editStatus != EditStatus.Review && editStatus != EditStatus.Reject">
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/type2']"
+                [queryParams]="{uid: unit.id}">取消</a>
+              <button type="button" mat-raised-button color="primary" (click)="onSubmit($event)">送出</button>
+            </ng-container>
+
+            <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id == editorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/type2']"
+                [queryParams]="{uid: unit.id}">取消</a>
+              <button type="button" mat-raised-button color="primary" disabled>審核中</button>
+            </ng-container>
+
+            <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/type2']"
+                [queryParams]="{uid: unit.id}">取消</a>
+              <button type="button" mat-stroked-button color="primary" (click)="onSubmit($event, EditStatus.Reject)"
+                class="mr-1-i">駁回</button>
+              <button type="button" mat-raised-button color="primary"
+                (click)="onSubmit($event, EditStatus.Approve)">批准</button>
+            </ng-container>
+
+            <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id == editorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/type2']"
+                [queryParams]="{uid: unit.id}">取消</a>
+              <button type="button" mat-raised-button color="primary"
+                (click)="onSubmit($event, EditStatus.Review)">駁回待編輯</button>
+            </ng-container>
+
+            <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id != editorId">
+              <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                (click)="openReviewNoteDialog()">查看備註</button>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/type2']"
+                [queryParams]="{uid: unit.id}">取消</a>
+              <button type="button" mat-raised-button color="primary" disabled>駁回待編輯</button>
+            </ng-container>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

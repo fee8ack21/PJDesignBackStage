@@ -25,7 +25,7 @@ namespace App.PL.Filters
                 }
 
                 var jwtToken = fullToken.Substring(7).Trim();
-                var payload = JWTHelper.DecodePayload(jwtToken);
+                var payload = JwtHelper.DecodePayload(jwtToken);
 
                 if(payload.ExpiredTime <= DateHelper.GetNowDate())
                 {

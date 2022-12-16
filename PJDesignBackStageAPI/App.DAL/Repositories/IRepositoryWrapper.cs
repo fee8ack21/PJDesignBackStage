@@ -28,6 +28,10 @@ namespace App.DAL.Repositories
         IPortfolioBeforeRepository PortfolioBefore { get; }
         IPortfolioPhotoBeforeRepository PortfolioPhotoBefore { get; }
         IPortfolioPhotoAfterRepository PortfolioPhotoAfter { get; }
+        IType1ContentBeforeRepository Type1ContentBefore { get; }
+        IType1ContentAfterRepository Type1ContentAfter { get; }
+        IType2ContentBeforeRepository Type2ContentBefore { get; }
+        IType2ContentAfterRepository Type2ContentAfter { get; }
 
         IDbContextTransaction CreateTransaction();
         void Save();

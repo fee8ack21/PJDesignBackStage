@@ -29,6 +29,10 @@ namespace App.DAL.Repositories
         private IPortfolioAfterRepository? _portfolioAfter;
         private IPortfolioPhotoBeforeRepository? _portfolioPhotoBefore;
         private IPortfolioPhotoAfterRepository? _portfolioPhotoAfter;
+        private IType1ContentBeforeRepository? _type1ContentBefore;
+        private IType1ContentAfterRepository? _type1ContentAfter;
+        private IType2ContentBeforeRepository? _type2ContentBefore;
+        private IType2ContentAfterRepository? _type2ContentAfter;
 
         public RepositoryWrapper(PjdesignContext context)
         {
@@ -265,6 +269,58 @@ namespace App.DAL.Repositories
                 }
 
                 return _portfolioPhotoAfter;
+            }
+        }
+
+        public IType1ContentBeforeRepository Type1ContentBefore
+        {
+            get
+            {
+                if (_type1ContentBefore == null)
+                {
+                    _type1ContentBefore = new Type1ContentBeforeRepository(_context);
+                }
+
+                return _type1ContentBefore;
+            }
+        }
+
+        public IType1ContentAfterRepository Type1ContentAfter
+        {
+            get
+            {
+                if (_type1ContentAfter == null)
+                {
+                    _type1ContentAfter = new Type1ContentAfterRepository(_context);
+                }
+
+                return _type1ContentAfter;
+            }
+        }
+
+        public IType2ContentBeforeRepository Type2ContentBefore
+        {
+            get
+            {
+                if (_type2ContentBefore == null)
+                {
+                    _type2ContentBefore = new Type2ContentBeforeRepository(_context);
+                }
+
+                return _type2ContentBefore;
+            }
+        }
+
+        public IType2ContentAfterRepository Type2ContentAfter
+        {
+            get
+            {
+                if (_type2ContentAfter == null)
+                {
+                    _type2ContentAfter = new Type2ContentAfterRepository(_context);
+                }
+
+                return _type2ContentAfter;
             }
         }
 

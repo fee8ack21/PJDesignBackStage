@@ -28,6 +28,12 @@ const routes: Routes = [
   },
   {
     path: 'question', loadChildren: () => import('./features/question/question.module').then(m => m.QuestionModule),
+  },
+  {
+    path: 'type1', loadChildren: () => import('./features/type1/type1.module').then(m => m.Type1Module),
+  },
+  {
+    path: 'type2', loadChildren: () => import('./features/type2/type2.module').then(m => m.Type2Module),
   }
 ];
 

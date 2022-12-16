@@ -1,0 +1,70 @@
+<div class="d-flex justify-center my-1">
+    <div class="w-95">
+        <mat-card>
+            <mat-card-content>
+                <h2>{{unit.name}}</h2>
+                <mat-divider></mat-divider>
+                <app-unit-setting-form [unitId]="unit.id"></app-unit-setting-form>
+                <mat-divider></mat-divider>
+                <form [formGroup]="type1Form" class="pt-1">
+                    <ng-container *ngIf="!isPreventEdit()">
+                        <angular-editor
+                            [ngClass]="{'editor-invalid': validatorService.isFormControlInvalid(type1Form, 'content')}"
+                            [config]="editorConfig" formControlName="content">
+                        </angular-editor>
+                    </ng-container>
+                    <div *ngIf="isPreventEdit()">
+                        <mat-card class="mb-1-i">
+                            <mat-card-content>
+                                <div [innerHTML]="type1Form.get('content')?.value"></div>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </form>
+
+                <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+                    <mat-divider class="mt-1"></mat-divider>
+                    <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;">
+                        <mat-label>備註</mat-label>
+                        <textarea matInput [(ngModel)]="editReviewNote"></textarea>
+                    </mat-form-field>
+                    <mat-divider></mat-divider>
+                </ng-container>
+
+                <div class="d-flex justify-center pt-1">
+                    <ng-container *ngIf="editStatus != EditStatus.Review && editStatus != EditStatus.Reject">
+                        <button type="button" mat-raised-button color="primary" (click)="onSubmit($event)">送出</button>
+                    </ng-container>
+
+                    <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id == editorId">
+                        <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                            (click)="openReviewNoteDialog()">查看備註</button>
+                        <button type="button" mat-raised-button color="primary" disabled>審核中</button>
+                    </ng-container>
+
+                    <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+                        <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                            (click)="openReviewNoteDialog()">查看備註</button>
+                        <button type="button" mat-stroked-button color="primary"
+                            (click)="onSubmit($event, EditStatus.Reject)" class="mr-1-i">駁回</button>
+                        <button type="button" mat-raised-button color="primary"
+                            (click)="onSubmit($event, EditStatus.Approve)">批准</button>
+                    </ng-container>
+
+                    <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id == editorId">
+                        <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                            (click)="openReviewNoteDialog()">查看備註</button>
+                        <button type="button" mat-raised-button color="primary"
+                            (click)="onSubmit($event, EditStatus.Review)">駁回待編輯</button>
+                    </ng-container>
+
+                    <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id != editorId">
+                        <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+                            (click)="openReviewNoteDialog()">查看備註</button>
+                        <button type="button" mat-raised-button color="primary" disabled>駁回待編輯</button>
+                    </ng-container>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

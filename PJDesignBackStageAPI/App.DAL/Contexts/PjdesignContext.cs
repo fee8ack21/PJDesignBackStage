@@ -50,6 +50,14 @@ public partial class PjdesignContext : DbContext
 
     public virtual DbSet<TblSettingBefore> TblSettingBefores { get; set; }
 
+    public virtual DbSet<TblType1ContentAfter> TblType1ContentAfters { get; set; }
+
+    public virtual DbSet<TblType1ContentBefore> TblType1ContentBefores { get; set; }
+
+    public virtual DbSet<TblType2ContentAfter> TblType2ContentAfters { get; set; }
+
+    public virtual DbSet<TblType2ContentBefore> TblType2ContentBefores { get; set; }
+
     public virtual DbSet<TblUnit> TblUnits { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -263,6 +271,42 @@ public partial class PjdesignContext : DbContext
             entity.Property(e => e.CNotes).HasComment("備註");
             entity.Property(e => e.CReviewerId).HasComment("審核人員ID");
             entity.Property(e => e.CUnitId).HasComment("單元ID");
+        });
+
+        modelBuilder.Entity<TblType1ContentAfter>(entity =>
+        {
+            entity.Property(e => e.CId).HasComment("流水號");
+            entity.Property(e => e.CCreateDt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CEditDt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CUnitId).HasComment("單元ID");
+        });
+
+        modelBuilder.Entity<TblType1ContentBefore>(entity =>
+        {
+            entity.Property(e => e.CId).HasComment("流水號");
+            entity.Property(e => e.CCreateDt)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("創建時間");
+            entity.Property(e => e.CEditStatus)
+                .HasDefaultValueSql("((2))")
+                .HasComment("1.審核中 2.駁回 3.批准");
+            entity.Property(e => e.CUnitId).HasComment("單元ID");
+        });
+
+        modelBuilder.Entity<TblType2ContentAfter>(entity =>
+        {
+            entity.Property(e => e.CCreateDt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CEditDt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CIsEnabled).HasDefaultValueSql("((1))");
+        });
+
+        modelBuilder.Entity<TblType2ContentBefore>(entity =>
+        {
+            entity.HasKey(e => e.CId).HasName("PK_tblTyp2ContentBefore");
+
+            entity.Property(e => e.CCreateDt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CEditDt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CIsEnabled).HasDefaultValueSql("((1))");
         });
 
         modelBuilder.Entity<TblUnit>(entity =>

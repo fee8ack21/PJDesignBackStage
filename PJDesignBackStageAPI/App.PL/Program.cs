@@ -45,7 +45,7 @@ builder.Services.AddDbContext<PjdesignContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("PJDesign"));
 });
-//builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -55,6 +55,8 @@ builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IPortfolioService, PortfolioService>();
+builder.Services.AddScoped<IType1Service, Type1Service>();
+builder.Services.AddScoped<IType2Service, Type2Service>();
 
 builder.Services.AddHostedService<EmailService>();
 

@@ -59,8 +59,8 @@ namespace App.BLL
                     throw new Exception("請求錯誤");
                 }
 
-                var payload = JWTHelper.CreatePayload(administrator.CId, administrator.CAccount, tblAdministratorGroup.CGroupId);
-                var token = JWTHelper.GetToken(payload);
+                var payload = JwtHelper.CreatePayload(administrator.CId, administrator.CAccount, tblAdministratorGroup.CGroupId);
+                var token = JwtHelper.GetToken(payload);
 
                 response.Entries.Id = administrator.CId;
                 response.Entries.Name = administrator.CName;

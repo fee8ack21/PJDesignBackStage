@@ -37,8 +37,17 @@ export class UnitService {
   getCurrentUnit(): { id: number, name: string } {
     if (this._units == null || this._units.length == 0) { return { id: -1, name: '' }; }
 
-    const path = window.location.pathname;
-    const filtededUnits = this._units.filter(x => x.backStageUrl != null ? path.includes(x.backStageUrl ?? '') : false);
+    const path = window.location.pathname + window.location.search;
+    let filtededUnits = [];
+    if (window.location.pathname.includes('type')) {
+      if (window.location.pathname.includes('detail')) {
+        filtededUnits = this._units.filter(x => x.backStageUrl != null ? x.backStageUrl.includes(path.split('?')[1]) : false);
+      } else {
+        filtededUnits = this._units.filter(x => x.backStageUrl != null ? path == x.backStageUrl.trimStart().trim() ?? '' : false);
+      }
+    } else {
+      filtededUnits = this._units.filter(x => x.backStageUrl != null ? path.includes(x.backStageUrl) : false);
+    }
 
     if (filtededUnits.length == 0) { return { id: -1, name: '' }; }
 

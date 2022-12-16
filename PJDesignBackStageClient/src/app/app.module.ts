@@ -24,6 +24,8 @@ import { FooterModule } from './features/footer/footer.module';
 import { ContactModule } from './features/contact/contact.module';
 import { QuestionModule } from './features/question/question.module';
 import { HomeModule } from './features/home/home.module';
+import { Type1Module } from './features/type1/type1.module';
+import { Type2Module } from './features/type2/type2.module';
 
 @NgModule({
   declarations: [
@@ -44,6 +46,8 @@ import { HomeModule } from './features/home/home.module';
     ContactModule,
     QuestionModule,
     HomeModule,
+    Type1Module,
+    Type2Module,
   ],
   providers: [
     HttpService,

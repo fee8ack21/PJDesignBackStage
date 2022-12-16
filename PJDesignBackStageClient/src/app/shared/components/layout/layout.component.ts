@@ -55,4 +55,17 @@ export class LayoutComponent implements OnInit {
       this.isShowProgressBar = response;
     })
   }
+
+  getLink(url: string | null | undefined) {
+    if (url == null || url == undefined) { return url; }
+
+    return url.split('?')[0];
+  }
+
+  getQueryParams(url: string | null | undefined) {
+    if (url == null || url == undefined || url.split('?').length == 1) { return {}; }
+
+    const params = new URLSearchParams(url.split('?')[1]);
+    return Object.fromEntries(params.entries());
+  }
 }

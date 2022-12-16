@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace App.Common
 {
-    public class JWTHelper
+    public class JwtHelper
     {
         public static JwtPayload CreatePayload(int id, string account, int groupId)
         {
