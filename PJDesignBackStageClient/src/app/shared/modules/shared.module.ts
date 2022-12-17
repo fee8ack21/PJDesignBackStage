@@ -13,6 +13,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -54,6 +55,7 @@ import { UnitSettingFormComponent } from '../components/unit-setting-form/unit-s
     MatNativeDateModule,
     MatCheckboxModule,
     MatTreeModule,
+    MatTabsModule,
     MatTableModule,
     DragDropModule,
     MatSortModule,
@@ -83,6 +85,7 @@ import { UnitSettingFormComponent } from '../components/unit-setting-form/unit-s
     ReactiveFormsModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatTabsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,

@@ -62,19 +62,18 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
   }
 
   ngOnInit(): void {
-    this.initForm();
     this.unitService.isBackStageUnitsInit.subscribe(async response => {
       this.setUnit();
+      this.initForm();
       this.getCategories();
-      this.getQuestion();
+      this.getType2Content();
     });
   }
 
+  getType2Content() {
+    if (this.id == null || this.id == -1 || this.unit.id == null || this.unit.id == -1) { return; }
 
-  getQuestion() {
-    if (this.id == null || this.id == -1) { return; }
-
-    this.httpService.get<ResponseBase<GetType2ContentByIdResponse>>(`question/getQuestionById?id=${this.id}&isBefore=${this.isBefore}`).subscribe(response => {
+    this.httpService.get<ResponseBase<GetType2ContentByIdResponse>>(`type2/getType2ContentById?unitId=${this.unit.id}&id=${this.id}&isBefore=${this.isBefore}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;
@@ -86,6 +85,10 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       this.editReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
       this.editorName = response.entries?.editorName;
       this.afterId = response.entries?.afterId;
+      this.thumbnailUrl = response.entries?.thumbnailUrl ?? '';
+      this.thumbnailName = response.entries?.thumbnailUrl != null ? response.entries.thumbnailUrl.split('/')[response.entries.thumbnailUrl.split('/').length - 1] : '';
+      this.imageUrl = response.entries?.imageUrl ?? '';
+      this.imageName = response.entries?.imageUrl != null ? response.entries.imageUrl.split('/')[response.entries.imageUrl.split('/').length - 1] : '';
 
       this.handleFormStatus(this.type2Form);
       this.updateForm(response.entries!);
@@ -102,6 +105,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
   initForm() {
     this.type2Form = new FormGroup({
       id: new FormControl(null),
+      unitId: new FormControl(this.unit.id),
       title: new FormControl(null, [Validators.required]),
       isEnabled: new FormControl(true, [Validators.required]),
       content: new FormControl(null, [Validators.required]),
@@ -112,6 +116,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
     this.type2Form.patchValue({
       // id 為before id
       id: this.isBefore ? data.id : null,
+      unitId: this.unit.id,
       title: data.title,
       isEnabled: data.isEnabled,
       content: data.content
@@ -119,7 +124,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
   }
 
   getCategories() {
-    if (this.unit.id == -1) { return; }
+    if (this.unit.id == -1 || this.unit.id == undefined) { return; }
 
     this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unit.id}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -174,6 +179,16 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       return;
     }
 
+    if (this.thumbnailUrl.length == 0) {
+      this.snackBarService.showSnackBar('請上傳縮圖');
+      return;
+    }
+
+    if (this.imageUrl.length == 0) {
+      this.snackBarService.showSnackBar('請上傳Banner圖');
+      return;
+    }
+
     if (this.type2Form.invalid) {
       this.type2Form.markAllAsTouched();
       return;
@@ -195,9 +210,6 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       request.note = temp;
     }
 
-
-    console.log('req', request);
-    return;
     this.httpService.post<ResponseBase<string>>('type2/createOrUpdateType2Content', request).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
@@ -205,7 +217,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       }
 
       this.snackBarService.showSnackBar(SnackBarService.RequestSuccessText);
-      this.router.navigate(['/type2']);
+      this.router.navigate(['/type2'], { queryParams: { uid: this.unit.id } });
     });
   }
 }

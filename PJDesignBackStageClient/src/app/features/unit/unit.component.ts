@@ -8,16 +8,16 @@ import { GetUnitsRequest, GetUnitsResponse, UnitList } from 'src/app/shared/mode
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
-import { UnitDialogComponent } from '../feature-shared/components/unit-dialog/unit-dialog.component';
-import { UnitDialogData } from '../feature-shared/models/unit-dialog-data';
-import { UpdateUnitsSortRequest } from '../feature-shared/models/update-units-sort';
+import { UnitDialogComponent } from './feature-shared/components/unit-dialog/unit-dialog.component';
+import { UnitDialogData } from './feature-shared/models/unit-dialog-data';
+import { UpdateUnitsSortRequest } from './feature-shared/models/update-units-sort';
 
 @Component({
-  selector: 'app-unit-list',
-  templateUrl: './unit-list.component.html',
-  styleUrls: ['./unit-list.component.scss']
+  selector: 'app-unit',
+  templateUrl: './unit.component.html',
+  styleUrls: ['./unit.component.scss']
 })
-export class UnitListComponent extends ListBaseComponent implements OnInit {
+export class UnitComponent extends ListBaseComponent implements OnInit {
   units: UnitList[] = [];
 
   constructor(

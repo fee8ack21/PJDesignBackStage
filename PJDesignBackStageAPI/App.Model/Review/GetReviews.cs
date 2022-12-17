@@ -8,5 +8,12 @@ namespace App.Model
 {
     public class GetReviewsResponse
     {
+        public int UnitId { get; set; }
+        public string UnitName { get; set; } = null!;
+        public int ContentId { get; set; }
+        public DateTime EditDt { get; set; }
+        public byte? EditStatus { get; set; }
+        public int EditorId { get; set; }
+        public string EditorName { get; set; } = null!;
     }
 }

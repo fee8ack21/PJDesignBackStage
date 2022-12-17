@@ -1,51 +1,70 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
+import { EditAndEnabledOptions, EditStatus } from 'src/app/shared/models/enums';
+import { HttpService } from 'src/app/shared/services/http.service';
+import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { UnitService } from 'src/app/shared/services/unit-service';
+import { GetQuestionsResponse } from '../../question/feature-shared/models/get-questions';
+import { QuestionListSearchParams } from '../../question/feature-shared/models/question-list-search-params';
 
 @Component({
   selector: 'app-review-list',
   templateUrl: './review-list.component.html',
   styleUrls: ['./review-list.component.scss']
 })
-export class ReviewListComponent implements OnInit {
-  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol', 'tool'];
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
+export class ReviewListComponent extends ListBaseComponent implements OnInit {
+  rawListData: GetQuestionsResponse[] = [];
+  displayedColumns: string[] = ['id', 'title', 'categories', 'editDt', 'isEnabled', 'tool'];
+  dataSource: MatTableDataSource<GetQuestionsResponse>;
+  searchParams = new QuestionListSearchParams();
 
-  constructor(private _liveAnnouncer: LiveAnnouncer) { }
-  ngOnInit(): void {
-  }
-
+  @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  ngAfterViewInit() {
+  constructor(
+    protected httpService: HttpService,
+    protected snackBarService: SnackBarService,
+    protected unitService: UnitService,
+    protected dialog: MatDialog) {
+    super(unitService, httpService, snackBarService, dialog);
+  }
+
+  ngOnInit(): void {
+    this.unitService.isBackStageUnitsInit.subscribe(response => {
+      this.setUnit();
+    });
+  }
+
+  onSearch(): void {
+    const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
+    this.dataSource = new MatTableDataSource(newData);
     this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
-  announceSortChange(sortState: Sort) {
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
+  onSearchFilterFn(data: GetQuestionsResponse): boolean {
+    return (this.searchParams.title == null || this.searchParams.title.trim().length == 0 || data.title.includes(this.searchParams.title.trim())) &&
+      (this.searchParams.categoryId == null || this.searchParams.categoryId == -1 || (data.categories != null && data.categories.filter(x => x.id == this.searchParams.categoryId).length > 0)) &&
+      (this.searchParams.startDt == null || new Date(data.editDt) >= this.searchParams.startDt) &&
+      (this.searchParams.endDt == null || new Date(data.editDt) <= this.searchParams.endDt) &&
+      (this.searchParams.editAndEnabledStatus == null ||
+        this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.全部 ||
+        (data.editStatus == null && +data.isEnabled == this.searchParams.editAndEnabledStatus) ||
+        (data.editStatus == EditStatus.Review && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.審核中) ||
+        (data.editStatus == EditStatus.Reject && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.駁回)
+      )
+  }
+
+  resetSearchParams(): void {
+    this.searchParams = new QuestionListSearchParams();
+  }
+
+  tableSortCb(state: Sort): void {
+    this.paginator.firstPage();
   }
 }
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
-const ELEMENT_DATA: PeriodicElement[] = [
-  { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-  { position: 2, name: 'Helium', weight: 4.0026, symbol: 'He' },
-  { position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li' },
-  { position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be' },
-  { position: 5, name: 'Boron', weight: 10.811, symbol: 'B' },
-  { position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C' },
-  { position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N' },
-  { position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O' },
-  { position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F' },
-  { position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne' },
-];

@@ -1,149 +1,51 @@
 <div class="d-flex justify-center my-1">
-    <div class="w-95">
-        <mat-card>
-            <mat-card-content>
-                <h2>{{unit.name}}</h2>
-                <mat-divider></mat-divider>
-                <!-- <div class="pt-1">
-                    <div class="d-flex justify-space-between py-1">
-                        <div class="w-55-i">
-                            <form [formGroup]="footerForm">
-                                <div class="d-flex justify-space-between">
-                                    <mat-form-field appearance="fill">
-                                        <mat-label>地址</mat-label>
-                                        <input matInput formControlName="address" name="address" readonly
-                                            onfocus="this.removeAttribute('readonly');">
-                                        <mat-error *ngIf="validatorService.isFormControlInvalid(footerForm, 'address')">
-                                            {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
-                                        </mat-error>
-                                    </mat-form-field>
-                                    <mat-form-field appearance="fill">
-                                        <mat-label>客服專線</mat-label>
-                                        <input matInput formControlName="phone" name="phone" readonly
-                                            onfocus="this.removeAttribute('readonly');" [disabled]="isPreventEdit()">
-                                        <mat-error *ngIf="validatorService.isFormControlInvalid(footerForm, 'phone')">
-                                            {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
-                                        </mat-error>
-                                    </mat-form-field>
-                                    <mat-form-field appearance="fill">
-                                        <mat-label>信箱</mat-label>
-                                        <input matInput formControlName="email" name="email" readonly
-                                            onfocus="this.removeAttribute('readonly');" [disabled]="isPreventEdit()">
-                                        <mat-error *ngIf="validatorService.isFormControlInvalid(footerForm, 'email')">
-                                            {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
-                                        </mat-error>
-                                    </mat-form-field>
-                                </div>
-                                <div>
-                                    <mat-form-field appearance="fill" class="w-100-i" style="max-width:none;">
-                                        <mat-label>粉絲專業嵌入</mat-label>
-                                        <textarea matInput name="fanpage" formControlName="fanpage"
-                                            [disabled]="isPreventEdit()"></textarea>
-                                    </mat-form-field>
-                                </div>
-                            </form>
-                            <div>
-                                <mat-expansion-panel hideToggle [expanded]="true">
-                                    <mat-expansion-panel-header>
-                                        <mat-panel-title class="d-flex justify-space-between">
-                                            <span>社群Icon</span>
-                                            <span>(寬高限制: 300x300)</span>
-                                        </mat-panel-title>
-                                    </mat-expansion-panel-header>
-                                    <mat-list role="list">
-                                        <mat-list-item role="listitem" *ngFor="let item of socialIcons;let i = index;"
-                                            class="my-1-i" style="position: relative;">
-
-                                            <input class="c-input mr-1-i" placeholder="請輸入URL" type="text"
-                                                [(ngModel)]="socialIcons[i].url" [name]="'socialIconsUrl' + i"
-                                                [disabled]="isPreventEdit()">
-
-                                            <img *ngIf="item.image != null && item.image.length > 0"
-                                                [src]="item.image | safeUrl"
-                                                style="position: absolute;top: 6px;left: 50%;transform: translateX(-50%);max-width: 36px;max-height: 36px;object-fit: contain;object-position: center;" />
-
-                                            <label class="file-input-btn ml-auto-i mr-1-i"
-                                                [ngClass]="{'disabled': isPreventEdit()}">
-                                                <input type="file" accept="image/*" (change)="onPhotoUpload($event, i)"
-                                                    [disabled]="isPreventEdit()">
-                                                上傳圖片
-                                            </label>
-                                            <button (click)="removeSocialIcon(i)" type="button" mat-stroked-button
-                                                color="basic" [disabled]="isPreventEdit()">移除</button>
-                                        </mat-list-item>
-                                        <mat-list-item class="my-1-i">
-                                            <button (click)="addSocialIcon()" type="button" mat-raised-button
-                                                color="primary" class="w-100 m-auto"
-                                                [disabled]="isPreventEdit()">新增</button>
-                                        </mat-list-item>
-                                    </mat-list>
-                                </mat-expansion-panel>
-                            </div>
-                        </div>
-                        <div class="w-40-i">
-                            <div class="mb-1-i">
-                                <mat-expansion-panel hideToggle [expanded]="true">
-                                    <mat-expansion-panel-header>
-                                        <mat-panel-title>
-                                            選擇呈現單元
-                                        </mat-panel-title>
-                                    </mat-expansion-panel-header>
-                                    <mat-selection-list #unitSelectEle>
-                                        <mat-list-option *ngFor="let item of type2Units" [value]="item.id"
-                                            [selected]="item.selected" [disabled]="isPreventEdit()">
-                                            {{item.name}}
-                                        </mat-list-option>
-                                    </mat-selection-list>
-                                </mat-expansion-panel>
-                            </div>
-                        </div>
-                    </div>
-                    <mat-divider></mat-divider>
-
-                    <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
-                        <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;">
-                            <mat-label>備註</mat-label>
-                            <textarea matInput [(ngModel)]="editReviewNote"></textarea>
-                        </mat-form-field>
-                        <mat-divider></mat-divider>
-                    </ng-container>
-
-                    <div class="d-flex justify-center pt-1">
-                        <ng-container *ngIf="editStatus != EditStatus.Review && editStatus != EditStatus.Reject">
-                            <button type="button" mat-raised-button color="primary"
-                                (click)="onSubmit(EditStatus.Review)">送出</button>
-                        </ng-container>
-
-                        <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id == editorId">
-                            <button type="button" class="mr-1-i" mat-stroked-button color="primary"
-                                (click)="openReviewNoteDialog()">查看備註</button>
-                            <button type="button" mat-raised-button color="primary" disabled>審核中</button>
-                        </ng-container>
-
-                        <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
-                            <button type="button" class="mr-1-i" mat-stroked-button color="primary"
-                                (click)="openReviewNoteDialog()">查看備註</button>
-                            <button type="button" mat-stroked-button color="primary"
-                                (click)="onSubmit(EditStatus.Reject)" class="mr-1-i">駁回</button>
-                            <button type="button" mat-raised-button color="primary"
-                                (click)="onSubmit(EditStatus.Approve)">批准</button>
-                        </ng-container>
-
-                        <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id == editorId">
-                            <button type="button" class="mr-1-i" mat-stroked-button color="primary"
-                                (click)="openReviewNoteDialog()">查看備註</button>
-                            <button type="button" mat-raised-button color="primary"
-                                (click)="onSubmit(EditStatus.Review)">駁回待編輯</button>
-                        </ng-container>
-
-                        <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id != editorId">
-                            <button type="button" class="mr-1-i" mat-stroked-button color="primary"
-                                (click)="openReviewNoteDialog()">查看備註</button>
-                            <button type="button" mat-raised-button color="primary" disabled>駁回待編輯</button>
-                        </ng-container>
-                    </div>
-                </div> -->
-            </mat-card-content>
-        </mat-card>
-    </div>
+  <div class="w-95">
+    <mat-card>
+      <mat-card-content>
+        <h2>{{unit.name}}</h2>
+        <mat-divider></mat-divider>
+        <div class="pt-2 pb-1 px-2">
+          <mat-tab-group>
+            <mat-tab label="自定義區塊">
+              <div class="p-1">
+                自定義區塊
+              </div>
+            </mat-tab>
+            <mat-tab label="單元區塊">
+              <div class="py-2 px-3">
+                <div class="d-flex justify-space-between items-center">
+                  <mat-form-field appearance="fill">
+                    <mat-label>Type2 單元</mat-label>
+                    <mat-select>
+                      <mat-option *ngFor="let item of type2Units" [value]="item.id">
+                        {{item.name}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill">
+                    <mat-label>單元模板</mat-label>
+                    <mat-select>
+                      <mat-option *ngFor="let item of type2TemplateTypes" [value]="item.id">
+                        {{item.name}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill">
+                    <mat-label>排序</mat-label>
+                    <input matInput type="number">
+                  </mat-form-field>
+                  <button type="button" mat-stroked-button color="basic" [disabled]="isPreventEdit()"
+                    style="position: relative;top: 8px;align-self: baseline;">移除</button>
+                </div>
+                <button mat-raised-button color="primary" class="w-100">新增</button>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+          <div class="my-1">
+            <mat-checkbox class="example-margin">是否呈現作品集</mat-checkbox>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>

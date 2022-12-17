@@ -25,7 +25,8 @@ namespace App.PL.Controllers
         [JwtFilter]
         public async Task<ResponseBase<List<GetReviewsResponse>>> GetReviews()
         {
-            return await _service.GetReviews(); ;
+            var payload = HttpContext.Items["jwtPayload"] as JwtPayload;
+            return await _service.GetReviews(payload); ;
         }
     }
 }

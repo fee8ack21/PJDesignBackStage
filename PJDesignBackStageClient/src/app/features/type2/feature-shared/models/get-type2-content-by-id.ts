@@ -3,6 +3,9 @@ import { ReviewNote } from "src/app/shared/models/review-note";
 
 export class GetType2ContentByIdResponse {
   id: number;
+  unitId: number;
+  thumbnailUrl: string;
+  imageUrl: string;
   afterId: number | null | undefined;
   isBefore: boolean;
   title: string;

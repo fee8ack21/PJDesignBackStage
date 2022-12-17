@@ -41,7 +41,8 @@ export class UnitService {
     let filtededUnits = [];
     if (window.location.pathname.includes('type')) {
       if (window.location.pathname.includes('detail')) {
-        filtededUnits = this._units.filter(x => x.backStageUrl != null ? x.backStageUrl.includes(path.split('?')[1]) : false);
+        var txt = `uid=${new URLSearchParams(window.location.search).get('uid')}`;
+        filtededUnits = this._units.filter(x => x.backStageUrl != null ? x.backStageUrl.includes(txt) : false);
       } else {
         filtededUnits = this._units.filter(x => x.backStageUrl != null ? path == x.backStageUrl.trimStart().trim() ?? '' : false);
       }

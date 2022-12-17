@@ -9,7 +9,10 @@ namespace App.Model
     public class GetType2ContentByIdResponse
     {
         public int Id { get; set; }
+        public int UnitId { get; set; }
         public int? AfterId { get; set; }
+        public string ThumbnailUrl { get; set; } = null!;
+        public string ImageUrl { get; set; } = null!;
         public bool IsBefore { get; set; }
         public string Title { get; set; } = null!;
         public DateTime CreateDt { get; set; }

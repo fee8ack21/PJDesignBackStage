@@ -19,25 +19,19 @@ namespace App.BLL
             _repositoryWrapper = repositoryWrapper;
         }
 
-        public Task<ResponseBase<List<GetReviewsResponse>>> GetReviews()
+        public Task<ResponseBase<List<GetReviewsResponse>>> GetReviews(JwtPayload payload)
         {
             throw new NotImplementedException();
 
-            //var response = new ResponseBase<List<GetReviewListResponse>>() { Entries = new List<GetReviewListResponse>() };
+            // Setting / Home / Footer
+            // 問題
+            // 作品集
+            // Type1
+            // Type2
 
-            //try
-            //{
-            //    var tasks = new List<Task>();
-            //    var settingBeforeTask = _repositoryWrapper.SettingBefore.GetByCondition(x => x.CStatus == (int)Status.審核中).ToListAsync();
-            //    tasks.Add(settingBeforeTask);
-            //}
-            //catch (Exception ex)
-            //{
-            //    response.StatusCode = StatusCode.Fail;
-            //    response.Message = ex.Message;
-            //}
+            // OrderBy EditDt
 
-            //return response;
+            // List<Task> When All
         }
     }
 }
