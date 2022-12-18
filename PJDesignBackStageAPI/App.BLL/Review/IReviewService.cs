@@ -9,6 +9,6 @@ namespace App.BLL
 {
     public interface IReviewService
     {
-        Task<ResponseBase<List<GetReviewsResponse>>> GetReviews(JwtPayload payload);
+        Task<ResponseBase<List<GetReviewsResponse>>> GetReviews();
     }
 }

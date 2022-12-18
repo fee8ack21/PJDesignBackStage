@@ -11,6 +11,8 @@ namespace App.Model
         public int UnitId { get; set; }
         public string UnitName { get; set; } = null!;
         public int ContentId { get; set; }
+        public string? Title { get; set; }
+        public string? url { get; set; }
         public DateTime EditDt { get; set; }
         public byte? EditStatus { get; set; }
         public int EditorId { get; set; }

@@ -5,12 +5,15 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
-import { EditAndEnabledOptions, EditStatus } from 'src/app/shared/models/enums';
+import { ResponseBase } from 'src/app/shared/models/bases';
+import { EditAndEnabledOptions, EditStatus, StatusCode, UnitID } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { GetQuestionsResponse } from '../../question/feature-shared/models/get-questions';
 import { QuestionListSearchParams } from '../../question/feature-shared/models/question-list-search-params';
+import { GetReviewsResponse } from '../feature-shared/models/get-reviews';
+import { ReviewListSearchParams } from '../feature-shared/models/review-list-search-params';
 
 @Component({
   selector: 'app-review-list',
@@ -18,10 +21,11 @@ import { QuestionListSearchParams } from '../../question/feature-shared/models/q
   styleUrls: ['./review-list.component.scss']
 })
 export class ReviewListComponent extends ListBaseComponent implements OnInit {
-  rawListData: GetQuestionsResponse[] = [];
-  displayedColumns: string[] = ['id', 'title', 'categories', 'editDt', 'isEnabled', 'tool'];
-  dataSource: MatTableDataSource<GetQuestionsResponse>;
-  searchParams = new QuestionListSearchParams();
+  unitOptions: { id: number, name: string }[] = [];
+  rawListData: GetReviewsResponse[] = [];
+  displayedColumns: string[] = ['id', 'unitName', 'title', 'editorName', 'editDt', 'tool'];
+  dataSource: MatTableDataSource<GetReviewsResponse>;
+  searchParams = new ReviewListSearchParams();
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -37,7 +41,53 @@ export class ReviewListComponent extends ListBaseComponent implements OnInit {
   ngOnInit(): void {
     this.unitService.isBackStageUnitsInit.subscribe(response => {
       this.setUnit();
+      this.getReviews();
     });
+  }
+
+  getReviews() {
+    if (this.rawListData.length > 0) { return; }
+
+    this.httpService.get<ResponseBase<GetReviewsResponse[]>>('review/getReviews').subscribe(response => {
+      if (response.statusCode == StatusCode.Fail) {
+        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+        return;
+      }
+
+      this.rawListData = response.entries!;
+      this.dataSource = new MatTableDataSource(this.rawListData);
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+
+      this.setUnitOptions(this.rawListData);
+    })
+  }
+
+  setUnitOptions(data: GetReviewsResponse[]) {
+    this.unitOptions = [];
+
+    let unitDict: any = {};
+    data.forEach(item => {
+      if (item.unitId in unitDict) {
+        return;
+      }
+
+      unitDict[item.unitId.toString()] = item.unitName;
+      this.unitOptions.push({ id: item.unitId, name: item.unitName });
+    })
+  }
+
+  getLink(url: string | null | undefined) {
+    if (url == null || url == undefined) { return url; }
+
+    return url.split('?')[0];
+  }
+
+  getQueryParams(url: string | null | undefined) {
+    if (url == null || url == undefined || url.split('?').length == 1) { return {}; }
+
+    const params = new URLSearchParams(url.split('?')[1]);
+    return Object.fromEntries(params.entries());
   }
 
   onSearch(): void {
@@ -47,21 +97,16 @@ export class ReviewListComponent extends ListBaseComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
   }
 
-  onSearchFilterFn(data: GetQuestionsResponse): boolean {
-    return (this.searchParams.title == null || this.searchParams.title.trim().length == 0 || data.title.includes(this.searchParams.title.trim())) &&
-      (this.searchParams.categoryId == null || this.searchParams.categoryId == -1 || (data.categories != null && data.categories.filter(x => x.id == this.searchParams.categoryId).length > 0)) &&
+  onSearchFilterFn(data: GetReviewsResponse): boolean {
+    return (this.searchParams.unitId == null || this.searchParams.unitId == -1 || data.unitId == this.searchParams.unitId) &&
+      (this.searchParams.title == null || this.searchParams.title.trim().length == 0 || data.title!.includes(this.searchParams.title.trim())) &&
+      (this.searchParams.editorName == null || this.searchParams.editorName.trim().length == 0 || data.editorName.includes(this.searchParams.editorName.trim())) &&
       (this.searchParams.startDt == null || new Date(data.editDt) >= this.searchParams.startDt) &&
-      (this.searchParams.endDt == null || new Date(data.editDt) <= this.searchParams.endDt) &&
-      (this.searchParams.editAndEnabledStatus == null ||
-        this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.全部 ||
-        (data.editStatus == null && +data.isEnabled == this.searchParams.editAndEnabledStatus) ||
-        (data.editStatus == EditStatus.Review && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.審核中) ||
-        (data.editStatus == EditStatus.Reject && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.駁回)
-      )
+      (this.searchParams.endDt == null || new Date(data.editDt) <= this.searchParams.endDt)
   }
 
   resetSearchParams(): void {
-    this.searchParams = new QuestionListSearchParams();
+    this.searchParams = new ReviewListSearchParams();
   }
 
   tableSortCb(state: Sort): void {
