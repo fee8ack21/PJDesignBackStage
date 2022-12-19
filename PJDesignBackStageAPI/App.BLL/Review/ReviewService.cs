@@ -24,7 +24,7 @@ namespace App.BLL
             var response = new ResponseBase<List<GetReviewsResponse>>() { Entries = new List<GetReviewsResponse>() };
             try
             {
-                var settingTask = await _repositoryWrapper.SettingBefore.GetAll()
+                var setting = await _repositoryWrapper.SettingBefore.GetAll()
                 .Join(_repositoryWrapper.Unit.GetAll(), x => x.CUnitId, y => y.CId, (x, y) => new { x, y })
                 .Join(_repositoryWrapper.Administrator.GetAll(), x => x.x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                 {
@@ -39,7 +39,7 @@ namespace App.BLL
                     EditorName = y.CName
                 }).ToListAsync();
 
-                var questionTask = await _repositoryWrapper.QuestionBefore.GetAll()
+                var question = await _repositoryWrapper.QuestionBefore.GetAll()
                     .Join(_repositoryWrapper.Administrator.GetAll(), x => x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                     {
                         UnitId = (int)UnitId.常見問題,
@@ -53,7 +53,7 @@ namespace App.BLL
                         EditorName = y.CName
                     }).ToListAsync();
 
-                var portfolioTask = await _repositoryWrapper.PortfolioBefore.GetAll()
+                var portfolio = await _repositoryWrapper.PortfolioBefore.GetAll()
                     .Join(_repositoryWrapper.Administrator.GetAll(), x => x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                     {
                         UnitId = (int)UnitId.作品集,
@@ -67,7 +67,7 @@ namespace App.BLL
                         EditorName = y.CName
                     }).ToListAsync();
 
-                var type1Task = await _repositoryWrapper.Type1ContentBefore.GetAll()
+                var type1 = await _repositoryWrapper.Type1ContentBefore.GetAll()
                   .Join(_repositoryWrapper.Unit.GetAll(), x => x.CUnitId, y => y.CId, (x, y) => new { x, y })
                   .Join(_repositoryWrapper.Administrator.GetAll(), x => x.x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                   {
@@ -81,7 +81,7 @@ namespace App.BLL
                       EditorName = y.CName
                   }).ToListAsync();
 
-                var type2Task = await _repositoryWrapper.Type2ContentBefore.GetAll()
+                var type2 = await _repositoryWrapper.Type2ContentBefore.GetAll()
                    .Join(_repositoryWrapper.Unit.GetAll(), x => x.CUnitId, y => y.CId, (x, y) => new { x, y })
                    .Join(_repositoryWrapper.Administrator.GetAll(), x => x.x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                    {
@@ -96,11 +96,11 @@ namespace App.BLL
                        EditorName = y.CName
                    }).ToListAsync();
 
-                response.Entries.AddRange(settingTask);
-                response.Entries.AddRange(questionTask);
-                response.Entries.AddRange(portfolioTask);
-                response.Entries.AddRange(type1Task);
-                response.Entries.AddRange(type2Task);
+                response.Entries.AddRange(setting);
+                response.Entries.AddRange(question);
+                response.Entries.AddRange(portfolio);
+                response.Entries.AddRange(type1);
+                response.Entries.AddRange(type2);
                 response.Entries = response.Entries.OrderByDescending(x => x.EditDt).ToList();
             }
             catch (Exception ex)
