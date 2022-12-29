@@ -67,8 +67,7 @@ export class UnitDialogComponent extends BaseComponent implements OnInit {
       return;
     }
 
-    let request = new CreateOrUpdateUnitRequest();
-    request = { ...this.form.value };
+    let request: CreateOrUpdateUnitRequest = { ...this.form.value };
 
     this.httpService.post<ResponseBase<string>>('unit/createOrUpdateUnit', request).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -76,6 +75,7 @@ export class UnitDialogComponent extends BaseComponent implements OnInit {
         return;
       }
 
+      this.unitService.getBackStageUnitsByGroupId();
       this.snackBarService.showSnackBar(SnackBarService.RequestSuccessText);
       this.dialogRef.close(true);
     })

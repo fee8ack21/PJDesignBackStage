@@ -34,7 +34,7 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.unitService.isBackStageUnitsInit.subscribe(async response => {
+    this.unitService.isBackStageUnitsInit$.subscribe(async response => {
       this.setUnit();
       this.getSettingByUnitId();
       await this.setType2Units();

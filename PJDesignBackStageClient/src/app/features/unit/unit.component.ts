@@ -28,7 +28,7 @@ export class UnitComponent extends ListBaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.unitService.isBackStageUnitsInit.subscribe(() => { this.setUnit(); })
+    this.unitService.isBackStageUnitsInit$.subscribe(() => { this.setUnit(); })
     this.getFrontStageUnits();
   }
 

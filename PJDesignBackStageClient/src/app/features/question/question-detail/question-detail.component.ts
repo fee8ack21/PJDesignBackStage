@@ -39,7 +39,7 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
 
   ngOnInit(): void {
     this.initForm();
-    this.unitService.isBackStageUnitsInit.subscribe(async response => {
+    this.unitService.isBackStageUnitsInit$.subscribe(async response => {
       this.setUnit();
       this.getCategories();
       this.getQuestion();

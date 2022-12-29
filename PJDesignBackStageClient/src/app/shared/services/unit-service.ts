@@ -8,29 +8,22 @@ import { HttpService } from './http.service';
 @Injectable()
 
 export class UnitService {
-  isBackStageUnitsInit = new BehaviorSubject<boolean>(false);
+  isBackStageUnitsInit$ = new BehaviorSubject<boolean>(false);
+  units$ = new BehaviorSubject<{ fixedUnits: UnitList[], customUnits: UnitList[] }>({ fixedUnits: [], customUnits: [] });
 
   private _units: GetUnitsResponse[] | undefined;
-  private _fixedUnits: UnitList[] = [];
-  private _customUnits: UnitList[] = [];
 
   constructor(private httpService: HttpService, private authService: AuthService) { }
 
-  async getBackStageUnitsByGroupId(): Promise<{ fixedUnits: UnitList[], customUnits: UnitList[] }> {
-    if (this._units != undefined) { return { fixedUnits: this._fixedUnits, customUnits: this._customUnits } };
-
+  getBackStageUnitsByGroupId(): void {
     let request = new GetUnitsRequest(StageType.後台, undefined, this.authService.getAdministrator()?.groupId);
-
-    const response = await this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
-    if (response.statusCode == StatusCode.Success) {
-      this._units = response.entries!;
-      this._setFormattedUnits(response.entries! as UnitList[])
-
-      this.isBackStageUnitsInit.next(true);
-      return { fixedUnits: this._fixedUnits, customUnits: this._customUnits };
-    }
-
-    return { fixedUnits: [], customUnits: [] };
+    this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).subscribe(response => {
+      if (response.statusCode == StatusCode.Success) {
+        this._units = response.entries!;
+        this.isBackStageUnitsInit$.next(true);
+        this.units$.next(this._getFormattedUnits(response.entries! as UnitList[]))
+      }
+    });
   }
 
   getCurrentUnit(): { id: number, name: string } {
@@ -40,7 +33,7 @@ export class UnitService {
     let filtededUnits = [];
     if (window.location.pathname.includes('type')) {
       if (window.location.pathname.includes('detail')) {
-        var txt = `uid=${new URLSearchParams(window.location.search).get('uid')}`;
+        const txt = `uid=${new URLSearchParams(window.location.search).get('uid')}`;
         filtededUnits = this._units.filter(x => x.backStageUrl != null ? x.backStageUrl.includes(txt) : false);
       } else {
         filtededUnits = this._units.filter(x => x.backStageUrl != null ? path == x.backStageUrl.trimStart().trim() ?? '' : false);
@@ -54,7 +47,7 @@ export class UnitService {
     return { id: filtededUnits[0].id, name: filtededUnits[0].name };
   }
 
-  private _setFormattedUnits(units: UnitList[]) {
+  private _getFormattedUnits(units: UnitList[]): { fixedUnits: UnitList[], customUnits: UnitList[] } {
     let fixedUnits: UnitList[] = []
     let customUnits: UnitList[] = []
     let childUnits: UnitList[] = []
@@ -97,14 +90,11 @@ export class UnitService {
       })
     })
 
-    this._fixedUnits = fixedUnits;
-    this._customUnits = customUnits;
+    return { fixedUnits, customUnits };
   }
 
   public clearUnits() {
     this._units = undefined;
-    this._fixedUnits = [];
-    this._customUnits = [];
   }
 
   public getUnitIcon(id: number) {

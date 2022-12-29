@@ -39,7 +39,7 @@ export class Type2ListComponent extends ListBaseComponent implements OnInit {
   ngOnInit(): void {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
 
-    this.unitService.isBackStageUnitsInit.subscribe(response => {
+    this.unitService.isBackStageUnitsInit$.subscribe(response => {
       this.setUnit();
       this.getCategories();
       this.getType2Contents();

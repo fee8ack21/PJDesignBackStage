@@ -36,7 +36,7 @@ export class ReviewListComponent extends ListBaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.unitService.isBackStageUnitsInit.subscribe(response => {
+    this.unitService.isBackStageUnitsInit$.subscribe(response => {
       this.setUnit();
       this.getReviews();
     });

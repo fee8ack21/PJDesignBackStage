@@ -37,7 +37,7 @@ export class QuestionListComponent extends ListBaseComponent implements OnInit {
   ngOnInit(): void {
     this.getQuestions();
 
-    this.unitService.isBackStageUnitsInit.subscribe(response => {
+    this.unitService.isBackStageUnitsInit$.subscribe(response => {
       this.setUnit();
       this.getCategories();
     });

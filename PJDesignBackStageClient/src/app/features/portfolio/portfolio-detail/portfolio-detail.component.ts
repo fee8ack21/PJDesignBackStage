@@ -41,7 +41,7 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
 
   ngOnInit(): void {
     this.initForm();
-    this.unitService.isBackStageUnitsInit.subscribe(response => {
+    this.unitService.isBackStageUnitsInit$.subscribe(response => {
       this.setUnit();
       this.getCategories();
       this.getPortfolio();

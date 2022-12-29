@@ -41,7 +41,7 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.unitService.isBackStageUnitsInit.subscribe(async response => {
+    this.unitService.isBackStageUnitsInit$.subscribe(async response => {
       this.setUnit();
       await this.setType2Units();
       this.getSettingByUnitId();

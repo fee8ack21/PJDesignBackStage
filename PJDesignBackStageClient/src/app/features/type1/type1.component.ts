@@ -38,7 +38,7 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
 
     this.initForm();
-    this.unitService.isBackStageUnitsInit.subscribe(async response => {
+    this.unitService.isBackStageUnitsInit$.subscribe(async response => {
       this.setUnit();
       this.getType1Content();
     });

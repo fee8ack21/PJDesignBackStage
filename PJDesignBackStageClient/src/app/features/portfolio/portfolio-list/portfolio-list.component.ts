@@ -37,7 +37,7 @@ export class PortfolioListComponent extends ListBaseComponent implements OnInit 
   ngOnInit(): void {
     this.getPortfolios();
 
-    this.unitService.isBackStageUnitsInit.subscribe(() => {
+    this.unitService.isBackStageUnitsInit$.subscribe(() => {
       this.setUnit();
       this.getCategories();
     })

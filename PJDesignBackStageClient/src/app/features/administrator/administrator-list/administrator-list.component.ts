@@ -42,7 +42,7 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
   }
 
   ngOnInit(): void {
-    this.unitService.isBackStageUnitsInit.subscribe(() => { this.setUnit(); });
+    this.unitService.isBackStageUnitsInit$.subscribe(() => { this.setUnit(); });
     this.getGroups();
     this.getAdministrators();
   }

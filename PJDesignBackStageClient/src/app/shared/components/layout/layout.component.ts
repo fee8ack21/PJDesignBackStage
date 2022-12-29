@@ -26,19 +26,15 @@ export class LayoutComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.unitService.getBackStageUnitsByGroupId()
+
     this.getAdministratorName();
-    this.getUnits();
     this.listenProgrssBarService();
+    this.listenUnitService();
   }
 
   getAdministratorName() {
     this.administratorName = this.authSerivce.getAdministrator()?.name ?? '';
-  }
-
-  async getUnits() {
-    let temp = await this.unitService.getBackStageUnitsByGroupId();
-    this.fixedUnits = temp.fixedUnits;
-    this.customUnits = temp.customUnits;
   }
 
   logout(e: any) {
@@ -50,8 +46,15 @@ export class LayoutComponent extends BaseComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
+  listenUnitService() {
+    this.unitService.units$.subscribe(response => {
+      this.fixedUnits = response.fixedUnits;
+      this.customUnits = response.customUnits;
+    })
+  }
+
   listenProgrssBarService() {
-    this.progressBarService.isShow.subscribe(response => {
+    this.progressBarService.isShow$.subscribe(response => {
       this.isShowProgressBar = response;
     })
   }
