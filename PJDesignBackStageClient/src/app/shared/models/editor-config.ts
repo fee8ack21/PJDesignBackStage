@@ -1,5 +1,4 @@
 import { AngularEditorConfig } from "@kolkov/angular-editor";
-import { environment } from "src/environments/environment";
 
 export let defaultEditorConfig: AngularEditorConfig = {
   editable: true,

@@ -4,13 +4,14 @@ import { UnitList } from '../../models/get-units';
 import { AuthService } from '../../services/auth.service';
 import { ProgressBarService } from '../../services/progress-bar.service';
 import { UnitService } from '../../services/unit-service';
+import { BaseComponent } from '../base/base.component';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss']
 })
-export class LayoutComponent implements OnInit {
+export class LayoutComponent extends BaseComponent implements OnInit {
   administratorName = '';
   fixedUnits: UnitList[] = [];
   customUnits: UnitList[] = [];
@@ -20,7 +21,9 @@ export class LayoutComponent implements OnInit {
     public unitService: UnitService,
     public router: Router,
     private authSerivce: AuthService,
-    private progressBarService: ProgressBarService) { }
+    private progressBarService: ProgressBarService) {
+    super(unitService);
+  }
 
   ngOnInit(): void {
     this.getAdministratorName();
@@ -51,18 +54,5 @@ export class LayoutComponent implements OnInit {
     this.progressBarService.isShow.subscribe(response => {
       this.isShowProgressBar = response;
     })
-  }
-
-  getLink(url: string | null | undefined) {
-    if (url == null || url == undefined) { return url; }
-
-    return url.split('?')[0];
-  }
-
-  getQueryParams(url: string | null | undefined) {
-    if (url == null || url == undefined || url.split('?').length == 1) { return {}; }
-
-    const params = new URLSearchParams(url.split('?')[1]);
-    return Object.fromEntries(params.entries());
   }
 }

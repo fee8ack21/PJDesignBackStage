@@ -82,8 +82,8 @@
                 管理
               </th>
               <td mat-cell *matCellDef="let element">
-                <a mat-stroked-button [routerLink]="[getLink(element.url)]"
-                  [queryParams]="getQueryParams(element.url)">編輯</a>
+                <a mat-stroked-button [routerLink]="[extractUrl(element.url)]"
+                  [queryParams]="extractQueryParams(element.url)">編輯</a>
               </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

@@ -9,15 +9,15 @@ export class AppComponent {
   isWindowDisabled = false;
 
   constructor() {
-    this.checkIfDisabled();
+    this.checkIfDisableWindow();
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(e: any) {
-    this.checkIfDisabled();
+    this.checkIfDisableWindow();
   }
 
-  checkIfDisabled() {
+  checkIfDisableWindow() {
     if (window.innerWidth < 1200) {
       this.isWindowDisabled = true;
       return;

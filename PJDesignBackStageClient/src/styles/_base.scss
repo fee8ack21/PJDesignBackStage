@@ -1,0 +1,44 @@
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "Helvetica Neue", sans-serif;
+}
+
+.mat-list-text,
+.mat-button,
+.mat-toolbar,
+.mat-tree,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+p,
+a,
+button {
+  font-family: "Noto Sans TC", "Helvetica Neue", sans-serif !important;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(156, 156, 156);
+
+  &:hover {
+    background: darken(rgb(156, 156, 156), 10%);
+  }
+}

@@ -27,4 +27,17 @@ export abstract class BaseComponent {
   isUnitInit(): boolean {
     return this.unit.id != null != undefined && this.unit.id != null && this.unit.id != -1;
   }
+
+  extractUrl(url: string | null | undefined): string | null | undefined {
+    if (url == null || url == undefined) { return url; }
+
+    return url.split('?')[0];
+  }
+
+  extractQueryParams(url: string | null | undefined): { [k: string]: string; } {
+    if (url == null || url == undefined || url.split('?').length == 1) { return {}; }
+
+    const params = new URLSearchParams(url.split('?')[1]);
+    return Object.fromEntries(params.entries());
+  }
 }

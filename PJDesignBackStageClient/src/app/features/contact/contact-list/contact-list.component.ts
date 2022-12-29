@@ -25,10 +25,6 @@ export class ContactListComponent extends ListBaseComponent implements OnInit {
   dataSource: MatTableDataSource<GetContactsResponse>;
   searchParams = new ContactListSearchParams();
 
-  administrator: { id: number, name: string } | null;
-  settingEditorId?: number;
-  settingStatus?: EditStatus;
-
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 

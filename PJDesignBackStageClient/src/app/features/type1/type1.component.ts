@@ -1,14 +1,9 @@
-import { HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AngularEditorConfig, UploadResponse } from '@kolkov/angular-editor';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { defaultEditorConfig } from 'src/app/shared/models/editor-config';
 import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { ReviewNote } from 'src/app/shared/models/review-note';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -26,22 +21,6 @@ import { GetType1ContentResponse } from './feature-shared/models/get-type1-conte
 })
 export class Type1Component extends DetailBaseComponent implements OnInit {
   type1Form: FormGroup;
-  editorConfig: AngularEditorConfig = {
-    ...defaultEditorConfig,
-    upload: (file: File): Observable<HttpEvent<UploadResponse>> => {
-      const formData = new FormData();
-      formData.append('image', file, file.name);
-
-      return this.httpService
-        .post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() })
-        .pipe(
-          map((x: any) => {
-            x.body = { imageUrl: x.entries };
-            return x;
-          })
-        );
-    },
-  };
 
   constructor(
     protected httpService: HttpService,
@@ -108,7 +87,7 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
     }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(ValidatorService.reviewErrorTxt);
+      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
       return;
     }
 

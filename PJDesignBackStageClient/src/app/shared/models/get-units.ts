@@ -3,7 +3,7 @@ export class GetUnitsRequest {
   groupId?: number;
   templateType?: number;
 
-  constructor(stageType?: number, templateType?: number) {
+  constructor(stageType?: number, templateType?: number, groupId?: number) {
     this.stageType = stageType;
     this.templateType = templateType;
   }

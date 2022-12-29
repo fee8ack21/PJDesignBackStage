@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpStatusCode } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, retry } from "rxjs/operators";
+import { catchError, retry, tap } from "rxjs/operators";
 import { SnackBarService } from '../services/snack-bar.service';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
@@ -25,7 +25,7 @@ export class ErrorInterceptor implements HttpInterceptor {
             errorMessage = `Error Code: ${error.status},  Message: ${error.message}`;
           }
 
-          if (error.status == 401) {
+          if (error.status == HttpStatusCode.Unauthorized) {
             this.authService.removeToken();
             this.authService.removeAdministrator();
             this.router.navigate(['/']);

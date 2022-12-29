@@ -1,18 +1,12 @@
-import { HttpEvent, HttpHeaders } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectionList } from '@angular/material/list';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AngularEditorConfig, UploadResponse } from '@kolkov/angular-editor';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { Category } from 'src/app/shared/models/category';
-import { defaultEditorConfig } from 'src/app/shared/models/editor-config';
 import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
-import { GetCategoriesByUnitId } from 'src/app/shared/models/get-categories-by-unit-id';
 import { ReviewNote } from 'src/app/shared/models/review-note';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
@@ -29,23 +23,6 @@ import { GetType2ContentByIdResponse } from '../feature-shared/models/get-type2-
 })
 export class Type2DetailComponent extends DetailBaseComponent implements OnInit {
   form: FormGroup;
-  editorConfig: AngularEditorConfig = {
-    ...defaultEditorConfig,
-    upload: (file: File): Observable<HttpEvent<UploadResponse>> => {
-      const formData = new FormData();
-      formData.append('image', file, file.name);
-
-      return this.httpService
-        .post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() })
-        .pipe(
-          map((x: any) => {
-            x.body = { imageUrl: x.entries };
-            return x;
-          })
-        );
-    },
-  };
-  unitCategories: { id: number, name: string, selected: boolean }[] = [];
   thumbnailUrl = '';
   thumbnailName = '';
   imageUrl = '';
@@ -150,7 +127,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
     }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(ValidatorService.reviewErrorTxt);
+      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
       return;
     }
 

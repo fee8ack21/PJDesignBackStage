@@ -113,7 +113,7 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
     if (e !== undefined) { e.preventDefault(); }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(ValidatorService.reviewErrorTxt);
+      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
       return;
     }
 

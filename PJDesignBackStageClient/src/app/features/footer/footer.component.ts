@@ -160,13 +160,11 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
 
   async onSubmit(status = EditStatus.Review) {
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(ValidatorService.reviewErrorTxt);
+      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
       return;
     }
 
-    let settings = new FooterSettings();
-    settings = { ... this.footerForm.value };
-
+    let settings: FooterSettings = { ... this.footerForm.value };
     let selectedUnits = this.getListSelectedIDs(this.unitSelectEle);
     settings.isShowMapUnit = selectedUnits.includes(-1);
     settings.showedUnits = selectedUnits.filter(x => x != -1);

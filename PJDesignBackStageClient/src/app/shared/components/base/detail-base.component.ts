@@ -1,10 +1,15 @@
+import { HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectionList } from '@angular/material/list';
 import { ActivatedRoute } from '@angular/router';
+import { AngularEditorConfig, UploadResponse } from '@kolkov/angular-editor';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ResponseBase } from '../../models/bases';
 import { Category } from '../../models/category';
+import { defaultEditorConfig } from '../../models/editor-config';
 import { EditStatus, PageStatus, StatusCode } from '../../models/enums';
 import { GetCategoriesByUnitId } from '../../models/get-categories-by-unit-id';
 import { ReviewNote } from '../../models/review-note';
@@ -35,6 +40,23 @@ export abstract class DetailBaseComponent extends BaseComponent {
   contentCreateDt?: Date | null;
 
   unitCategories: { id: number, name: string, selected: boolean }[] = [];
+
+  editorConfig: AngularEditorConfig = {
+    ...defaultEditorConfig,
+    upload: (file: File): Observable<HttpEvent<UploadResponse>> => {
+      const formData = new FormData();
+      formData.append('image', file, file.name);
+
+      return this.httpService
+        .post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() })
+        .pipe(
+          map((x: any) => {
+            x.body = { imageUrl: x.entries };
+            return x;
+          })
+        );
+    },
+  };
 
   constructor(
     protected route: ActivatedRoute,

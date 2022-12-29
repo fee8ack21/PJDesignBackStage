@@ -5,7 +5,7 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { StatusCode } from 'src/app/shared/models/enums';
+import { EditAndEnabledOptions, StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
@@ -61,17 +61,16 @@ export class PortfolioListComponent extends ListBaseComponent implements OnInit 
   }
 
   onSearchFilterFn(data: GetPortfoliosResponse): boolean {
-    // return (this.searchParams.title == null || this.searchParams.title.trim().length == 0 || data.title.includes(this.searchParams.title.trim())) &&
-    //   (this.searchParams.categoryId == null || this.searchParams.categoryId == -1 || (data.categories != null && data.categories.filter(x => x.id == this.searchParams.categoryId).length > 0)) &&
-    //   (this.searchParams.startDt == null || new Date(data.editDt) >= this.searchParams.startDt) &&
-    //   (this.searchParams.endDt == null || new Date(data.editDt) <= this.searchParams.endDt) &&
-    //   (this.searchParams.editAndEnabledStatus == null ||
-    //     this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.全部 ||
-    //     (data.editStatus == null && +data.isEnabled == this.searchParams.editAndEnabledStatus) ||
-    //     (data.editStatus == EditStatus.Review && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.審核中) ||
-    //     (data.editStatus == EditStatus.Reject && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.駁回)
-    //   )
-    return true;
+    return (this.searchParams.title == null || this.searchParams.title.trim().length == 0 || data.title.includes(this.searchParams.title.trim())) &&
+      (this.searchParams.categoryId == null || this.searchParams.categoryId == -1 || (data.categories != null && data.categories.filter(x => x.id == this.searchParams.categoryId).length > 0)) &&
+      (this.searchParams.startDt == null || new Date(data.editDt) >= this.searchParams.startDt) &&
+      (this.searchParams.endDt == null || new Date(data.editDt) <= this.searchParams.endDt) &&
+      (this.searchParams.editAndEnabledStatus == null ||
+        this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.全部 ||
+        (data.editStatus == null && +data.isEnabled == this.searchParams.editAndEnabledStatus) ||
+        (data.editStatus == this.EditStatus.Review && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.審核中) ||
+        (data.editStatus == this.EditStatus.Reject && this.searchParams.editAndEnabledStatus == EditAndEnabledOptions.駁回)
+      )
   }
 
   resetSearchParams(): void {

@@ -20,7 +20,7 @@ import { GetGroupsResponse } from '../feature-shared/models/get-groups';
   styleUrls: ['./administrator-detail.component.scss']
 })
 export class AdministratorDetailComponent extends DetailBaseComponent implements OnInit {
-  administratorForm: FormGroup;
+  form: FormGroup;
   groups: GetGroupsResponse[] = [];
 
   constructor(
@@ -67,7 +67,7 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
   }
 
   initForm() {
-    this.administratorForm = new FormGroup({
+    this.form = new FormGroup({
       id: new FormControl(null),
       account: new FormControl(null, [Validators.required]),
       name: new FormControl(null, [Validators.required]),
@@ -78,16 +78,16 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
   }
 
   updateForm(data: GetAdministratorByIdResponse) {
-    this.administratorForm.patchValue({ ...data });
+    this.form.patchValue({ ...data });
   }
 
   onSubmit() {
-    if (this.administratorForm.invalid) {
-      this.administratorForm.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    let request: CreateOrUpdateAdministratorRequest = { ...this.administratorForm.value };
+    let request: CreateOrUpdateAdministratorRequest = { ...this.form.value };
 
     this.httpService.post<ResponseBase<null>>('administrator/CreateOrUpdateAdministrator', request).subscribe(response => {
       if (response?.statusCode == null || response.statusCode == StatusCode.Fail || typeof response.entries == null) {

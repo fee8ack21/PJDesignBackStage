@@ -68,19 +68,6 @@ export class ReviewListComponent extends ListBaseComponent implements OnInit {
     })
   }
 
-  getLink(url: string | null | undefined): string | null | undefined {
-    if (url == null || url == undefined) { return url; }
-
-    return url.split('?')[0];
-  }
-
-  getQueryParams(url: string | null | undefined): { [k: string]: string; } {
-    if (url == null || url == undefined || url.split('?').length == 1) { return {}; }
-
-    const params = new URLSearchParams(url.split('?')[1]);
-    return Object.fromEntries(params.entries());
-  }
-
   onSearch(): void {
     const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
     this.dataSource = this.createDataSource<GetReviewsResponse>(newData, this.sort, this.paginator);

@@ -31,7 +31,7 @@
         <h3 mat-subheader *ngIf="fixedUnits.length > 0">固定單元</h3>
         <ng-container *ngFor="let item of fixedUnits">
           <a *ngIf="item.children == null || item.children.length == 0" mat-list-item
-            [routerLink]="[getLink(item.backStageUrl)]" [queryParams]="getQueryParams(item.backStageUrl)"
+            [routerLink]="[extractUrl(item.backStageUrl)]" [queryParams]="extractQueryParams(item.backStageUrl)"
             routerLinkActive="active">
             <mat-icon mat-list-icon>
               {{unitService.getUnitIcon(item.id)}}
@@ -49,7 +49,7 @@
                 </mat-panel-title>
               </mat-expansion-panel-header>
               <mat-nav-list>
-                <a *ngFor="let detail of item.children" mat-list-item [routerLink]="[getLink(detail.backStageUrl)]"
+                <a *ngFor="let detail of item.children" mat-list-item [routerLink]="[extractUrl(detail.backStageUrl)]"
                   routerLinkActive="active">
                   <mat-icon mat-list-icon>
                     {{unitService.getUnitIcon(detail.id)}}
@@ -64,7 +64,7 @@
         <h3 mat-subheader *ngIf="customUnits.length > 0">自定義單元</h3>
         <ng-container *ngFor="let item of customUnits">
           <a *ngIf="item.children == null || item.children.length == 0" mat-list-item
-            [routerLink]="[getLink(item.backStageUrl)]" [queryParams]="getQueryParams(item.backStageUrl)"
+            [routerLink]="[extractUrl(item.backStageUrl)]" [queryParams]="extractQueryParams(item.backStageUrl)"
             routerLinkActive="active">
             <mat-icon mat-list-icon>
               {{unitService.getUnitIcon(item.id)}}
@@ -82,8 +82,8 @@
                 </mat-panel-title>
               </mat-expansion-panel-header>
               <mat-nav-list>
-                <a *ngFor="let detail of item.children" mat-list-item [routerLink]="[getLink(detail.backStageUrl)]"
-                  [queryParams]="getQueryParams(item.backStageUrl)" routerLinkActive="active">
+                <a *ngFor="let detail of item.children" mat-list-item [routerLink]="[extractUrl(detail.backStageUrl)]"
+                  [queryParams]="extractQueryParams(item.backStageUrl)" routerLinkActive="active">
                   <mat-icon mat-list-icon>
                     {{unitService.getUnitIcon(detail.id)}}
                   </mat-icon>

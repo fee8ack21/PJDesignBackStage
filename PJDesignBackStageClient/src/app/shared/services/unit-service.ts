@@ -9,6 +9,7 @@ import { HttpService } from './http.service';
 
 export class UnitService {
   isBackStageUnitsInit = new BehaviorSubject<boolean>(false);
+
   private _units: GetUnitsResponse[] | undefined;
   private _fixedUnits: UnitList[] = [];
   private _customUnits: UnitList[] = [];
@@ -18,9 +19,7 @@ export class UnitService {
   async getBackStageUnitsByGroupId(): Promise<{ fixedUnits: UnitList[], customUnits: UnitList[] }> {
     if (this._units != undefined) { return { fixedUnits: this._fixedUnits, customUnits: this._customUnits } };
 
-    let request = new GetUnitsRequest();
-    request.groupId = this.authService.getAdministrator()?.groupId;
-    request.stageType = StageType.後台;
+    let request = new GetUnitsRequest(StageType.後台, undefined, this.authService.getAdministrator()?.groupId);
 
     const response = await this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
     if (response.statusCode == StatusCode.Success) {

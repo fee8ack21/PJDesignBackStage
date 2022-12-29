@@ -87,9 +87,7 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
     ]).then(([unitsResponse, rightsResponse]) => {
       if (unitsResponse.statusCode == StatusCode.Success) {
         unitsResponse.entries!.forEach(unit => {
-          let temp = new GetUnitsResponse();
-          temp = { ...unit };
-          units.push(temp);
+          units.push({ ...unit } as GetUnitsResponse);
         })
       };
       if (rightsResponse.statusCode == StatusCode.Success) { rights = rightsResponse.entries! };
