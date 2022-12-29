@@ -5,6 +5,11 @@ import { FormControlErrorType } from '../models/enums';
 @Injectable()
 
 export class ValidatorService {
+  readonly requiredErrorTxt = '欄位不得為空';
+  readonly patternErrorTxt = '欄位格式錯誤';
+
+  static readonly reviewErrorTxt = '請填寫備註';
+
   constructor() { }
 
   isFormControlInvalid(form: FormGroup, controlName: string): boolean {
@@ -18,11 +23,11 @@ export class ValidatorService {
   getFormControlErrorText(type: number): string {
     switch (type) {
       case FormControlErrorType.Required:
-        return '欄位不得為空';
+        return this.requiredErrorTxt;
       case FormControlErrorType.Pattern:
-        return '欄位格式錯誤'
+        return this.patternErrorTxt;
       default:
-        return ''
+        return '';
     }
   }
 }

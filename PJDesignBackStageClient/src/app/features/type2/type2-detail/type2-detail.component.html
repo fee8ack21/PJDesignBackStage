@@ -5,14 +5,14 @@
         <h2>{{unit.name}} - {{pageStatusName}}</h2>
         <mat-divider></mat-divider>
         <div class="pt-1">
-          <form [formGroup]="type2Form">
+          <form [formGroup]="form">
             <div class="d-flex py-1">
               <input formControlName="id" name="id" [value]="null" type="hidden">
               <mat-form-field appearance="fill">
                 <mat-label>標題</mat-label>
                 <input matInput formControlName="title" name="title" readonly
                   onfocus="this.removeAttribute('readonly');">
-                <mat-error *ngIf="validatorService.isFormControlInvalid(type2Form, 'title')">
+                <mat-error *ngIf="validatorService.isFormControlInvalid(form, 'title')">
                   {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
                 </mat-error>
               </mat-form-field>
@@ -70,14 +70,14 @@
             <div class="pt-1" [ngClass]="{'pb-1': editStatus == EditStatus.Review && administrator?.id != editorId}">
               <ng-container *ngIf="!isPreventEdit()">
                 <angular-editor
-                  [ngClass]="{'editor-invalid': validatorService.isFormControlInvalid(type2Form, 'content')}"
+                  [ngClass]="{'editor-invalid': validatorService.isFormControlInvalid(form, 'content')}"
                   [config]="editorConfig" formControlName="content">
                 </angular-editor>
               </ng-container>
               <div *ngIf="isPreventEdit()">
                 <mat-card>
                   <mat-card-content>
-                    <div [innerHTML]="type2Form.get('content')?.value"></div>
+                    <div [innerHTML]="form.get('content')?.value"></div>
                   </mat-card-content>
                 </mat-card>
               </div>

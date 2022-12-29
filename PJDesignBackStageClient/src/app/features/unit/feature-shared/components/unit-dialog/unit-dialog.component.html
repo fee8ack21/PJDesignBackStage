@@ -1,10 +1,10 @@
 <h1 mat-dialog-title>{{data?.unit?.id != null && data?.unit?.id != undefined ? '編輯' : '新增'}}</h1>
-<form [formGroup]="unitForm">
+<form [formGroup]="form">
   <div mat-dialog-content>
     <mat-form-field appearance="fill" class="w-100 mb-1">
       <mat-label>名稱</mat-label>
       <input matInput formControlName="name">
-      <mat-error *ngIf="validatorService.isFormControlInvalid(unitForm, 'name')">
+      <mat-error *ngIf="validatorService.isFormControlInvalid(form, 'name')">
         {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
       </mat-error>
     </mat-form-field>
@@ -16,11 +16,11 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="fill" class="w-100" *ngIf="unitForm.get('templateType')?.value === 0">
+    <mat-form-field appearance="fill" class="w-100" *ngIf="form.get('templateType')?.value === 0">
       <mat-label>URL</mat-label>
       <input matInput formControlName="url">
       <mat-error
-        *ngIf="unitForm.get('templateType')?.value === 0 && validatorService.isFormControlInvalid(unitForm, 'name')">
+        *ngIf="form.get('templateType')?.value === 0 && validatorService.isFormControlInvalid(form, 'name')">
         {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
       </mat-error>
     </mat-form-field>

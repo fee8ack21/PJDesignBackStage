@@ -1,5 +1,5 @@
 <div class="auth-login">
-  <form class="auth-login__form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <form class="auth-login__form" [formGroup]="form" (ngSubmit)="onSubmit()">
     <mat-card>
       <mat-card-content>
         <div class="my-1-i">
@@ -7,7 +7,7 @@
             <mat-label>帳號</mat-label>
             <input type="text" matInput formControlName="account" name="account" readonly
               onfocus="this.removeAttribute('readonly');">
-            <mat-error *ngIf="validatorService.isFormControlInvalid(loginForm, 'account')">
+            <mat-error *ngIf="validatorService.isFormControlInvalid(form, 'account')">
               {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
             </mat-error>
           </mat-form-field>
@@ -17,7 +17,7 @@
             <mat-label>密碼</mat-label>
             <input type="password" matInput formControlName="password" name="password" readonly
               onfocus="this.removeAttribute('readonly');">
-            <mat-error *ngIf="validatorService.isFormControlInvalid(loginForm, 'password')">
+            <mat-error *ngIf="validatorService.isFormControlInvalid(form, 'password')">
               {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
             </mat-error>
           </mat-form-field>

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { GetUnitsResponse, UnitList } from '../../models/get-units';
+import { UnitList } from '../../models/get-units';
 import { AuthService } from '../../services/auth.service';
-import { HttpService } from '../../services/http.service';
 import { ProgressBarService } from '../../services/progress-bar.service';
 import { UnitService } from '../../services/unit-service';
 
@@ -12,15 +11,12 @@ import { UnitService } from '../../services/unit-service';
   styleUrls: ['./layout.component.scss']
 })
 export class LayoutComponent implements OnInit {
-  administratorName = ''
-
+  administratorName = '';
   fixedUnits: UnitList[] = [];
   customUnits: UnitList[] = [];
-
   isShowProgressBar = false;
 
   constructor(
-    private httpService: HttpService,
     public unitService: UnitService,
     public router: Router,
     private authSerivce: AuthService,
@@ -47,6 +43,7 @@ export class LayoutComponent implements OnInit {
 
     this.authSerivce.removeToken();
     this.authSerivce.removeAdministrator();
+    this.unitService.clearUnits();
     this.router.navigate(['/']);
   }
 

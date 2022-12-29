@@ -17,7 +17,7 @@ import { GroupDialogData } from '../../models/group-dialog-data';
 })
 export class GroupDialogComponent implements OnInit {
   readonly rightDefaultId = -1;
-  groupForm: FormGroup;
+  form: FormGroup;
 
   public get FormControlErrorType(): typeof FormControlErrorType {
     return FormControlErrorType;
@@ -37,7 +37,7 @@ export class GroupDialogComponent implements OnInit {
   }
 
   initForm() {
-    this.groupForm = new FormGroup(this.getInitFormControlData(this.data));
+    this.form = new FormGroup(this.getInitFormControlData(this.data));
   }
 
   getInitFormControlData(data: GroupDialogData) {
@@ -65,9 +65,7 @@ export class GroupDialogComponent implements OnInit {
   }
 
   getGroupUnitRightByIdPromise(id: number) {
-    let request = new GetUnitRightsByGroupIdRequest();
-    request.id = id;
-
+    let request = new GetUnitRightsByGroupIdRequest(id);
     return this.httpService.post<ResponseBase<GetUnitRightsByGroupIdResponse[]>>('administrator/getUnitRightsByGroupId', request).toPromise();
   }
 
@@ -79,14 +77,14 @@ export class GroupDialogComponent implements OnInit {
       patchValues[key] = unitRights?.find(unitRight => unitRight.unitId == unit.id)?.rightId ?? this.rightDefaultId;
     })
 
-    this.groupForm.patchValue(patchValues);
+    this.form.patchValue(patchValues);
   }
 
   onGroupSelectChange() {
     if (!this.data.isEdit) { return; }
 
-    this.groupForm.get('id')?.valueChanges.subscribe(async value => {
-      this.groupForm.patchValue({ name: this.data?.groups?.find(x => x.id == value)?.name })
+    this.form.get('id')?.valueChanges.subscribe(async value => {
+      this.form.patchValue({ name: this.data?.groups?.find(x => x.id == value)?.name })
 
       const unitRightsResponse = await this.getGroupUnitRightByIdPromise(value);
 
@@ -97,36 +95,30 @@ export class GroupDialogComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.groupForm.invalid) {
-      this.groupForm.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    let request = new CreateOrUpdateGroupRequest();
-    request.id = this.groupForm.get('id')?.value;
-    request.name = this.groupForm.get('name')?.value;
+    let request = new CreateOrUpdateGroupRequest(this.form.get('id')?.value, this.form.get('name')?.value);
 
-    for (let key in this.groupForm.value) {
+    for (let key in this.form.value) {
       if (!key.includes('unit')) { continue; }
 
       const unitId = parseInt(key.replace('unit', ""));
-      const rightId = this.groupForm.value[key];
+      const rightId = this.form.value[key];
 
       if (rightId == this.rightDefaultId) { continue; }
 
-      let temp = new UnitRight();
-      temp.unitId = unitId;
-      temp.rightId = rightId;
-
-      request.unitRights.push(temp);
+      request.unitRights.push(new UnitRight(unitId, rightId));
     }
 
     this.httpService.post<ResponseBase<string>>('administrator/createOrUpdateGroup', request).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-      } else {
-        this.snackBarService.showSnackBar(SnackBarService.RequestSuccessText);
+        return;
       }
+      this.snackBarService.showSnackBar(SnackBarService.RequestSuccessText);
     })
     this.dialogRef.close(true);
   }

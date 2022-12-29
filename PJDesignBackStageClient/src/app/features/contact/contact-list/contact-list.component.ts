@@ -45,10 +45,6 @@ export class ContactListComponent extends ListBaseComponent implements OnInit {
     this.getContacts();
   }
 
-  isPreventEdit(): boolean {
-    return this.settingStatus == EditStatus.Review || (this.settingStatus == EditStatus.Reject && this.administrator?.id != this.settingEditorId);
-  }
-
   getContacts() {
     this.httpService.get<ResponseBase<GetContactsResponse[]>>('contact/getContacts').subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -57,30 +53,22 @@ export class ContactListComponent extends ListBaseComponent implements OnInit {
       }
 
       this.rawListData = response.entries!;
-      this.dataSource = new MatTableDataSource(this.rawListData);
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
+      this.dataSource = this.createDataSource<GetContactsResponse>(this.rawListData, this.sort, this.paginator);
     });
   }
 
   async openDialog(index: number): Promise<void> {
     const _data = this.dataSource.data[index];
-    const data = new ContactDialogData();
-    data.name = _data.name;
-    data.createDt = _data.createDt;
-    data.content = _data.content;
 
     this.dialog.open(ContactDialogComponent, {
       width: '474px',
-      data: data
+      data: new ContactDialogData(_data.name, _data.content, _data.createDt)
     });
   }
 
   onSearch() {
     const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
-    this.dataSource = new MatTableDataSource(newData);
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.dataSource = this.createDataSource<GetContactsResponse>(newData, this.sort, this.paginator);
   }
 
   onSearchFilterFn(data: GetContactsResponse): boolean {

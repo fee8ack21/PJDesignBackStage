@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { HttpHeaders } from '@angular/common/http';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { toCamel } from '../../helpers/format-helper';
@@ -10,9 +11,9 @@ import { ReviewNote } from '../../models/review-note';
 import { UnitSetting } from '../../models/unit-setting';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
-import { ProgressBarService } from '../../services/progress-bar.service';
 import { SnackBarService } from '../../services/snack-bar.service';
 import { UnitService } from '../../services/unit-service';
+import { ValidatorService } from '../../services/validator.service';
 import { DetailBaseComponent } from '../base/detail-base.component';
 
 @Component({
@@ -20,7 +21,7 @@ import { DetailBaseComponent } from '../base/detail-base.component';
   templateUrl: './unit-setting-form.component.html',
   styleUrls: ['./unit-setting-form.component.scss']
 })
-export class UnitSettingFormComponent extends DetailBaseComponent implements OnInit {
+export class UnitSettingFormComponent extends DetailBaseComponent implements OnInit, OnChanges {
   enName = '';
   imageFile: File;
   imageName: string;
@@ -29,27 +30,30 @@ export class UnitSettingFormComponent extends DetailBaseComponent implements OnI
   @Input('unitId') unitId = -1;
 
   constructor(
-    private httpService: HttpService,
-    private snackBarService: SnackBarService,
+    protected httpService: HttpService,
+    protected snackBarService: SnackBarService,
     protected route: ActivatedRoute,
     protected unitService: UnitService,
     protected authService: AuthService,
     protected dialog: MatDialog) {
-    super(route, authService, unitService, dialog);
+    super(route, authService, unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if ('unitId' in changes) {
-      this.unitId = changes.unitId.currentValue;
-      this.getSettingByUnitId();
-    }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!('unitId' in changes)) { return; }
+    this.unitId = changes.unitId.currentValue;
+    this.getSettingByUnitId();
+  }
+
+  isUnitInit() {
+    return this.unitId != null && this.unitId != -1;
   }
 
   getSettingByUnitId() {
-    if (this.unitId == null || this.unitId == -1) { return }
+    if (!this.isUnitInit()) { return }
 
     this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${this.unitId}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -57,12 +61,12 @@ export class UnitSettingFormComponent extends DetailBaseComponent implements OnI
         return;
       }
 
-      this.editorId = response.entries?.editorId;
-      this.editorName = response.entries?.editorName;
-      this.contentCreateDt = response.entries?.createDt;
-      this.editStatus = response.entries?.editStatus;
-      this.editReviewNotes = toCamel(response.entries?.notes) as ReviewNote[] ?? [];
-
+      this.setEditData(
+        response.entries?.editorId,
+        response.entries?.editorName,
+        response.entries?.createDt,
+        response.entries?.editStatus,
+        toCamel(response.entries?.notes) as ReviewNote[] ?? [])
       this.updateSetting(response.entries?.content as UnitSetting)
     });
   }
@@ -78,7 +82,8 @@ export class UnitSettingFormComponent extends DetailBaseComponent implements OnI
   onPhotoUpload(e: any) {
     this.imageFile = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
     this.imageName = this.imageFile.name;
-    this.httpService.postPhoto<ResponseBase<string>>('upload/uploadPhoto', this.imageFile).subscribe(response => {
+
+    this.httpService.post<ResponseBase<string>>('upload/uploadPhoto', new FormData().append('image', this.imageFile, this.imageFile.name), { headers: new HttpHeaders() }).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;
@@ -89,24 +94,15 @@ export class UnitSettingFormComponent extends DetailBaseComponent implements OnI
 
   onSubmit(status = EditStatus.Review) {
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar('請填寫備註');
+      this.snackBarService.showSnackBar(ValidatorService.reviewErrorTxt);
       return;
     }
 
-    let request = new CreateOrUpdateSettingRequest();
-    let content = new UnitSetting();
-    content.enName = this.enName;
-    content.backgroundImageUrl = this.imagePath;
-    request.content = content;
-    request.unitId = this.unitId;
-    request.editStatus = status;
+    let content = new UnitSetting(this.enName, this.imagePath);
+    let request = new CreateOrUpdateSettingRequest(this.unitId, content, status);
 
     if (status == EditStatus.Reject) {
-      let temp = new ReviewNote();
-      temp.date = new Date();
-      temp.note = this.editReviewNote!;
-      temp.name = this.administrator!.name
-      request.note = temp;
+      request.note = new ReviewNote(this.administrator!.name, this.editReviewNote!, new Date());
     }
 
     this.httpService.post<ResponseBase<string>>('unit/createOrUpdateSetting', request).subscribe(response => {

@@ -9,7 +9,6 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { UnitDialogComponent } from './feature-shared/components/unit-dialog/unit-dialog.component';
-import { UnitDialogData } from './feature-shared/models/unit-dialog-data';
 import { UpdateUnitsSortRequest } from './feature-shared/models/update-units-sort';
 
 @Component({
@@ -34,9 +33,7 @@ export class UnitComponent extends ListBaseComponent implements OnInit {
   }
 
   getFrontStageUnits() {
-    let request = new GetUnitsRequest();
-    request.stageType = StageType.前台;
-
+    let request = new GetUnitsRequest(StageType.前台);
     this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
@@ -76,15 +73,12 @@ export class UnitComponent extends ListBaseComponent implements OnInit {
 
   sortFn() {
     return function (a: GetUnitsResponse, b: GetUnitsResponse) {
-      if (a.sort === b.sort) {
-        return 0;
-      }
-      if (a.sort === null || a.sort === undefined) {
-        return 1;
-      }
-      if (b.sort === null || b.sort === undefined) {
-        return -1;
-      }
+      if (a.sort === b.sort) { return 0; }
+
+      if (a.sort === null || a.sort === undefined) { return 1; }
+
+      if (b.sort === null || b.sort === undefined) { return -1; }
+
       return a.sort < b.sort ? -1 : 1;
     };
   }
@@ -108,10 +102,9 @@ export class UnitComponent extends ListBaseComponent implements OnInit {
   }
 
   openDialog(unit?: UnitList, parent?: number): void {
-    let data: UnitDialogData = { unit, parent };
     const dialogRef = this.dialog.open(UnitDialogComponent, {
       width: '300px',
-      data: data
+      data: { unit, parent }
     });
 
     dialogRef.afterClosed().subscribe(doRefresh => {

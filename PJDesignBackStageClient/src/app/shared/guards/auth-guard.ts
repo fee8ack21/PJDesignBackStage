@@ -15,6 +15,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return new Observable(observer => {
       const isAuthorized = this.authService.getToken() != null ? true : false;
+
       if (isAuthorized) {
         observer.next(true);
         return;

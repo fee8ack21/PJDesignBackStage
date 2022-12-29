@@ -9,7 +9,7 @@ import { HttpService } from './http.service';
 
 export class UnitService {
   isBackStageUnitsInit = new BehaviorSubject<boolean>(false);
-  private _units: GetUnitsResponse[];
+  private _units: GetUnitsResponse[] | undefined;
   private _fixedUnits: UnitList[] = [];
   private _customUnits: UnitList[] = [];
 
@@ -100,6 +100,12 @@ export class UnitService {
 
     this._fixedUnits = fixedUnits;
     this._customUnits = customUnits;
+  }
+
+  public clearUnits() {
+    this._units = undefined;
+    this._fixedUnits = [];
+    this._customUnits = [];
   }
 
   public getUnitIcon(id: number) {

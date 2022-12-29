@@ -19,12 +19,12 @@ namespace App.BLL
             _repositoryWrapper = repositoryWrapper;
         }
 
-        public async Task<ResponseBase<List<GetReviewsResponse>>> GetReviews()
+        public async Task<ResponseBase<List<GetReviewsResponse>>> GetReviews(JwtPayload payload)
         {
             var response = new ResponseBase<List<GetReviewsResponse>>() { Entries = new List<GetReviewsResponse>() };
             try
             {
-                var setting = await _repositoryWrapper.SettingBefore.GetAll()
+                var setting = await _repositoryWrapper.SettingBefore.GetByCondition(x => x.CEditorId != payload.Id)
                 .Join(_repositoryWrapper.Unit.GetAll(), x => x.CUnitId, y => y.CId, (x, y) => new { x, y })
                 .Join(_repositoryWrapper.Administrator.GetAll(), x => x.x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                 {
@@ -39,7 +39,7 @@ namespace App.BLL
                     EditorName = y.CName
                 }).ToListAsync();
 
-                var question = await _repositoryWrapper.QuestionBefore.GetAll()
+                var question = await _repositoryWrapper.QuestionBefore.GetByCondition(x => x.CEditorId != payload.Id)
                     .Join(_repositoryWrapper.Administrator.GetAll(), x => x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                     {
                         UnitId = (int)UnitId.常見問題,
@@ -53,7 +53,7 @@ namespace App.BLL
                         EditorName = y.CName
                     }).ToListAsync();
 
-                var portfolio = await _repositoryWrapper.PortfolioBefore.GetAll()
+                var portfolio = await _repositoryWrapper.PortfolioBefore.GetByCondition(x => x.CEditorId != payload.Id)
                     .Join(_repositoryWrapper.Administrator.GetAll(), x => x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                     {
                         UnitId = (int)UnitId.作品集,
@@ -67,7 +67,7 @@ namespace App.BLL
                         EditorName = y.CName
                     }).ToListAsync();
 
-                var type1 = await _repositoryWrapper.Type1ContentBefore.GetAll()
+                var type1 = await _repositoryWrapper.Type1ContentBefore.GetByCondition(x => x.CEditorId != payload.Id)
                   .Join(_repositoryWrapper.Unit.GetAll(), x => x.CUnitId, y => y.CId, (x, y) => new { x, y })
                   .Join(_repositoryWrapper.Administrator.GetAll(), x => x.x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                   {
@@ -81,7 +81,7 @@ namespace App.BLL
                       EditorName = y.CName
                   }).ToListAsync();
 
-                var type2 = await _repositoryWrapper.Type2ContentBefore.GetAll()
+                var type2 = await _repositoryWrapper.Type2ContentBefore.GetByCondition(x => x.CEditorId != payload.Id)
                    .Join(_repositoryWrapper.Unit.GetAll(), x => x.CUnitId, y => y.CId, (x, y) => new { x, y })
                    .Join(_repositoryWrapper.Administrator.GetAll(), x => x.x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                    {

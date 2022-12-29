@@ -1,4 +1,4 @@
-import { HttpEvent } from '@angular/common/http';
+import { HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
+import { Category } from 'src/app/shared/models/category';
 import { defaultEditorConfig } from 'src/app/shared/models/editor-config';
 import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { GetCategoriesByUnitId } from 'src/app/shared/models/get-categories-by-unit-id';
@@ -18,7 +19,6 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
-import { environment } from 'src/environments/environment';
 import { CreateOrUpdateQuestionRequest } from '../feature-shared/models/create-or-update-question';
 import { GetQuestionByIdResponse } from '../feature-shared/models/get-question-by-id';
 
@@ -32,8 +32,11 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
   editorConfig: AngularEditorConfig = {
     ...defaultEditorConfig,
     upload: (file: File): Observable<HttpEvent<UploadResponse>> => {
+      const formData = new FormData();
+      formData.append('image', file, file.name);
+
       return this.httpService
-        .postPhoto<ResponseBase<string>>('upload/uploadPhoto', file)
+        .post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() })
         .pipe(
           map((x: any) => {
             x.body = { imageUrl: x.entries };
@@ -48,14 +51,14 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
 
   constructor(
     protected route: ActivatedRoute,
-    private snackBarService: SnackBarService,
-    private httpService: HttpService,
+    protected snackBarService: SnackBarService,
+    protected httpService: HttpService,
     public validatorService: ValidatorService,
     protected unitService: UnitService,
     private router: Router,
     protected dialog: MatDialog,
     protected authService: AuthService) {
-    super(route, authService, unitService, dialog);
+    super(route, authService, unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
@@ -68,7 +71,7 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
   }
 
   getQuestion() {
-    if (this.id == null || this.id == -1) { return; }
+    if (!this.isIdInit()) { return; }
 
     this.httpService.get<ResponseBase<GetQuestionByIdResponse>>(`question/getQuestionById?id=${this.id}&isBefore=${this.isBefore}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -76,22 +79,18 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
         return;
       }
 
-      this.editStatus = response.entries?.editStatus;
-      this.contentCreateDt = response.entries?.createDt;
-      this.editorId = response.entries?.editorId;
-      this.editReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
-      this.editorName = response.entries?.editorName;
-      this.afterId = response.entries?.afterId;
+      this.setEditData(
+        response.entries?.editorId,
+        response.entries?.editorName,
+        response.entries?.createDt,
+        response.entries?.editStatus,
+        response.entries?.notes as ReviewNote[] ?? [],
+        response.entries?.afterId
+      );
 
       this.handleFormStatus(this.questionForm);
       this.updateForm(response.entries!);
-      response.entries!.categories?.forEach(item => {
-        this.unitCategories.forEach(item2 => {
-          if (item2.id == item.id) {
-            item2.selected = true;
-          }
-        })
-      })
+      this.updateCategories(response.entries!.categories);
     });
   }
 
@@ -106,7 +105,6 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
 
   updateForm(data: GetQuestionByIdResponse) {
     this.questionForm.patchValue({
-      // id 為before id
       id: this.isBefore ? data.id : null,
       title: data.title,
       isEnabled: data.isEnabled,
@@ -114,41 +112,11 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
     })
   }
 
-  getCategories() {
-    if (this.unit.id == -1) { return; }
-
-    this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unit.id}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
-
-      if (response.entries != null) {
-        response.entries.forEach(item => {
-          let temp = { id: item.id, name: item.name, selected: false }
-          this.unitCategories.push(temp);
-        })
-      }
-    });
-  }
-
-  getSelectedCategoryIDs() {
-    let categoryIDs: number[] = [];
-    if (this.categorySelectEle?.selectedOptions?.selected == null) { return categoryIDs };
-
-    this.categorySelectEle.selectedOptions.selected.forEach(item => {
-      categoryIDs.push(item.value)
-    })
-    return categoryIDs;
-  }
-
   onSubmit(e: any, status: EditStatus = EditStatus.Review) {
-    if (e !== undefined) {
-      e.preventDefault();
-    }
+    if (e !== undefined) { e.preventDefault(); }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar('請填寫備註');
+      this.snackBarService.showSnackBar(ValidatorService.reviewErrorTxt);
       return;
     }
 
@@ -160,15 +128,12 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
     let request: CreateOrUpdateQuestionRequest = {
       ...this.questionForm.value,
       editStatus: status,
-      categoryIDs: this.getSelectedCategoryIDs(),
+      categoryIDs: this.getListSelectedIDs(this.categorySelectEle),
       afterId: this.isBefore ? this.afterId : this.id
     };
 
     if (status == EditStatus.Reject) {
-      let temp = new ReviewNote();
-      temp.note = this.editReviewNote!;
-      temp.name = this.administrator!.name
-      request.note = temp;
+      request.note = new ReviewNote(this.administrator!.name, this.editReviewNote!);
     }
 
     this.httpService.post<ResponseBase<string>>('question/createOrUpdateQuestion', request).subscribe(response => {

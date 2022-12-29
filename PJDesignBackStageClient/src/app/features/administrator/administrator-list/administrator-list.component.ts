@@ -7,7 +7,6 @@ import { ListBaseComponent } from 'src/app/shared/components/base/list-base.comp
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { Group, StageType, StatusCode } from 'src/app/shared/models/enums';
 import { GetUnitsRequest, GetUnitsResponse } from 'src/app/shared/models/get-units';
-import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
@@ -55,9 +54,7 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
         return;
       }
       this.rawListData = response.entries!;
-      this.dataSource = new MatTableDataSource(this.rawListData);
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
+      this.dataSource = this.createDataSource<GetAdministratorsResponse>(this.rawListData, this.sort, this.paginator);
     });
   }
 
@@ -72,9 +69,7 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
   }
 
   getBackStageUnitsPromise() {
-    let request = new GetUnitsRequest();
-    request.stageType = StageType.後台;
-
+    let request = new GetUnitsRequest(StageType.後台);
     return this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
   }
 
@@ -126,9 +121,7 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
 
   onSearch() {
     const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
-    this.dataSource = new MatTableDataSource(newData);
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.dataSource = this.createDataSource<GetAdministratorsResponse>(newData, this.sort, this.paginator);
   }
 
   onSearchFilterFn(data: GetAdministratorsResponse): boolean {

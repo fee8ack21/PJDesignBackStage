@@ -6,12 +6,12 @@
         <mat-divider></mat-divider>
         <button mat-stroked-button class="mt-2-i mb-1-i" (click)="openDialog()">新增母節點</button>
 
-        <div cdkDropList class="example-list mb-1-i" (cdkDropListDropped)="drop($event, units)">
-          <cdk-accordion class="example-accordion">
+        <div cdkDropList class="cdk-drop-list mb-1-i" (cdkDropListDropped)="drop($event, units)">
+          <cdk-accordion class="cdk-accordion">
             <cdk-accordion-item *ngFor="let item of units; let index = index;" cdkDrag #accordionItem="cdkAccordionItem"
-              class="example-accordion-item" role="button" tabindex="0" [attr.id]="'accordion-header-' + index"
+              class="cdk-accordion-item" role="button" tabindex="0" [attr.id]="'accordion-header-' + index"
               [attr.aria-expanded]="accordionItem.expanded" [attr.aria-controls]="'accordion-body-' + index">
-              <div class="example-accordion-item-header"
+              <div class="cdk-accordion-item-header"
                 [ngStyle]="{'text-decoration': item.isEnabled ? 'none' : 'line-through'}">
                 <button mat-icon-button *ngIf="item.children != null && item.children.length > 0" class="mr-1-i"
                   (click)="accordionItem.toggle()">
@@ -34,10 +34,10 @@
                 </mat-menu>
               </div>
               <div *ngIf="item.children != null && item.children.length > 0" cdkDropList
-                (cdkDropListDropped)="drop($event, item.children)" class="example-accordion-item-body" role="region"
+                (cdkDropListDropped)="drop($event, item.children)" class="cdk-accordion-item-body" role="region"
                 [style.display]="accordionItem.expanded ? '' : 'none'" [attr.id]="'accordion-body-' + index"
                 [attr.aria-labelledby]="'accordion-header-' + index">
-                <div class="example-box" *ngFor="let child of item.children" cdkDrag
+                <div class="cdk-box" *ngFor="let child of item.children" cdkDrag
                   [ngStyle]="{'text-decoration': child.isEnabled ? 'none' : 'line-through'}">
                   {{child.name}}
                   <button mat-icon-button [matMenuTriggerFor]="unitMenu" class="ml-2-i">

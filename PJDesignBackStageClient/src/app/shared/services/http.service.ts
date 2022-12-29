@@ -12,9 +12,6 @@ export class HttpService {
       'Cache-Control': 'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
       'Pragma': 'no-cache',
       'Expires': '0'
-      // 'Access-Control-Allow-Origin': 'API Domain',
-      // 'Access-Control-Allow-Methods': 'GET, PUT, POST, DELETE, OPTIONS',
-      // 'Access-Control-Max-Age': '86400'
     }),
   };
 
@@ -38,12 +35,5 @@ export class HttpService {
 
   delete<T>(path: string, httpOptions = this._httpOptions): Observable<T> {
     return this.http.delete<T>(`${environment.apiUrl}${path}`, httpOptions);
-  }
-
-  postPhoto<T>(path: string, file: File) {
-    const formData = new FormData();
-    formData.append('image', file, file.name);
-
-    return this.http.post<T>(`${environment.apiUrl}${path}`, formData);
   }
 }

@@ -7,9 +7,6 @@ export class AuthService {
 
   constructor() { }
 
-  checkToken() {
-  }
-
   getToken(): string | null {
     return localStorage.getItem(this.tokenItemName);
   }

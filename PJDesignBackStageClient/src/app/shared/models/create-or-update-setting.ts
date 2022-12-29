@@ -6,5 +6,12 @@ export class CreateOrUpdateSettingRequest {
   content: object;
   editStatus: EditStatus | undefined;
   note?: ReviewNote;
+
+  constructor(unitId: number, content: object, editStatus: EditStatus | undefined, note?: ReviewNote) {
+    this.unitId = unitId;
+    this.content = content;
+    this.editStatus = editStatus;
+    this.note = note;
+  }
 }
 

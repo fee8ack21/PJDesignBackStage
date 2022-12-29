@@ -51,17 +51,13 @@ export class PortfolioListComponent extends ListBaseComponent implements OnInit 
       }
 
       this.rawListData = response.entries!;
-      this.dataSource = new MatTableDataSource(this.rawListData);
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
+      this.dataSource = this.createDataSource<GetPortfoliosResponse>(this.rawListData, this.sort, this.paginator);
     });
   }
 
   onSearch(): void {
     const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
-    this.dataSource = new MatTableDataSource(newData);
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.dataSource = this.createDataSource<GetPortfoliosResponse>(newData, this.sort, this.paginator);
   }
 
   onSearchFilterFn(data: GetPortfoliosResponse): boolean {

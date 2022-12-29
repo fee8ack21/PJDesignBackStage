@@ -4,12 +4,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
-import { CategoryDialogComponent } from 'src/app/shared/components/category-dialog/category-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { Category } from 'src/app/shared/models/category';
-import { CategoryDialogData } from 'src/app/shared/models/category-dialog-data';
 import { EditAndEnabledOptions, EditStatus, StatusCode } from 'src/app/shared/models/enums';
-import { GetCategoriesByUnitId } from 'src/app/shared/models/get-categories-by-unit-id';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
@@ -55,17 +51,13 @@ export class QuestionListComponent extends ListBaseComponent implements OnInit {
       }
 
       this.rawListData = response.entries!;
-      this.dataSource = new MatTableDataSource(this.rawListData);
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
+      this.dataSource = this.createDataSource<GetQuestionsResponse>(this.rawListData, this.sort, this.paginator);
     });
   }
 
   onSearch(): void {
     const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
-    this.dataSource = new MatTableDataSource(newData);
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.dataSource = this.createDataSource<GetQuestionsResponse>(newData, this.sort, this.paginator);
   }
 
   onSearchFilterFn(data: GetQuestionsResponse): boolean {

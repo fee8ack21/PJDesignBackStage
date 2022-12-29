@@ -23,14 +23,14 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
   type2TemplateTypes = [{ id: 1, name: '左圖右文' }, { id: 2, name: '右圖左文' }, { id: 3, name: '三項目' }]
 
   constructor(
-    private httpService: HttpService,
+    protected httpService: HttpService,
     public validatorService: ValidatorService,
-    private snackBarService: SnackBarService,
+    protected snackBarService: SnackBarService,
     protected route: ActivatedRoute,
     protected unitService: UnitService,
     protected authService: AuthService,
     protected dialog: MatDialog) {
-    super(route, authService, unitService, dialog);
+    super(route, authService, unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
@@ -42,7 +42,7 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
   }
 
   getSettingByUnitId() {
-    if (this.unit.id == null || this.unit.id == -1) { return }
+    if (!this.isUnitInit()) { return }
 
     this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${this.unit.id}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -50,11 +50,13 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
         return;
       }
 
-      this.editorId = response.entries?.editorId;
-      this.editorName = response.entries?.editorName;
-      this.contentCreateDt = response.entries?.createDt;
-      this.editStatus = response.entries?.editStatus;
-      this.editReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
+      this.setEditData(
+        response.entries?.editorId,
+        response.entries?.editorName,
+        response.entries?.createDt,
+        response.entries?.editStatus,
+        response.entries?.notes as ReviewNote[] ?? []
+      );
     });
   }
 
@@ -62,15 +64,16 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
     const type2UnitsRespoonse = await this.getType2UnitsPromise();
     if (type2UnitsRespoonse.statusCode == StatusCode.Fail) {
       this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-    } else {
-      if (this.type2Units.length > 0) { return; }
-      type2UnitsRespoonse.entries?.forEach(item => { this.type2Units.push({ ...item }); });
+      return;
     }
+
+    if (this.type2Units.length > 0) { return; }
+
+    type2UnitsRespoonse.entries?.forEach(item => { this.type2Units.push({ ...item }); });
   }
 
   getType2UnitsPromise() {
-    let request = new GetUnitsRequest();
-    request.templateType = TemplateType.模板二;
+    let request = new GetUnitsRequest(TemplateType.模板二);
     return this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
   }
 }

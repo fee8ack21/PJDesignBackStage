@@ -1,5 +1,5 @@
 <h1 mat-dialog-title>{{data.isEdit ? '編輯' : '新增'}}組別</h1>
-<form [formGroup]="groupForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
   <div mat-dialog-content>
     <div *ngIf="data.isEdit && (data.groups == null || data.groups.length == 0)">
       <p class="text-center">目前無可編輯組別</p>
@@ -17,7 +17,7 @@
         <mat-form-field appearance="fill">
           <mat-label>名稱</mat-label>
           <input matInput formControlName="name" name="name">
-          <mat-error *ngIf="validatorService.isFormControlInvalid(groupForm, 'name')">
+          <mat-error *ngIf="validatorService.isFormControlInvalid(form, 'name')">
             {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
           </mat-error>
         </mat-form-field>

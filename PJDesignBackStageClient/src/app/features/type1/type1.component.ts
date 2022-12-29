@@ -1,8 +1,8 @@
-import { HttpEvent } from '@angular/common/http';
+import { HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Route, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AngularEditorConfig, UploadResponse } from '@kolkov/angular-editor';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -10,7 +10,6 @@ import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { defaultEditorConfig } from 'src/app/shared/models/editor-config';
 import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
-import { GetSettingByUnitIdResponse } from 'src/app/shared/models/get-setting-by-unit-id';
 import { ReviewNote } from 'src/app/shared/models/review-note';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
@@ -30,8 +29,11 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
   editorConfig: AngularEditorConfig = {
     ...defaultEditorConfig,
     upload: (file: File): Observable<HttpEvent<UploadResponse>> => {
+      const formData = new FormData();
+      formData.append('image', file, file.name);
+
       return this.httpService
-        .postPhoto<ResponseBase<string>>('upload/uploadPhoto', file)
+        .post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() })
         .pipe(
           map((x: any) => {
             x.body = { imageUrl: x.entries };
@@ -42,15 +44,15 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
   };
 
   constructor(
-    private httpService: HttpService,
+    protected httpService: HttpService,
     public validatorService: ValidatorService,
-    private snackBarService: SnackBarService,
+    protected snackBarService: SnackBarService,
     protected route: ActivatedRoute,
     protected unitService: UnitService,
     protected authService: AuthService,
     private router: Router,
     protected dialog: MatDialog) {
-    super(route, authService, unitService, dialog);
+    super(route, authService, unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
@@ -59,7 +61,6 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
     this.initForm();
     this.unitService.isBackStageUnitsInit.subscribe(async response => {
       this.setUnit();
-      this.getSettingByUnitId();
       this.getType1Content();
     });
   }
@@ -79,7 +80,7 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
   }
 
   getType1Content() {
-    if (this.unit.id <= 0) { return; }
+    if (!this.isUnitInit()) { return; }
 
     this.httpService.get<ResponseBase<GetType1ContentResponse>>(`type1/getType1ContentByUnitId?id=${this.unit.id}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -87,32 +88,17 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
         return;
       }
 
-      this.editStatus = response.entries?.editStatus;
-      this.contentCreateDt = response.entries?.createDt;
-      this.editorId = response.entries?.editorId;
-      this.editReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
-      this.editorName = response.entries?.editorName;
-      this.afterId = response.entries?.afterId;
+      this.setEditData(
+        response.entries?.editorId,
+        response.entries?.editorName,
+        response.entries?.createDt,
+        response.entries?.editStatus,
+        response.entries?.notes as ReviewNote[] ?? [],
+        response.entries?.afterId
+      );
 
       this.handleFormStatus(this.type1Form);
       this.updateForm(response.entries!);
-    });
-  }
-
-  getSettingByUnitId() {
-    if (this.unit.id == null || this.unit.id == -1) { return }
-
-    this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${this.unit.id}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
-
-      this.editorId = response.entries?.editorId;
-      this.editorName = response.entries?.editorName;
-      this.contentCreateDt = response.entries?.createDt;
-      this.editStatus = response.entries?.editStatus;
-      this.editReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
     });
   }
 
@@ -122,7 +108,7 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
     }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar('請填寫備註');
+      this.snackBarService.showSnackBar(ValidatorService.reviewErrorTxt);
       return;
     }
 
@@ -137,10 +123,7 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
     };
 
     if (status == this.EditStatus.Reject) {
-      let temp = new ReviewNote();
-      temp.note = this.editReviewNote!;
-      temp.name = this.administrator!.name
-      request.note = temp;
+      request.note = new ReviewNote(this.administrator!.name, this.editReviewNote!);
     }
 
     this.httpService.post<ResponseBase<string>>('type1/createOrUpdateType1Content', request).subscribe(response => {

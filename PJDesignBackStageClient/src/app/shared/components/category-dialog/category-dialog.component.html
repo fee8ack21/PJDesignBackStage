@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>{{data.isEdit ? '編輯' : '新增'}}分類</h2>
-<form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
   <ng-container *ngIf="data.isEdit">
     <div *ngIf="data.categories == null || data.categories.length == 0">
       <p class="text-center">目前無可編輯分類</p>
@@ -10,7 +10,7 @@
           <mat-form-field appearance="fill">
             <mat-label>名稱</mat-label>
             <input matInput [formControlName]="'category' + item.id + 'name'">
-            <mat-error *ngIf="validatorService.isFormControlInvalid(categoryForm, 'name')">
+            <mat-error *ngIf="validatorService.isFormControlInvalid(form, 'name')">
               {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
             </mat-error>
           </mat-form-field>
@@ -33,7 +33,7 @@
         <mat-form-field appearance="fill">
           <mat-label>名稱</mat-label>
           <input matInput formControlName="name" name="name">
-          <mat-error *ngIf="validatorService.isFormControlInvalid(categoryForm, 'name')">
+          <mat-error *ngIf="validatorService.isFormControlInvalid(form, 'name')">
             {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
           </mat-error>
         </mat-form-field>

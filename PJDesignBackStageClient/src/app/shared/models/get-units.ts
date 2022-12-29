@@ -2,6 +2,11 @@ export class GetUnitsRequest {
   stageType?: number;
   groupId?: number;
   templateType?: number;
+
+  constructor(stageType?: number, templateType?: number) {
+    this.stageType = stageType;
+    this.templateType = templateType;
+  }
 }
 
 export class GetUnitsResponse {

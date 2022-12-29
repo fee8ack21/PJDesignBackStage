@@ -5,13 +5,13 @@
         <h2>{{unit.name}} - {{pageStatusName}}</h2>
         <mat-divider></mat-divider>
         <div class="pt-1">
-          <form [formGroup]="portfolioForm">
+          <form [formGroup]="form">
             <div class="py-1">
               <mat-form-field appearance="fill">
                 <mat-label>標題</mat-label>
                 <input matInput formControlName="title" name="title" readonly
                   onfocus="this.removeAttribute('readonly');">
-                <mat-error *ngIf="validatorService.isFormControlInvalid(portfolioForm, 'title')">
+                <mat-error *ngIf="validatorService.isFormControlInvalid(form, 'title')">
                   {{validatorService.getFormControlErrorText(FormControlErrorType.Required)}}
                 </mat-error>
               </mat-form-field>

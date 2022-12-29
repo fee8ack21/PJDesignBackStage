@@ -1,4 +1,4 @@
-import { HttpEvent } from '@angular/common/http';
+import { HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
+import { Category } from 'src/app/shared/models/category';
 import { defaultEditorConfig } from 'src/app/shared/models/editor-config';
 import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { GetCategoriesByUnitId } from 'src/app/shared/models/get-categories-by-unit-id';
@@ -27,12 +28,15 @@ import { GetType2ContentByIdResponse } from '../feature-shared/models/get-type2-
   styleUrls: ['./type2-detail.component.scss']
 })
 export class Type2DetailComponent extends DetailBaseComponent implements OnInit {
-  type2Form: FormGroup;
+  form: FormGroup;
   editorConfig: AngularEditorConfig = {
     ...defaultEditorConfig,
     upload: (file: File): Observable<HttpEvent<UploadResponse>> => {
+      const formData = new FormData();
+      formData.append('image', file, file.name);
+
       return this.httpService
-        .postPhoto<ResponseBase<string>>('upload/uploadPhoto', file)
+        .post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() })
         .pipe(
           map((x: any) => {
             x.body = { imageUrl: x.entries };
@@ -51,14 +55,14 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
 
   constructor(
     protected route: ActivatedRoute,
-    private snackBarService: SnackBarService,
-    private httpService: HttpService,
+    protected snackBarService: SnackBarService,
+    protected httpService: HttpService,
     public validatorService: ValidatorService,
     protected unitService: UnitService,
     private router: Router,
     protected dialog: MatDialog,
     protected authService: AuthService) {
-    super(route, authService, unitService, dialog);
+    super(route, authService, unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
@@ -71,7 +75,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
   }
 
   getType2Content() {
-    if (this.id == null || this.id == -1 || this.unit.id == null || this.unit.id == -1) { return; }
+    if (!this.isIdInit() || !this.isUnitInit()) { return; }
 
     this.httpService.get<ResponseBase<GetType2ContentByIdResponse>>(`type2/getType2ContentById?unitId=${this.unit.id}&id=${this.id}&isBefore=${this.isBefore}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -79,31 +83,28 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
         return;
       }
 
-      this.editStatus = response.entries?.editStatus;
-      this.contentCreateDt = response.entries?.createDt;
-      this.editorId = response.entries?.editorId;
-      this.editReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
-      this.editorName = response.entries?.editorName;
-      this.afterId = response.entries?.afterId;
+      this.setEditData(
+        response.entries?.editorId,
+        response.entries?.editorName,
+        response.entries?.createDt,
+        response.entries?.editStatus,
+        response.entries?.notes as ReviewNote[] ?? [],
+        response.entries?.afterId
+      );
+
       this.thumbnailUrl = response.entries?.thumbnailUrl ?? '';
       this.thumbnailName = response.entries?.thumbnailUrl != null ? response.entries.thumbnailUrl.split('/')[response.entries.thumbnailUrl.split('/').length - 1] : '';
       this.imageUrl = response.entries?.imageUrl ?? '';
       this.imageName = response.entries?.imageUrl != null ? response.entries.imageUrl.split('/')[response.entries.imageUrl.split('/').length - 1] : '';
 
-      this.handleFormStatus(this.type2Form);
+      this.handleFormStatus(this.form);
       this.updateForm(response.entries!);
-      response.entries!.categories?.forEach(item => {
-        this.unitCategories.forEach(item2 => {
-          if (item2.id == item.id) {
-            item2.selected = true;
-          }
-        })
-      })
+      this.updateCategories(response.entries!.categories);
     });
   }
 
   initForm() {
-    this.type2Form = new FormGroup({
+    this.form = new FormGroup({
       id: new FormControl(null),
       unitId: new FormControl(this.unit.id),
       title: new FormControl(null, [Validators.required]),
@@ -113,8 +114,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
   }
 
   updateForm(data: any) {
-    this.type2Form.patchValue({
-      // id 為before id
+    this.form.patchValue({
       id: this.isBefore ? data.id : null,
       unitId: this.unit.id,
       title: data.title,
@@ -123,37 +123,12 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
     })
   }
 
-  getCategories() {
-    if (this.unit.id == -1 || this.unit.id == undefined) { return; }
-
-    this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unit.id}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
-
-      if (response.entries != null) {
-        response.entries.forEach(item => {
-          let temp = { id: item.id, name: item.name, selected: false }
-          this.unitCategories.push(temp);
-        })
-      }
-    });
-  }
-
-  getSelectedCategoryIDs() {
-    let categoryIDs: number[] = [];
-    if (this.categorySelectEle?.selectedOptions?.selected == null) { return categoryIDs };
-
-    this.categorySelectEle.selectedOptions.selected.forEach(item => {
-      categoryIDs.push(item.value)
-    })
-    return categoryIDs;
-  }
-
   onPhotoUpload(e: any, type: string) {
     const file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
-    this.httpService.postPhoto<ResponseBase<string>>('upload/uploadPhoto', file).subscribe(response => {
+    const formData = new FormData();
+    formData.append('image', file, file.name);
+
+    this.httpService.post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() }).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;
@@ -175,7 +150,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
     }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar('請填寫備註');
+      this.snackBarService.showSnackBar(ValidatorService.reviewErrorTxt);
       return;
     }
 
@@ -189,25 +164,22 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       return;
     }
 
-    if (this.type2Form.invalid) {
-      this.type2Form.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
     let request: CreateOrUpdateType2ContentRequest = {
-      ...this.type2Form.value,
+      ...this.form.value,
       editStatus: status,
-      categoryIDs: this.getSelectedCategoryIDs(),
+      categoryIDs: this.getListSelectedIDs(this.categorySelectEle),
       afterId: this.isBefore ? this.afterId : this.id,
       thumbnailUrl: this.thumbnailUrl,
       imageUrl: this.imageUrl
     };
 
     if (status == EditStatus.Reject) {
-      let temp = new ReviewNote();
-      temp.note = this.editReviewNote!;
-      temp.name = this.administrator!.name
-      request.note = temp;
+      request.note = new ReviewNote(this.administrator!.name, this.editReviewNote!);
     }
 
     this.httpService.post<ResponseBase<string>>('type2/createOrUpdateType2Content', request).subscribe(response => {

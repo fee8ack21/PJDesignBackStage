@@ -4,18 +4,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSelectionList } from '@angular/material/list';
 import { ActivatedRoute } from '@angular/router';
 import { DetailBaseComponent } from 'src/app/shared/components/base/detail-base.component';
-import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
-import { ReviewNoteDialogComponent } from 'src/app/shared/components/review-note-dialog/review-note-dialog.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
 import { CreateOrUpdateSettingRequest } from 'src/app/shared/models/create-or-update-setting';
 import { EditStatus, StatusCode, TemplateType } from 'src/app/shared/models/enums';
 import { GetSettingByUnitIdResponse } from 'src/app/shared/models/get-setting-by-unit-id';
 import { GetUnitsRequest, GetUnitsResponse } from 'src/app/shared/models/get-units';
 import { ReviewNote } from 'src/app/shared/models/review-note';
-import { ReviewNoteDialogData } from 'src/app/shared/models/review-note-dialog-data';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
-import { ProgressBarService } from 'src/app/shared/services/progress-bar.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
@@ -34,15 +30,14 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
   @ViewChild('unitSelectEle') unitSelectEle: MatSelectionList;
 
   constructor(
-    private httpService: HttpService,
+    protected httpService: HttpService,
     public validatorService: ValidatorService,
-    private snackBarService: SnackBarService,
+    protected snackBarService: SnackBarService,
     protected route: ActivatedRoute,
     protected unitService: UnitService,
     protected authService: AuthService,
-    private progressBarService: ProgressBarService,
     protected dialog: MatDialog) {
-    super(route, authService, unitService, dialog);
+    super(route, authService, unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
@@ -59,20 +54,20 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
     const type2UnitsRespoonse = await this.getType2UnitsPromise();
     if (type2UnitsRespoonse.statusCode == StatusCode.Fail) {
       this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-    } else {
-      this.type2Units = [{ id: -1, name: '網站導覽', selected: false }];
-      type2UnitsRespoonse.entries?.forEach(item => { this.type2Units.push({ ...item, selected: false }); });
+      return;
     }
+
+    this.type2Units = [{ id: -1, name: '網站導覽', selected: false }];
+    type2UnitsRespoonse.entries?.forEach(item => { this.type2Units.push({ ...item, selected: false }); });
   }
 
   getType2UnitsPromise() {
-    let request = new GetUnitsRequest();
-    request.templateType = TemplateType.模板二;
+    let request = new GetUnitsRequest(undefined, TemplateType.模板二);
     return this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
   }
 
   getSettingByUnitId() {
-    if (this.unit.id == null || this.unit.id == -1) { return }
+    if (!this.isUnitInit()) { return }
 
     this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${this.unit.id}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -80,17 +75,19 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
         return;
       }
 
-      this.editorId = response.entries?.editorId;
-      this.editorName = response.entries?.editorName;
-      this.contentCreateDt = response.entries?.createDt;
-      this.editStatus = response.entries?.editStatus;
-      this.editReviewNotes = response.entries?.notes as ReviewNote[] ?? [];
+      this.setEditData(
+        response.entries?.editorId,
+        response.entries?.editorName,
+        response.entries?.createDt,
+        response.entries?.editStatus,
+        response.entries?.notes as ReviewNote[] ?? []
+      );
 
       this.handleFormStatus(this.footerForm);
 
-      if (response.entries?.content != null) {
-        this.updateFooterSetting(response.entries.content as FooterSettings);
-      }
+      if (response.entries?.content == null) { return; }
+
+      this.updateFooterSetting(response.entries.content as FooterSettings);
     });
   }
 
@@ -117,16 +114,6 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
     })
 
     this.socialIcons = setting.socialIcons;
-  }
-
-  getSelectedDisplayUnits() {
-    let units: number[] = [];
-    if (this.unitSelectEle?.selectedOptions?.selected == null) { return units };
-
-    this.unitSelectEle.selectedOptions.selected.forEach(item => {
-      units.push(item.value)
-    })
-    return units;
   }
 
   addSocialIcon() {
@@ -173,30 +160,22 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
 
   async onSubmit(status = EditStatus.Review) {
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar('請填寫備註');
+      this.snackBarService.showSnackBar(ValidatorService.reviewErrorTxt);
       return;
     }
 
     let settings = new FooterSettings();
     settings = { ... this.footerForm.value };
 
-    let selectedUnits = this.getSelectedDisplayUnits();
+    let selectedUnits = this.getListSelectedIDs(this.unitSelectEle);
     settings.isShowMapUnit = selectedUnits.includes(-1);
     settings.showedUnits = selectedUnits.filter(x => x != -1);
     settings.socialIcons = this.socialIcons.filter(x => x.url != null && x.url.trim().length > 0 && x.image != null && x.image.trim().length > 0);
 
-
-    let request = new CreateOrUpdateSettingRequest();
-    request.unitId = this.unit.id;
-    request.content = settings;
-    request.editStatus = status;
+    let request = new CreateOrUpdateSettingRequest(this.unit.id, settings, status);
 
     if (status == EditStatus.Reject) {
-      let temp = new ReviewNote();
-      temp.date = new Date();
-      temp.note = this.editReviewNote!;
-      temp.name = this.administrator!.name
-      request.note = temp;
+      request.note = new ReviewNote(this.administrator!.name, this.editReviewNote!);
     }
 
     this.httpService.post<ResponseBase<string>>('unit/createOrUpdateSetting', request).subscribe(response => {

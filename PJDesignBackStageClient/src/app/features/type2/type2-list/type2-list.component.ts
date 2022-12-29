@@ -46,8 +46,8 @@ export class Type2ListComponent extends ListBaseComponent implements OnInit {
     });
   }
 
-  getType2Contents() {
-    if (this.unit.id <= 0) { return; }
+  getType2Contents(): void {
+    if (!this.isUnitInit()) { return; }
 
     this.httpService.get<ResponseBase<GetType2ContentsResponse[]>>(`type2/getType2ContentsByUnitId?id=${this.unit.id}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -56,17 +56,13 @@ export class Type2ListComponent extends ListBaseComponent implements OnInit {
       }
 
       this.rawListData = response.entries!;
-      this.dataSource = new MatTableDataSource(this.rawListData);
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
+      this.dataSource = this.createDataSource<GetType2ContentsResponse>(this.rawListData, this.sort, this.paginator);
     });
   }
 
   onSearch(): void {
     const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
-    this.dataSource = new MatTableDataSource(newData);
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.dataSource = this.createDataSource<GetType2ContentsResponse>(newData, this.sort, this.paginator);
   }
 
   onSearchFilterFn(data: GetType2ContentsResponse): boolean {

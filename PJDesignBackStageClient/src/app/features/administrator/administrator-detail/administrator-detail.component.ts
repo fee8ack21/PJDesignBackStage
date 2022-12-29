@@ -29,10 +29,10 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
     protected unitService: UnitService,
     protected dialog: MatDialog,
     private router: Router,
-    private httpService: HttpService,
-    private snackBarService: SnackBarService,
+    protected httpService: HttpService,
+    protected snackBarService: SnackBarService,
     public validatorService: ValidatorService) {
-    super(route, authService, unitService, dialog);
+    super(route, authService, unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
@@ -54,9 +54,8 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
   }
 
   getAdministratorById() {
-    if (this.pageStatus == PageStatus.Create || this.id == null) {
-      return;
-    }
+    if (this.pageStatus == PageStatus.Create || !this.isIdInit()) { return; }
+
     this.httpService.get<ResponseBase<GetAdministratorByIdResponse>>(`administrator/GetAdministratorById?id=${this.id}`).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
@@ -88,8 +87,7 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
       return;
     }
 
-    let request = new CreateOrUpdateAdministratorRequest();
-    request = { ...this.administratorForm.value };
+    let request: CreateOrUpdateAdministratorRequest = { ...this.administratorForm.value };
 
     this.httpService.post<ResponseBase<null>>('administrator/CreateOrUpdateAdministrator', request).subscribe(response => {
       if (response?.statusCode == null || response.statusCode == StatusCode.Fail || typeof response.entries == null) {

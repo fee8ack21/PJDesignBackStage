@@ -15,7 +15,11 @@ import { AuthLoginRequest, AuthLoginResponse } from '../featured-shared/models/a
   styleUrls: ['./auth-login.component.scss']
 })
 export class AuthLoginComponent implements OnInit {
-  loginForm: FormGroup;
+  form: FormGroup;
+
+  public get FormControlErrorType(): typeof FormControlErrorType {
+    return FormControlErrorType;
+  }
 
   constructor(
     private httpService: HttpService,
@@ -36,20 +40,19 @@ export class AuthLoginComponent implements OnInit {
   }
 
   initForm() {
-    this.loginForm = new FormGroup({
+    this.form = new FormGroup({
       account: new FormControl(null, [Validators.required]),
       password: new FormControl(null, [Validators.required])
     });
   }
 
   onSubmit() {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    let request = new AuthLoginRequest();
-    request = { ...this.loginForm.value };
+    let request: AuthLoginRequest = { ...this.form.value };
 
     this.httpService.post<ResponseBase<AuthLoginResponse>>('auth/login', request).subscribe(response => {
       if (response?.statusCode == null || response.statusCode == StatusCode.Fail || typeof response.entries == null) {
@@ -62,9 +65,5 @@ export class AuthLoginComponent implements OnInit {
       this.snackBarService.showSnackBar(response.message ?? "登入成功");
       this.router.navigate(['/administrator']);
     })
-  }
-
-  public get FormControlErrorType(): typeof FormControlErrorType {
-    return FormControlErrorType;
   }
 }

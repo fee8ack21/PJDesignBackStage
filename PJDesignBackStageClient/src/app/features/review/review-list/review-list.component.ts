@@ -1,4 +1,3 @@
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -6,12 +5,10 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { EditAndEnabledOptions, EditStatus, StatusCode, UnitID } from 'src/app/shared/models/enums';
+import { StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
-import { GetQuestionsResponse } from '../../question/feature-shared/models/get-questions';
-import { QuestionListSearchParams } from '../../question/feature-shared/models/question-list-search-params';
 import { GetReviewsResponse } from '../feature-shared/models/get-reviews';
 import { ReviewListSearchParams } from '../feature-shared/models/review-list-search-params';
 
@@ -45,9 +42,7 @@ export class ReviewListComponent extends ListBaseComponent implements OnInit {
     });
   }
 
-  getReviews() {
-    if (this.rawListData.length > 0) { return; }
-
+  getReviews(): void {
     this.httpService.get<ResponseBase<GetReviewsResponse[]>>('review/getReviews').subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
@@ -55,35 +50,31 @@ export class ReviewListComponent extends ListBaseComponent implements OnInit {
       }
 
       this.rawListData = response.entries!;
-      this.dataSource = new MatTableDataSource(this.rawListData);
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
+      this.dataSource = this.createDataSource<GetReviewsResponse>(this.rawListData, this.sort, this.paginator);
 
       this.setUnitOptions(this.rawListData);
     })
   }
 
-  setUnitOptions(data: GetReviewsResponse[]) {
+  setUnitOptions(data: GetReviewsResponse[]): void {
     this.unitOptions = [];
-
     let unitDict: any = {};
+
     data.forEach(item => {
-      if (item.unitId in unitDict) {
-        return;
-      }
+      if (item.unitId in unitDict) { return; }
 
       unitDict[item.unitId.toString()] = item.unitName;
       this.unitOptions.push({ id: item.unitId, name: item.unitName });
     })
   }
 
-  getLink(url: string | null | undefined) {
+  getLink(url: string | null | undefined): string | null | undefined {
     if (url == null || url == undefined) { return url; }
 
     return url.split('?')[0];
   }
 
-  getQueryParams(url: string | null | undefined) {
+  getQueryParams(url: string | null | undefined): { [k: string]: string; } {
     if (url == null || url == undefined || url.split('?').length == 1) { return {}; }
 
     const params = new URLSearchParams(url.split('?')[1]);
@@ -92,9 +83,7 @@ export class ReviewListComponent extends ListBaseComponent implements OnInit {
 
   onSearch(): void {
     const newData = this.rawListData.filter(data => this.onSearchFilterFn(data));
-    this.dataSource = new MatTableDataSource(newData);
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.dataSource = this.createDataSource<GetReviewsResponse>(newData, this.sort, this.paginator);
   }
 
   onSearchFilterFn(data: GetReviewsResponse): boolean {
