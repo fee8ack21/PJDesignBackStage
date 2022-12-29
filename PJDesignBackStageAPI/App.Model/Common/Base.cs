@@ -7,10 +7,6 @@ using System.Threading.Tasks;
 
 namespace App.Model
 {
-    public class RequestBase
-    {
-    }
-
     public class ResponseBase<T>
     {
         public string Message { get; set; } = "";
@@ -18,14 +14,20 @@ namespace App.Model
         public StatusCode StatusCode { get; set; } = StatusCode.Success;
     }
 
-    public class ListRequestBase : RequestBase
+    public abstract class EditRequestBase
     {
-        public int? PageIndex { get; set; }
-        public int? PageSize { get; set; }
+        public int? AfterId { get; set; }
+        public byte EditStatus { get; set; }
+        public ReviewNote? Note { get; set; }
     }
 
-    public class ListResponseBase<T> : ResponseBase<T>
+    public abstract class EditResponseBase
     {
-        public int? TotalItems { get; set; }
+        public DateTime EditDt { get; set; }
+        public int EditorId { get; set; }
+        public string EditorName { get; set; } = null!;
+        public byte? EditStatus { get; set; }
+        public List<ReviewNote>? Notes { get; set; }
+        public int? AfterId { get; set; }
     }
 }

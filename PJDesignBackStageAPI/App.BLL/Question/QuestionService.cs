@@ -358,7 +358,10 @@ namespace App.BLL
                                 await _repositoryWrapper.SaveAsync();
 
                                 // 刪除所有categoryMappingBefore 資料
-                                _repositoryWrapper.CategoryMappingBefore.DeleteRange(_repositoryWrapper.CategoryMappingBefore.GetByCondition(x => request.CategoryIDs.Contains(x.CCategoryId) && x.CContentId == tblQuestionBefore.CId));
+                                if (request.CategoryIDs != null)
+                                {
+                                    _repositoryWrapper.CategoryMappingBefore.DeleteRange(_repositoryWrapper.CategoryMappingBefore.GetByCondition(x => request.CategoryIDs.Contains(x.CCategoryId) && x.CContentId == tblQuestionBefore.CId));
+                                }
 
                                 var tblCategoryMappingAfters = _repositoryWrapper.Category.GetByCondition(x => x.CUnitId == (int)UnitId.常見問題)
                                     .Join(

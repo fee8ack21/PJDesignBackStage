@@ -48,7 +48,7 @@ namespace App.PL.Controllers
         public async Task<ResponseBase<string>> CreateOrUpdateType2Content(CreateOrUpdateType2ContentRequest request)
         {
             var payload = HttpContext.Items["jwtPayload"] as JwtPayload;
-            return await _service.CreateOrUpdateType2Content(request, payload);
+            return await _service.CreateOrUpdateType2Content(request, payload!);
         }
     }
 }

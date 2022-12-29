@@ -48,7 +48,7 @@ namespace App.PL.Controllers
         public async Task<ResponseBase<string>> CreateOrUpdateQuestion(CreateOrUpdateQuestionRequest request)
         {
             var payload = HttpContext.Items["jwtPayload"] as JwtPayload;
-            return await _service.CreateOrUpdateQuestion(request, payload);
+            return await _service.CreateOrUpdateQuestion(request, payload!);
         }
     }
 }

@@ -8,6 +8,7 @@ import { HttpService } from './http.service';
 @Injectable()
 
 export class UnitService {
+  isBackStageUnitsInit = false;
   isBackStageUnitsInit$ = new BehaviorSubject<boolean>(false);
   units$ = new BehaviorSubject<{ fixedUnits: UnitList[], customUnits: UnitList[] }>({ fixedUnits: [], customUnits: [] });
 
@@ -15,12 +16,17 @@ export class UnitService {
 
   constructor(private httpService: HttpService, private authService: AuthService) { }
 
-  getBackStageUnitsByGroupId(): void {
+  getBackStageUnitsByGroupId(isForce = false): void {
+    if (!isForce && (this._units != undefined && this._units.length > 0)) { return; }
+
     let request = new GetUnitsRequest(StageType.後台, undefined, this.authService.getAdministrator()?.groupId);
     this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).subscribe(response => {
       if (response.statusCode == StatusCode.Success) {
         this._units = response.entries!;
-        this.isBackStageUnitsInit$.next(true);
+        if (!this.isBackStageUnitsInit) {
+          this.isBackStageUnitsInit = true;
+          this.isBackStageUnitsInit$.next(true);
+        }
         this.units$.next(this._getFormattedUnits(response.entries! as UnitList[]))
       }
     });

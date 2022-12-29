@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BaseComponent } from 'src/app/shared/components/base/base.component';
 import { ResponseBase } from 'src/app/shared/models/bases';
-import { FormControlErrorType, StatusCode, TemplateType } from 'src/app/shared/models/enums';
+import { StatusCode, TemplateType } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
@@ -75,7 +75,7 @@ export class UnitDialogComponent extends BaseComponent implements OnInit {
         return;
       }
 
-      this.unitService.getBackStageUnitsByGroupId();
+      this.unitService.getBackStageUnitsByGroupId(true);
       this.snackBarService.showSnackBar(SnackBarService.RequestSuccessText);
       this.dialogRef.close(true);
     })

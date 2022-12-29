@@ -1,12 +1,8 @@
-import { ReviewNote } from "./review-note";
+import { EditResponseBase } from "./bases";
 
-export class GetSettingByUnitIdResponse {
+export class GetSettingByUnitIdResponse extends EditResponseBase {
   unitId: number;
   content: object;
-  editStatus?: number;
-  editorId: number;
-  editorName: string;
   reviewId: number;
-  notes?: ReviewNote[];
   createDt: Date;
 }

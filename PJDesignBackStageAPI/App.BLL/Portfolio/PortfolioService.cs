@@ -418,7 +418,10 @@ namespace App.BLL
                                 await _repositoryWrapper.SaveAsync();
 
                                 // 刪除所有categoryMappingBefore 資料
-                                _repositoryWrapper.CategoryMappingBefore.DeleteRange(_repositoryWrapper.CategoryMappingBefore.GetByCondition(x => request.CategoryIDs.Contains(x.CCategoryId) && x.CContentId == tblPortfolioBefore.CId));
+                                if (request.CategoryIDs != null)
+                                {
+                                    _repositoryWrapper.CategoryMappingBefore.DeleteRange(_repositoryWrapper.CategoryMappingBefore.GetByCondition(x => request.CategoryIDs.Contains(x.CCategoryId) && x.CContentId == tblPortfolioBefore.CId));
+                                }
 
                                 var tblCategoryMappingAfters = _repositoryWrapper.Category.GetByCondition(x => x.CUnitId == (int)UnitId.作品集)
                                     .Join(
@@ -465,11 +468,15 @@ namespace App.BLL
                                         removeAfterPhotos.Add(photo);
                                     }
                                 }
-                                foreach (var photo in request.Photos)
+
+                                if (request.Photos != null)
                                 {
-                                    if (!tblPortfolioPhotoAfters.Any(x => x.CUrl == photo))
+                                    foreach (var photo in request.Photos)
                                     {
-                                        createAfterPhotos.Add(new TblPortfolioPhotoAfter() { CUrl = photo, CPortfolioId = tblPortfolioAfter.CId });
+                                        if (!tblPortfolioPhotoAfters.Any(x => x.CUrl == photo))
+                                        {
+                                            createAfterPhotos.Add(new TblPortfolioPhotoAfter() { CUrl = photo, CPortfolioId = tblPortfolioAfter.CId });
+                                        }
                                     }
                                 }
 

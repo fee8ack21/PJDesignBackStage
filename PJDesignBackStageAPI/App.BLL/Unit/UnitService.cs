@@ -101,9 +101,9 @@ namespace App.BLL
                     response.Entries.Content = tblSettingBefore?.CContent != null ? JsonSerializer.Deserialize<object?>(tblSettingBefore.CContent) : null;
                     response.Entries.EditStatus = tblSettingBefore!.CEditStatus;
                     response.Entries.EditorId = tblSettingBefore.CEditorId;
-                    response.Entries.EditorName = _repositoryWrapper.Administrator.GetByCondition(x => x.CId == tblSettingBefore.CEditorId).FirstOrDefault()?.CName;
+                    response.Entries.EditorName = _repositoryWrapper.Administrator.GetByCondition(x => x.CId == tblSettingBefore.CEditorId).FirstOrDefault()?.CName ?? "";
                     response.Entries.ReviewerId = tblSettingBefore.CReviewerId;
-                    response.Entries.Notes = tblSettingBefore.CNotes != null ? JsonSerializer.Deserialize<object?>(tblSettingBefore.CNotes) : null;
+                    response.Entries.Notes = (List<ReviewNote>?)(tblSettingBefore.CNotes != null ? JsonSerializer.Deserialize<object?>(tblSettingBefore.CNotes) : null);
                     response.Entries.CreateDt = tblSettingBefore.CCreateDt;
                     return response;
                 }
@@ -115,7 +115,7 @@ namespace App.BLL
                     response.Entries.UnitId = tblSettingAfter.CUnitId;
                     response.Entries.Content = tblSettingAfter?.CContent != null ? JsonSerializer.Deserialize<object?>(tblSettingAfter.CContent) : null;
                     response.Entries.EditorId = tblSettingAfter!.CEditorId;
-                    response.Entries.EditorName = _repositoryWrapper.Administrator.GetByCondition(x => x.CId == tblSettingAfter.CEditorId).FirstOrDefault()?.CName;
+                    response.Entries.EditorName = _repositoryWrapper.Administrator.GetByCondition(x => x.CId == tblSettingAfter.CEditorId).FirstOrDefault()?.CName ?? "";
                     response.Entries.CreateDt = tblSettingAfter.CCreateDt;
                 }
             }
@@ -269,6 +269,8 @@ namespace App.BLL
                 else
                 {
                     var tblUnit = await _repositoryWrapper.Unit.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
+
+                    if (tblUnit == null) { throw new Exception("無此單元"); }
 
                     tblUnit.CName = request.Name;
                     tblUnit.CTemplateType = request.TemplateType;

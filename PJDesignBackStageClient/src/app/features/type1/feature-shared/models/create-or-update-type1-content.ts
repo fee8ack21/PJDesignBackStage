@@ -1,9 +1,6 @@
-import { EditStatus } from "src/app/shared/models/enums";
-import { ReviewNote } from "src/app/shared/models/review-note";
+import { EditRequestBase } from "src/app/shared/models/bases";
 
-export class CreateOrUpdateType1ContentRequest {
-    unitId?: number | null;
-    content: string;
-    editStatus: EditStatus;
-    note?: ReviewNote;
+export class CreateOrUpdateType1ContentRequest extends EditRequestBase {
+  unitId?: number | null;
+  content: string;
 }

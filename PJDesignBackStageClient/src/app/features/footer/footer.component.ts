@@ -105,13 +105,15 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
 
     if (setting.isShowMapUnit) { this.type2Units[0].selected = true; }
 
-    setting.showedUnits.forEach(showedUnit => {
-      this.type2Units.forEach(unit => {
-        if (showedUnit == unit.id) {
-          unit.selected = true;
-        }
+    if (setting.showedUnits) {
+      setting.showedUnits.forEach(showedUnit => {
+        this.type2Units.forEach(unit => {
+          if (showedUnit == unit.id) {
+            unit.selected = true;
+          }
+        })
       })
-    })
+    }
 
     this.socialIcons = setting.socialIcons;
   }

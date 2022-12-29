@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace App.Model
 {
-    public class CreateOrUpdateSettingRequest
+    public class CreateOrUpdateSettingRequest : EditRequestBase
     {
         public int UnitId { get; set; }
         public object? Content { get; set; }
-        public byte EditStatus { get; set; }
-        public ReviewNote? Note { get; set; }
     }
 }
