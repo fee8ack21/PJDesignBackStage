@@ -1,5 +1,9 @@
 .mat-form-field {
-  max-width: 185px;
+  max-width: 170px;
+
+  @media (min-width: 1240px) {
+    max-width: 185px;
+  }
 }
 
 .mat-table {

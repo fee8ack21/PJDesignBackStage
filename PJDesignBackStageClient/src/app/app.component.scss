@@ -1,0 +1,23 @@
+.mask {
+  z-index: 999;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 16px;
+  letter-spacing: 5px;
+  background-color: rgba(0, 0, 0, 0.8);
+
+  @media (min-width: 576px) {
+    font-size: 22px;
+  }
+
+  @media (min-width: 768px) {
+    font-size: 26px;
+  }
+}
