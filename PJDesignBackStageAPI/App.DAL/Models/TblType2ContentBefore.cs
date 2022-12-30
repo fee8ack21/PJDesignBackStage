@@ -55,4 +55,17 @@ public partial class TblType2ContentBefore
 
     [Column("cUnitId")]
     public int CUnitId { get; set; }
+
+    /// <summary>
+    /// 是否置頂
+    /// </summary>
+    [Column("cIsFixed")]
+    public bool CIsFixed { get; set; }
+
+    /// <summary>
+    /// 敘述
+    /// </summary>
+    [Column("cDescription")]
+    [StringLength(300)]
+    public string? CDescription { get; set; }
 }

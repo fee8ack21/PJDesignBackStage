@@ -61,8 +61,7 @@ public partial class PjdesignContext : DbContext
     public virtual DbSet<TblUnit> TblUnits { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=PJDesign;Trusted_Connection=True;Integrated Security=True");
+    { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -296,8 +295,10 @@ public partial class PjdesignContext : DbContext
         modelBuilder.Entity<TblType2ContentAfter>(entity =>
         {
             entity.Property(e => e.CCreateDt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CDescription).HasComment("敘述");
             entity.Property(e => e.CEditDt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.CIsEnabled).HasDefaultValueSql("((1))");
+            entity.Property(e => e.CIsFixed).HasComment("是否置頂");
         });
 
         modelBuilder.Entity<TblType2ContentBefore>(entity =>
@@ -305,8 +306,10 @@ public partial class PjdesignContext : DbContext
             entity.HasKey(e => e.CId).HasName("PK_tblTyp2ContentBefore");
 
             entity.Property(e => e.CCreateDt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CDescription).HasComment("敘述");
             entity.Property(e => e.CEditDt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.CIsEnabled).HasDefaultValueSql("((1))");
+            entity.Property(e => e.CIsFixed).HasComment("是否置頂");
         });
 
         modelBuilder.Entity<TblUnit>(entity =>
