@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace App.Model
 {
-    public class ResponseBase<T> where T : class
+    public class ResponseBase<T> 
     {
         public string Message { get; set; } = "";
-        public T? Entries { get; set; }
+        public T Entries { get; set; }
         public StatusCode StatusCode { get; set; } = StatusCode.Success;
     }
 
