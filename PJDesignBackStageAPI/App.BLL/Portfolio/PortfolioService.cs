@@ -27,7 +27,7 @@ namespace App.BLL
             var response = new ResponseBase<List<GetPortfoliosResponse>>() { Entries = new List<GetPortfoliosResponse>() };
             try
             {
-                var beforePortfolios = await _repositoryWrapper.PortfolioBefore.GetAll().GroupJoin(
+                var beforePortfolios = _repositoryWrapper.PortfolioBefore.GetAll().ToList().GroupJoin(
                    _repositoryWrapper.Category.GetByCondition(x => x.CUnitId == (int)UnitId.作品集).Join(
                        _repositoryWrapper.CategoryMappingBefore.GetAll(), a => a.CId, b => b.CCategoryId, (a, b) => new { CategoryId = a.CId, CategoryName = a.CName, ContentId = b.CContentId }),
                    x => x.CId,
@@ -43,11 +43,11 @@ namespace App.BLL
                        Date = x.CDate,
                        EditStatus = x.CEditStatus,
                        Categories = y.Select(a => new Category { Id = a.CategoryId, Name = a.CategoryName })
-                   }).ToListAsync();
+                   }).ToList();
 
                 var beforeAfterIDs = beforePortfolios.Where(x => x.AfterId != null).Select(x => x.AfterId) ?? Enumerable.Empty<int?>();
 
-                var afterPortfolios = await _repositoryWrapper.PortfolioAfter.GetByCondition(x => !beforeAfterIDs.Contains(x.CId)).GroupJoin(
+                var afterPortfolios = _repositoryWrapper.PortfolioAfter.GetByCondition(x => !beforeAfterIDs.Contains(x.CId)).ToList().GroupJoin(
                     _repositoryWrapper.Category.GetByCondition(x => x.CUnitId == (int)UnitId.作品集).Join(
                         _repositoryWrapper.CategoryMappingAfter.GetAll(), a => a.CId, b => b.CCategoryId, (a, b) => new { CategoryId = a.CId, CategoryName = a.CName, ContentId = b.CContentId }),
                     x => x.CId,
@@ -63,7 +63,7 @@ namespace App.BLL
                         EditDt = x.CEditDt,
                         EditStatus = null,
                         Categories = y.Select(a => new Category { Id = a.CategoryId, Name = a.CategoryName })
-                    }).ToListAsync();
+                    }).ToList();
 
                 response.Entries.AddRange(beforePortfolios);
                 response.Entries.AddRange(afterPortfolios);
@@ -85,8 +85,9 @@ namespace App.BLL
             {
                 if (isBefore)
                 {
-                    var portfolio = await _repositoryWrapper.PortfolioBefore
+                    var portfolio = _repositoryWrapper.PortfolioBefore
                        .GetByCondition(x => x.CId == id)
+                       .ToList()
                        .GroupJoin(
                            _repositoryWrapper.Category
                            .GetByCondition(a => a.CUnitId == (int)UnitId.作品集)
@@ -111,7 +112,7 @@ namespace App.BLL
                        {
                            x,
                            y
-                       }).FirstOrDefaultAsync();
+                       }).FirstOrDefault();
 
                     if (portfolio == null) { throw new Exception("無此問題"); }
 
@@ -132,8 +133,9 @@ namespace App.BLL
                 }
                 else
                 {
-                    var portfolio = await _repositoryWrapper.PortfolioAfter
+                    var portfolio = _repositoryWrapper.PortfolioAfter
                        .GetByCondition(x => x.CId == id)
+                       .ToList()
                        .GroupJoin(
                            _repositoryWrapper.Category
                            .GetByCondition(a => a.CUnitId == (int)UnitId.作品集)
@@ -153,7 +155,7 @@ namespace App.BLL
                            {
                                x,
                                y
-                           }).FirstOrDefaultAsync();
+                           }).FirstOrDefault();
 
                     if (portfolio == null) { throw new Exception("無此問題"); }
 

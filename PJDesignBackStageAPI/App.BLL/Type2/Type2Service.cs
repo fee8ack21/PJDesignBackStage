@@ -27,7 +27,7 @@ namespace App.BLL
             var response = new ResponseBase<List<GetType2ContentsByUnitIdResponse>>() { Entries = new List<GetType2ContentsByUnitIdResponse>() };
             try
             {
-                var beforeContents = await _repositoryWrapper.Type2ContentBefore.GetByCondition(x => x.CUnitId == id).GroupJoin(
+                var beforeContents = _repositoryWrapper.Type2ContentBefore.GetByCondition(x => x.CUnitId == id).ToList().GroupJoin(
                    _repositoryWrapper.Category.GetByCondition(x => x.CUnitId == id).Join(
                        _repositoryWrapper.CategoryMappingBefore.GetAll(), a => a.CId, b => b.CCategoryId, (a, b) => new { CategoryId = a.CId, CategoryName = a.CName, ContentId = b.CContentId }),
                    x => x.CId,
@@ -42,11 +42,11 @@ namespace App.BLL
                        EditDt = x.CEditDt,
                        EditStatus = x.CEditStatus,
                        Categories = y.Select(a => new Category { Id = a.CategoryId, Name = a.CategoryName })
-                   }).ToListAsync();
+                   }).ToList();
 
                 var beforeAfterIDs = beforeContents.Where(x => x.AfterId != null).Select(x => x.AfterId) ?? Enumerable.Empty<int?>();
 
-                var afterContents = await _repositoryWrapper.Type2ContentAfter.GetByCondition(x => x.CUnitId == id && !beforeAfterIDs.Contains(x.CId)).GroupJoin(
+                var afterContents = _repositoryWrapper.Type2ContentAfter.GetByCondition(x => x.CUnitId == id && !beforeAfterIDs.Contains(x.CId)).ToList().GroupJoin(
                     _repositoryWrapper.Category.GetByCondition(x => x.CUnitId == id).Join(
                         _repositoryWrapper.CategoryMappingAfter.GetAll(), a => a.CId, b => b.CCategoryId, (a, b) => new { CategoryId = a.CId, CategoryName = a.CName, ContentId = b.CContentId }),
                     x => x.CId,
@@ -61,7 +61,7 @@ namespace App.BLL
                         EditDt = x.CEditDt,
                         EditStatus = null,
                         Categories = y.Select(a => new Category { Id = a.CategoryId, Name = a.CategoryName })
-                    }).ToListAsync();
+                    }).ToList();
 
                 response.Entries.AddRange(beforeContents);
                 response.Entries.AddRange(afterContents);
@@ -83,8 +83,9 @@ namespace App.BLL
             {
                 if (isBefore)
                 {
-                    var content = await _repositoryWrapper.Type2ContentBefore
+                    var content = _repositoryWrapper.Type2ContentBefore
                        .GetByCondition(x => x.CId == id && x.CUnitId == unitId)
+                       .ToList()
                        .GroupJoin(
                            _repositoryWrapper.Category
                            .GetByCondition(a => a.CUnitId == unitId)
@@ -108,7 +109,7 @@ namespace App.BLL
                            {
                                x,
                                y
-                           }).FirstOrDefaultAsync();
+                           }).FirstOrDefault();
 
                     if (content == null) { throw new Exception("無此內容"); }
 
@@ -130,8 +131,9 @@ namespace App.BLL
                 }
                 else
                 {
-                    var content = await _repositoryWrapper.Type2ContentAfter
+                    var content = _repositoryWrapper.Type2ContentAfter
                        .GetByCondition(x => x.CId == id && x.CUnitId == unitId)
+                       .ToList()
                        .GroupJoin(
                            _repositoryWrapper.Category
                            .GetByCondition(a => a.CUnitId == unitId)
@@ -151,7 +153,7 @@ namespace App.BLL
                            {
                                x,
                                y
-                           }).FirstOrDefaultAsync();
+                           }).FirstOrDefault();
 
                     if (content == null) { throw new Exception("無此內容"); }
 

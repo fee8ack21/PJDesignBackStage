@@ -27,7 +27,7 @@ namespace App.BLL
             var response = new ResponseBase<List<GetQuestionsResponse>>() { Entries = new List<GetQuestionsResponse>() };
             try
             {
-                var beforeQuestions = await _repositoryWrapper.QuestionBefore.GetAll().GroupJoin(
+                var beforeQuestions = _repositoryWrapper.QuestionBefore.GetAll().ToList().GroupJoin(
                     _repositoryWrapper.Category.GetByCondition(x => x.CUnitId == (int)UnitId.常見問題).Join(
                         _repositoryWrapper.CategoryMappingBefore.GetAll(), a => a.CId, b => b.CCategoryId, (a, b) => new { CategoryId = a.CId, CategoryName = a.CName, ContentId = b.CContentId }),
                     x => x.CId,
@@ -42,11 +42,11 @@ namespace App.BLL
                         EditDt = x.CEditDt,
                         EditStatus = x.CEditStatus,
                         Categories = y.Select(a => new Category { Id = a.CategoryId, Name = a.CategoryName })
-                    }).ToListAsync();
+                    }).ToList();
 
                 var beforeAfterIDs = beforeQuestions.Where(x => x.AfterId != null).Select(x => x.AfterId) ?? Enumerable.Empty<int?>();
 
-                var afterQuestions = await _repositoryWrapper.QuestionAfter.GetByCondition(x => !beforeAfterIDs.Contains(x.CId)).GroupJoin(
+                var afterQuestions = _repositoryWrapper.QuestionAfter.GetByCondition(x => !beforeAfterIDs.Contains(x.CId)).ToList().GroupJoin(
                     _repositoryWrapper.Category.GetByCondition(x => x.CUnitId == (int)UnitId.常見問題).Join(
                         _repositoryWrapper.CategoryMappingAfter.GetAll(), a => a.CId, b => b.CCategoryId, (a, b) => new { CategoryId = a.CId, CategoryName = a.CName, ContentId = b.CContentId }),
                     x => x.CId,
@@ -61,7 +61,7 @@ namespace App.BLL
                         EditDt = x.CEditDt,
                         EditStatus = null,
                         Categories = y.Select(a => new Category { Id = a.CategoryId, Name = a.CategoryName })
-                    }).ToListAsync();
+                    }).ToList();
 
                 response.Entries.AddRange(beforeQuestions);
                 response.Entries.AddRange(afterQuestions);
@@ -83,8 +83,9 @@ namespace App.BLL
             {
                 if (isBefore)
                 {
-                    var question = await _repositoryWrapper.QuestionBefore
+                    var question = _repositoryWrapper.QuestionBefore
                        .GetByCondition(x => x.CId == id)
+                       .ToList()
                        .GroupJoin(
                            _repositoryWrapper.Category
                            .GetByCondition(a => a.CUnitId == (int)UnitId.常見問題)
@@ -108,7 +109,7 @@ namespace App.BLL
                            {
                                x,
                                y
-                           }).FirstOrDefaultAsync();
+                           }).FirstOrDefault();
 
                     if (question == null) { throw new Exception("無此問題"); }
 
@@ -128,8 +129,9 @@ namespace App.BLL
                 }
                 else
                 {
-                    var question = await _repositoryWrapper.QuestionAfter
+                    var question = _repositoryWrapper.QuestionAfter
                        .GetByCondition(x => x.CId == id)
+                       .ToList()
                        .GroupJoin(
                            _repositoryWrapper.Category
                            .GetByCondition(a => a.CUnitId == (int)UnitId.常見問題)
@@ -149,7 +151,7 @@ namespace App.BLL
                            {
                                x,
                                y
-                           }).FirstOrDefaultAsync();
+                           }).FirstOrDefault();
 
                     if (question == null) { throw new Exception("無此問題"); }
 
