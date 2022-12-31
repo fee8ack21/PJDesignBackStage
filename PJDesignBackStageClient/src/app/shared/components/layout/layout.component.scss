@@ -42,6 +42,7 @@
   }
 
   &__content {
+    position: relative;
     top: 56px;
     height: calc(100vh - 56px);
     overflow-y: auto;
@@ -52,11 +53,17 @@
     }
   }
 
-  &__progress-bar-container {
-    height: 5px;
-  }
-
   &__spinner-wrap {
+    z-index: 999;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    left: 0px;
+    bottom: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.2);
   }
 
   .mat-list-item {
@@ -90,5 +97,15 @@
         transform: rotate(225deg);
       }
     }
+  }
+}
+
+::ng-deep {
+  .mat-progress-spinner svg {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  .mat-spinner circle {
+    stroke: rgb(71, 71, 71);
   }
 }

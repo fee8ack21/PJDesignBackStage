@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 @Injectable()
 
-export class ProgressBarService {
+export class SpinnerService {
   isShow$ = new BehaviorSubject<boolean>(false);
 
   constructor() { }

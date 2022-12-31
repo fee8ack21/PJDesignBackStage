@@ -38,5 +38,9 @@ namespace App.DAL.Models
         [Required]
         [Column("cIsEnabled")]
         public bool? CIsEnabled { get; set; }
+        [Required]
+        [Column("cThumbnailUrl")]
+        [StringLength(200)]
+        public string CThumbnailUrl { get; set; }
     }
 }

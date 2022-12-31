@@ -128,6 +128,7 @@ namespace App.BLL
                     response.Entries.Categories = portfolio.x.y.Select(a => new Category { Id = a.Id, Name = a.Name }).ToList();
                     response.Entries.IsEnabled = portfolio.x.x.CIsEnabled ?? false;
                     response.Entries.Title = portfolio.x.x.CTitle;
+                    response.Entries.ThumbnailUrl = portfolio.x.x.CThumbnailUrl;
                     response.Entries.Notes = portfolio.x.x.CNotes != null ? JsonSerializer.Deserialize<List<ReviewNote>>(portfolio.x.x.CNotes) : null;
                     response.Entries.Photos = await _repositoryWrapper.PortfolioPhotoBefore.GetByCondition(x => x.CPortfolioId == portfolio.x.x.CId).Select(x => x.CUrl).ToListAsync();
                 }
@@ -171,6 +172,7 @@ namespace App.BLL
                     response.Entries.Categories = portfolio.x.y.Select(a => new Category { Id = a.Id, Name = a.Name }).ToList();
                     response.Entries.IsEnabled = portfolio.x.x.CIsEnabled ?? false;
                     response.Entries.Title = portfolio.x.x.CTitle;
+                    response.Entries.ThumbnailUrl = portfolio.x.x.CThumbnailUrl;
                     response.Entries.Notes = null;
                     response.Entries.Photos = await _repositoryWrapper.PortfolioPhotoAfter.GetByCondition(x => x.CPortfolioId == portfolio.x.x.CId).Select(x => x.CUrl).ToListAsync();
                 }
@@ -208,7 +210,8 @@ namespace App.BLL
                                     CCreateDt = DateHelper.GetNowDate(),
                                     CEditDt = DateHelper.GetNowDate(),
                                     CEditorId = payload.Id,
-                                    CAfterId = request.AfterId
+                                    CAfterId = request.AfterId,
+                                    CThumbnailUrl = request.ThumbnailUrl
                                 };
 
                                 _repositoryWrapper.PortfolioBefore.Create(tblPortfolioBefore);
@@ -250,6 +253,7 @@ namespace App.BLL
                                 tblPortfolioBefore.CIsEnabled = request.IsEnabled;
                                 tblPortfolioBefore.CEditStatus = request.EditStatus;
                                 tblPortfolioBefore.CEditDt = DateHelper.GetNowDate();
+                                tblPortfolioBefore.CThumbnailUrl = request.ThumbnailUrl;
 
                                 _repositoryWrapper.PortfolioBefore.Update(tblPortfolioBefore);
 
@@ -366,6 +370,7 @@ namespace App.BLL
                                     CCreatorId = tblPortfolioBefore.CEditorId,
                                     CCreateDt = DateHelper.GetNowDate(),
                                     CIsEnabled = tblPortfolioBefore.CIsEnabled,
+                                    CThumbnailUrl = tblPortfolioBefore.CThumbnailUrl
                                 };
 
                                 _repositoryWrapper.PortfolioAfter.Create(tblPortfolioAfter);
@@ -414,6 +419,7 @@ namespace App.BLL
                                 tblPortfolioAfter.CEditorId = tblPortfolioBefore.CEditorId;
                                 tblPortfolioAfter.CEditDt = DateHelper.GetNowDate();
                                 tblPortfolioAfter.CIsEnabled = request.IsEnabled;
+                                tblPortfolioAfter.CThumbnailUrl = request.ThumbnailUrl;
 
                                 _repositoryWrapper.PortfolioAfter.Update(tblPortfolioAfter);
                                 _repositoryWrapper.PortfolioBefore.Delete(tblPortfolioBefore);

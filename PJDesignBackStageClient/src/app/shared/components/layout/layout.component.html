@@ -96,14 +96,11 @@
       </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content class="layout__content">
-      <!-- <div class="layout__progress-bar-container">
-        <mat-progress-bar color="indigo" mode="indeterminate" *ngIf="isShowProgressBar">
-        </mat-progress-bar>
-      </div> -->
-      <!-- <div class="layout__spinner-wrap">
-        <mat-spinner></mat-spinner>
-      </div> -->
       <router-outlet></router-outlet>
     </mat-sidenav-content>
   </mat-sidenav-container>
+
+  <div class="layout__spinner-wrap" *ngIf="isShowSpinner">
+    <mat-spinner></mat-spinner>
+  </div>
 </div>

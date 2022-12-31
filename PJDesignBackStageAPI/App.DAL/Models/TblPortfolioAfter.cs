@@ -32,5 +32,9 @@ namespace App.DAL.Models
         public int CEditorId { get; set; }
         [Column("cCreatorId")]
         public int CCreatorId { get; set; }
+        [Required]
+        [Column("cThumbnailUrl")]
+        [StringLength(200)]
+        public string CThumbnailUrl { get; set; }
     }
 }

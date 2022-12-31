@@ -7,4 +7,5 @@ export class CreateOrUpdatePortfolioRequest extends EditRequestBase {
   date: Date;
   categoryIDs: number[] | null | undefined;
   photos?: string[]
+  thumbnailUrl: string;
 }

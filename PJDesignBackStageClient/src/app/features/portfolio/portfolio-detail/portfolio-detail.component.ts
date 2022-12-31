@@ -23,6 +23,8 @@ import { GetPortfolioByIdResponse } from '../feature-shared/models/get-portfolio
 })
 export class PortfolioDetailComponent extends DetailBaseComponent implements OnInit {
   form: FormGroup;
+  thumbnailUrl = '';
+  thumbnailName = '';
   photos: string[] = [];
 
   @ViewChild('categorySelectEle') categorySelectEle: MatSelectionList;
@@ -75,6 +77,8 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
         response.entries?.afterId
       );
 
+      this.thumbnailUrl = response.entries?.thumbnailUrl ?? '';
+      this.thumbnailName = response.entries?.thumbnailUrl != null ? response.entries.thumbnailUrl.split('/')[response.entries.thumbnailUrl.split('/').length - 1] : '';
       this.photos = response.entries?.photos ?? [];
 
       this.handleFormStatus(this.form);
@@ -96,15 +100,24 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
     this.photos.splice(index, 1);
   }
 
-  onPhotoUpload(e: any) {
+  onPhotoUpload(e: any, type = 'photo') {
     const file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
     const formData = new FormData();
     formData.append('image', file, file.name);
 
     this.httpService.post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() }).subscribe(response => {
       if (response.statusCode == StatusCode.Success) {
-        this.photos.push(response.entries!);
-        return;
+        switch (type) {
+          case 'photo':
+            this.photos.push(response.entries!);
+            return;
+          case 'thumbnail':
+            this.thumbnailUrl = response.entries!;
+            this.thumbnailName = file.name;
+            return;
+          default:
+            return;
+        }
       }
     })
   }
@@ -112,13 +125,18 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
   onSubmit(e: any, status: EditStatus = EditStatus.Review) {
     if (e !== undefined) { e.preventDefault(); }
 
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
       this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
       return;
     }
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (this.thumbnailUrl.length == 0) {
+      this.snackBarService.showSnackBar('請上傳縮圖');
       return;
     }
 
@@ -127,7 +145,8 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
       editStatus: status,
       categoryIDs: this.getListSelectedIDs(this.categorySelectEle),
       afterId: this.isBefore ? this.afterId : this.id,
-      photos: this.photos
+      photos: this.photos,
+      thumbnailUrl: this.thumbnailUrl,
     };
 
     if (status == EditStatus.Reject) {

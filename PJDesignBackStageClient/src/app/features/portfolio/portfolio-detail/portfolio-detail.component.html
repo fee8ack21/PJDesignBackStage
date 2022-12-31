@@ -6,7 +6,7 @@
         <mat-divider></mat-divider>
         <div class="pt-1">
           <form [formGroup]="form">
-            <div class="py-1">
+            <div class="d-flex py-1">
               <mat-form-field appearance="fill">
                 <mat-label>標題</mat-label>
                 <input matInput formControlName="title" name="title" readonly
@@ -28,6 +28,19 @@
                   <mat-option [value]="false">停用</mat-option>
                 </mat-select>
               </mat-form-field>
+              <div class="d-flex ml-1-i">
+                <img *ngIf="thumbnailUrl.length > 0" [src]="thumbnailUrl" alt="" class="mr-1-i"
+                  style="max-height:52px;max-width: 70px;object-fit: cover;object-position: center;">
+                <span *ngIf="thumbnailName.length > 0"
+                  style="max-width: 60px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;align-self: baseline;position: relative;top: 8px;"
+                  class="mr-1-i">{{thumbnailName}}</span>
+                <label style="position: relative;top: 8px; align-self: baseline;" class="file-input-btn"
+                  [ngClass]="{'disabled': isPreventEdit()}">
+                  <input type="file" accept="image/*" (change)="onPhotoUpload($event, 'thumbnail')"
+                    [disabled]="isPreventEdit()">
+                  上傳縮圖
+                </label>
+              </div>
             </div>
             <mat-divider></mat-divider>
             <div class="py-1">
@@ -56,15 +69,15 @@
                 <mat-list-item role="listitem" *ngFor="let item of photos;let i = index;" class="my-2-i"
                   style="position: relative;overflow-y: hidden;height: 100px;">
 
-                  <img *ngIf="item != null && item.length > 0" [src]="item | safeUrl" style="width: 90%;max-height: 100px;object-fit: cover;object-position: center;"/>
+                  <img *ngIf="item != null && item.length > 0" [src]="item | safeUrl"
+                    style="width: 90%;max-height: 100px;object-fit: cover;object-position: center;" />
 
                   <button (click)="removePhoto(i)" type="button" class="ml-auto-i" mat-stroked-button color="basic"
                     [disabled]="isPreventEdit()">移除</button>
                 </mat-list-item>
                 <mat-list-item class="">
                   <label class="file-input-btn w-100" [ngClass]="{'disabled': isPreventEdit()}">
-                    <input type="file" accept="image/*" (change)="onPhotoUpload($event)"
-                      [disabled]="isPreventEdit()">
+                    <input type="file" accept="image/*" (change)="onPhotoUpload($event)" [disabled]="isPreventEdit()">
                     上傳圖片
                   </label>
                 </mat-list-item>

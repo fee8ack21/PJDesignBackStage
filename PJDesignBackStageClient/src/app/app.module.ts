@@ -19,7 +19,7 @@ import { ErrorInterceptor } from './shared/interceptors/error-interceptor';
 import { SnackBarService } from './shared/services/snack-bar.service';
 import { UnitService } from './shared/services/unit-service';
 import { AuthGuard } from './shared/guards/auth-guard';
-import { ProgressBarService } from './shared/services/progress-bar.service';
+import { SpinnerService } from './shared/services/spinner.service';
 import { FooterModule } from './features/footer/footer.module';
 import { ContactModule } from './features/contact/contact.module';
 import { QuestionModule } from './features/question/question.module';
@@ -56,7 +56,7 @@ import { Type2Module } from './features/type2/type2.module';
     SnackBarService,
     UnitService,
     AuthGuard,
-    ProgressBarService,
+    SpinnerService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],

@@ -4,7 +4,9 @@ export class CreateOrUpdateType2ContentRequest extends EditRequestBase {
   id?: number | null;
   unitId: number;
   title: string;
+  description: string;
   isEnabled: boolean;
+  isFixed: boolean;
   content: string;
   categoryIDs: number[] | null | undefined;
   thumbnailUrl: string;

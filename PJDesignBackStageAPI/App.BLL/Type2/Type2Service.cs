@@ -127,6 +127,8 @@ namespace App.BLL
                     response.Entries.Categories = content.x.y.Select(a => new Category { Id = a.Id, Name = a.Name }).ToList();
                     response.Entries.IsEnabled = content.x.x.CIsEnabled ?? false;
                     response.Entries.Title = content.x.x.CTitle;
+                    response.Entries.IsFixed = content.x.x.CIsFixed;
+                    response.Entries.Description = content.x.x.CDescription;
                     response.Entries.Notes = content.x.x.CNotes != null ? JsonSerializer.Deserialize<List<ReviewNote>>(content.x.x.CNotes) : null;
                 }
                 else
@@ -172,6 +174,8 @@ namespace App.BLL
                     response.Entries.Categories = content.x.y.Select(a => new Category { Id = a.Id, Name = a.Name }).ToList();
                     response.Entries.IsEnabled = content.x.x.CIsEnabled ?? false;
                     response.Entries.Title = content.x.x.CTitle;
+                    response.Entries.IsFixed = content.x.x.CIsFixed;
+                    response.Entries.Description = content.x.x.CDescription;
                     response.Entries.Notes = null;
                 }
             }
@@ -211,6 +215,8 @@ namespace App.BLL
                                     CCreateDt = DateHelper.GetNowDate(),
                                     CEditDt = DateHelper.GetNowDate(),
                                     CEditorId = payload.Id,
+                                    CIsFixed = request.IsFixed,
+                                    CDescription = request.Description,
                                     CAfterId = request.AfterId
                                 };
 
@@ -241,6 +247,8 @@ namespace App.BLL
                                 tblType2ContentBefore.CTitle = request.Title;
                                 tblType2ContentBefore.CContent = HtmlHelper.Sanitize(request.Content);
                                 tblType2ContentBefore.CIsEnabled = request.IsEnabled;
+                                tblType2ContentBefore.CIsFixed = request.IsFixed;
+                                tblType2ContentBefore.CDescription = request.Description;
                                 tblType2ContentBefore.CEditStatus = request.EditStatus;
                                 tblType2ContentBefore.CEditDt = DateHelper.GetNowDate();
                                 tblType2ContentBefore.CImageUrl = request.ImageUrl;
@@ -323,12 +331,14 @@ namespace App.BLL
                                 var tblType2ContentAfter = new TblType2ContentAfter()
                                 {
                                     CTitle = request.Title,
+                                    CDescription = request.Description,
                                     CContent = HtmlHelper.Sanitize(request.Content),
                                     CEditorId = tblType2ContentBefore.CEditorId,
                                     CEditDt = DateHelper.GetNowDate(),
                                     CCreatorId = tblType2ContentBefore.CEditorId,
                                     CCreateDt = DateHelper.GetNowDate(),
                                     CIsEnabled = tblType2ContentBefore.CIsEnabled,
+                                    CIsFixed = tblType2ContentBefore.CIsFixed,
                                     CImageUrl = tblType2ContentBefore.CImageUrl,
                                     CThumbnailUrl = tblType2ContentBefore.CThumbnailUrl,
                                     CUnitId = tblType2ContentBefore.CUnitId,
@@ -363,12 +373,14 @@ namespace App.BLL
                                 if (tblType2ContentAfter == null) { throw new Exception("請求錯物"); }
 
                                 tblType2ContentAfter.CTitle = request.Title;
+                                tblType2ContentAfter.CDescription = request.Description;
                                 tblType2ContentAfter.CContent = HtmlHelper.Sanitize(request.Content);
                                 tblType2ContentAfter.CImageUrl = request.ImageUrl;
                                 tblType2ContentAfter.CThumbnailUrl = request.ThumbnailUrl;
                                 tblType2ContentAfter.CEditorId = tblType2ContentBefore.CEditorId;
                                 tblType2ContentAfter.CEditDt = DateHelper.GetNowDate();
                                 tblType2ContentAfter.CIsEnabled = request.IsEnabled;
+                                tblType2ContentAfter.CIsFixed = request.IsFixed;
 
                                 _repositoryWrapper.Type2ContentAfter.Update(tblType2ContentAfter);
                                 _repositoryWrapper.Type2ContentBefore.Delete(tblType2ContentBefore);

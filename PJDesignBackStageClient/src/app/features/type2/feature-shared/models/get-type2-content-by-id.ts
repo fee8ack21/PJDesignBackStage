@@ -10,6 +10,8 @@ export class GetType2ContentByIdResponse extends EditResponseBase {
   title: string;
   createDt: Date;
   isEnabled: boolean;
+  isFixed: boolean;
+  description: string;
   content: string;
   categories: Category[] | null;
 }

@@ -6,6 +6,7 @@ export class GetPortfolioByIdResponse extends EditResponseBase {
   isBefore: boolean;
   title: string;
   createDt: Date;
+  thumbnailUrl: string;
   isEnabled: boolean;
   date?: Date;
   categories: Category[] | null;

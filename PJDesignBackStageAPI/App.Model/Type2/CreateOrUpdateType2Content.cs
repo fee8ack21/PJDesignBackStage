@@ -11,7 +11,9 @@ namespace App.Model
         public int? Id { get; set; }
         public int UnitId { get; set; }
         public bool IsEnabled { get; set; }
+        public bool IsFixed { get; set; }
         public string Title { get; set; } = null!;
+        public string Description { get; set; } = null!;
         public string Content { get; set; } = null!;
         public string ThumbnailUrl { get; set; } = null!;
         public string ImageUrl { get; set; } = null!;

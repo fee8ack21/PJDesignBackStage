@@ -85,7 +85,9 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       id: new FormControl(null),
       unitId: new FormControl(this.unit.id),
       title: new FormControl(null, [Validators.required]),
+      description: new FormControl(null),
       isEnabled: new FormControl(true, [Validators.required]),
+      isFixed: new FormControl(false, [Validators.required]),
       content: new FormControl(null, [Validators.required]),
     });
   }
@@ -96,7 +98,9 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       unitId: this.unit.id,
       title: data.title,
       isEnabled: data.isEnabled,
-      content: data.content
+      content: data.content,
+      isFixed: data.isFixed,
+      description: data.description
     })
   }
 
@@ -126,6 +130,11 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       e.preventDefault();
     }
 
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
       this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
       return;
@@ -141,18 +150,13 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       return;
     }
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
     let request: CreateOrUpdateType2ContentRequest = {
       ...this.form.value,
       editStatus: status,
       categoryIDs: this.getListSelectedIDs(this.categorySelectEle),
       afterId: this.isBefore ? this.afterId : this.id,
       thumbnailUrl: this.thumbnailUrl,
-      imageUrl: this.imageUrl
+      imageUrl: this.imageUrl,
     };
 
     if (status == EditStatus.Reject) {

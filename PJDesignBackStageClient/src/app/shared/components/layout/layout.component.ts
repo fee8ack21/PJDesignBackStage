@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UnitList } from '../../models/get-units';
 import { AuthService } from '../../services/auth.service';
-import { ProgressBarService } from '../../services/progress-bar.service';
+import { SpinnerService } from '../../services/spinner.service';
 import { UnitService } from '../../services/unit-service';
 import { BaseComponent } from '../base/base.component';
 
@@ -15,13 +15,13 @@ export class LayoutComponent extends BaseComponent implements OnInit {
   administratorName = '';
   fixedUnits: UnitList[] = [];
   customUnits: UnitList[] = [];
-  isShowProgressBar = false;
+  isShowSpinner = false;
 
   constructor(
     public unitService: UnitService,
     public router: Router,
     private authSerivce: AuthService,
-    private progressBarService: ProgressBarService) {
+    private spinnerService: SpinnerService) {
     super(unitService);
   }
 
@@ -29,7 +29,7 @@ export class LayoutComponent extends BaseComponent implements OnInit {
     this.unitService.getBackStageUnitsByGroupId()
 
     this.getAdministratorName();
-    this.listenProgrssBarService();
+    this.listenSpinnerService();
     this.listenUnitService();
   }
 
@@ -53,9 +53,9 @@ export class LayoutComponent extends BaseComponent implements OnInit {
     })
   }
 
-  listenProgrssBarService() {
-    this.progressBarService.isShow$.subscribe(response => {
-      this.isShowProgressBar = response;
+  listenSpinnerService() {
+    this.spinnerService.isShow$.subscribe(response => {
+      this.isShowSpinner = response;
     })
   }
 }
