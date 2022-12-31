@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class RightRepository : GenericRepository<TblRight>, IRightRepository
     {
-        public RightRepository(PjdesignContext context) : base(context)
+        public RightRepository(PJDesignContext context) : base(context)
         {
         }
     }

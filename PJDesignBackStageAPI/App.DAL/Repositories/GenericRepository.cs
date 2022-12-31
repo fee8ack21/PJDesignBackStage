@@ -11,9 +11,9 @@ namespace App.DAL.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly PjdesignContext _context;
+        private readonly PJDesignContext _context;
 
-        public GenericRepository(PjdesignContext context)
+        public GenericRepository(PJDesignContext context)
         {
             _context = context;
         }

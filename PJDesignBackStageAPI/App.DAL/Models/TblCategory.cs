@@ -2,46 +2,31 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
-namespace App.DAL.Models;
+// Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
+// If you have enabled NRTs for your project, then un-comment the following line:
+// #nullable disable
 
-[Table("tblCategory")]
-public partial class TblCategory
+namespace App.DAL.Models
 {
-    /// <summary>
-    /// 流水號
-    /// </summary>
-    [Key]
-    [Column("cId")]
-    public int CId { get; set; }
-
-    /// <summary>
-    /// 標籤/分類名稱
-    /// </summary>
-    [Column("cName")]
-    [StringLength(50)]
-    public string CName { get; set; } = null!;
-
-    /// <summary>
-    /// 所屬單元ID
-    /// </summary>
-    [Column("cUnitId")]
-    public int CUnitId { get; set; }
-
-    /// <summary>
-    /// 創建時間
-    /// </summary>
-    [Column("cCreateDt", TypeName = "datetime")]
-    public DateTime CCreateDt { get; set; }
-
-    /// <summary>
-    /// 是否啟用
-    /// </summary>
-    [Required]
-    [Column("cIsEnabled")]
-    public bool? CIsEnabled { get; set; }
-
-    [Column("cEditDt", TypeName = "datetime")]
-    public DateTime CEditDt { get; set; }
+    [Table("tblCategory")]
+    public partial class TblCategory
+    {
+        [Key]
+        [Column("cId")]
+        public int CId { get; set; }
+        [Required]
+        [Column("cName")]
+        [StringLength(50)]
+        public string CName { get; set; }
+        [Column("cUnitId")]
+        public int CUnitId { get; set; }
+        [Column("cCreateDt", TypeName = "datetime")]
+        public DateTime CCreateDt { get; set; }
+        [Required]
+        [Column("cIsEnabled")]
+        public bool? CIsEnabled { get; set; }
+        [Column("cEditDt", TypeName = "datetime")]
+        public DateTime CEditDt { get; set; }
+    }
 }

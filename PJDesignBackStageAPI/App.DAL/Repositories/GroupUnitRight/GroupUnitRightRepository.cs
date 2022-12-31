@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class GroupUnitRightRepository : GenericRepository<TblGroupUnitRight>, IGroupUnitRightRepository
     {
-        public GroupUnitRightRepository(PjdesignContext context) : base(context)
+        public GroupUnitRightRepository(PJDesignContext context) : base(context)
         {
         }
     }

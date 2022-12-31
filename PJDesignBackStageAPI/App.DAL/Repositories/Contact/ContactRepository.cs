@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class ContactRepository : GenericRepository<TblContact>, IContactRepository
     {
-        public ContactRepository(PjdesignContext context) : base(context)
+        public ContactRepository(PJDesignContext context) : base(context)
         {
         }
     }

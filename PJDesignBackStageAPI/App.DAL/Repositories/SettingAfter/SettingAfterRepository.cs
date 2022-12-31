@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class SettingAfterRepository : GenericRepository<TblSettingAfter>, ISettingAfterRepository
     {
-        public SettingAfterRepository(PjdesignContext context) : base(context)
+        public SettingAfterRepository(PJDesignContext context) : base(context)
         {
         }
     }

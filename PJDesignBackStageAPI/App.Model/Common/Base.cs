@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace App.Model
 {
-    public class ResponseBase<T>
+    public class ResponseBase<T> where T : class
     {
         public string Message { get; set; } = "";
         public T? Entries { get; set; }

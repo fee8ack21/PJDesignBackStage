@@ -3,8 +3,14 @@ using App.DAL.Contexts;
 using App.DAL.Repositories;
 using App.Enum;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace App.PL.HostedServices
 {
@@ -13,7 +19,7 @@ namespace App.PL.HostedServices
         private int _executionCount = 0;
         private readonly ILogger<EmailService> _logger;
         private Timer _timer;
-        private DbContextOptionsBuilder<PjdesignContext> _optionsBuilder;
+        private DbContextOptionsBuilder<PJDesignContext> _optionsBuilder;
 
         private SmtpClient _client;
         private readonly string _mailTitle = "系統通知";
@@ -25,7 +31,7 @@ namespace App.PL.HostedServices
         public EmailService(ILogger<EmailService> logger)
         {
             _logger = logger;
-            _optionsBuilder = new DbContextOptionsBuilder<PjdesignContext>();
+            _optionsBuilder = new DbContextOptionsBuilder<PJDesignContext>();
             _optionsBuilder.UseSqlServer(AppSettingHelper.GetSection("ConnectionStrings").GetSection("PJDesign").Value);
 
             var mailOptions = AppSettingHelper.GetSection("MailOptions");
@@ -56,9 +62,9 @@ namespace App.PL.HostedServices
             {
                 try
                 {
-                    using (var context = new PjdesignContext(_optionsBuilder.Options))
+                    using (var context = new PJDesignContext(_optionsBuilder.Options))
                     {
-                        var mails = context.TblContacts
+                        var mails = context.TblContact
                             .Where(x => x.CAutoReplyStatus == (int)EmailStatus.未處理 || x.CAutoReplyStatus == (int)EmailStatus.未完成)
                             .ToList();
 
@@ -89,7 +95,7 @@ namespace App.PL.HostedServices
                                 _logger.LogError($"Email Service Error: {ex.Message}");
                             }
 
-                            context.TblContacts.Update(mail);
+                            context.TblContact.Update(mail);
                             context.SaveChanges();
                         }
                     }

@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class CategoryMappingAfterRepository : GenericRepository<TblCategoryMappingAfter>, ICategoryMappingAfterRepository
     {
-        public CategoryMappingAfterRepository(PjdesignContext context) : base(context)
+        public CategoryMappingAfterRepository(PJDesignContext context) : base(context)
         {
         }
     }

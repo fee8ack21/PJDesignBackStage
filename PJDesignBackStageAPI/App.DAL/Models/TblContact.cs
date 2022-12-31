@@ -2,63 +2,40 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
-namespace App.DAL.Models;
+// Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
+// If you have enabled NRTs for your project, then un-comment the following line:
+// #nullable disable
 
-[Table("tblContact")]
-public partial class TblContact
+namespace App.DAL.Models
 {
-    /// <summary>
-    /// 流水號
-    /// </summary>
-    [Key]
-    [Column("cId")]
-    public int CId { get; set; }
-
-    /// <summary>
-    /// 訪客名稱
-    /// </summary>
-    [Column("cName")]
-    [StringLength(50)]
-    public string CName { get; set; } = null!;
-
-    /// <summary>
-    /// 訪客信箱
-    /// </summary>
-    [Column("cEmail")]
-    [StringLength(200)]
-    public string CEmail { get; set; } = null!;
-
-    /// <summary>
-    /// 訪客電話
-    /// </summary>
-    [Column("cPhone")]
-    [StringLength(200)]
-    public string CPhone { get; set; } = null!;
-
-    /// <summary>
-    /// 聯絡內容
-    /// </summary>
-    [Column("cContent")]
-    [StringLength(200)]
-    public string CContent { get; set; } = null!;
-
-    /// <summary>
-    /// 創建時間
-    /// </summary>
-    [Column("cCreateDt", TypeName = "datetime")]
-    public DateTime CCreateDt { get; set; }
-
-    /// <summary>
-    /// 自動回覆執行時間
-    /// </summary>
-    [Column("cAutoReplyDt", TypeName = "datetime")]
-    public DateTime? CAutoReplyDt { get; set; }
-
-    /// <summary>
-    /// 自動回覆執行狀態 0.未處理 1.已執行 2.未完成
-    /// </summary>
-    [Column("cAutoReplyStatus")]
-    public byte CAutoReplyStatus { get; set; }
+    [Table("tblContact")]
+    public partial class TblContact
+    {
+        [Key]
+        [Column("cId")]
+        public int CId { get; set; }
+        [Required]
+        [Column("cName")]
+        [StringLength(50)]
+        public string CName { get; set; }
+        [Required]
+        [Column("cEmail")]
+        [StringLength(200)]
+        public string CEmail { get; set; }
+        [Required]
+        [Column("cPhone")]
+        [StringLength(200)]
+        public string CPhone { get; set; }
+        [Required]
+        [Column("cContent")]
+        [StringLength(200)]
+        public string CContent { get; set; }
+        [Column("cCreateDt", TypeName = "datetime")]
+        public DateTime CCreateDt { get; set; }
+        [Column("cAutoReplyDt", TypeName = "datetime")]
+        public DateTime? CAutoReplyDt { get; set; }
+        [Column("cAutoReplyStatus")]
+        public byte CAutoReplyStatus { get; set; }
+    }
 }

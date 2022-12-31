@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class Type2ContentAfterRepository : GenericRepository<TblType2ContentAfter>, IType2ContentAfterRepository
     {
-        public Type2ContentAfterRepository(PjdesignContext context) : base(context)
+        public Type2ContentAfterRepository(PJDesignContext context) : base(context)
         {
         }
     }

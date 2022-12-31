@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class PortfolioAfterRepository : GenericRepository<TblPortfolioAfter>, IPortfolioAfterRepository
     {
-        public PortfolioAfterRepository(PjdesignContext context) : base(context)
+        public PortfolioAfterRepository(PJDesignContext context) : base(context)
         {
         }
     }

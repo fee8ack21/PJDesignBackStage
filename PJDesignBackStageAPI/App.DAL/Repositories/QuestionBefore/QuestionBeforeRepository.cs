@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class QuestionBeforeRepository : GenericRepository<TblQuestionBefore>, IQuestionBeforeRepository
     {
-        public QuestionBeforeRepository(PjdesignContext context) : base(context)
+        public QuestionBeforeRepository(PJDesignContext context) : base(context)
         {
         }
     }

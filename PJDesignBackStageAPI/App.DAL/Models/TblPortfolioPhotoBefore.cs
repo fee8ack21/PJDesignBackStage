@@ -2,30 +2,24 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
-namespace App.DAL.Models;
+// Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
+// If you have enabled NRTs for your project, then un-comment the following line:
+// #nullable disable
 
-[Table("tblPortfolioPhotoBefore")]
-public partial class TblPortfolioPhotoBefore
+namespace App.DAL.Models
 {
-    /// <summary>
-    /// 流水號
-    /// </summary>
-    [Key]
-    [Column("cId")]
-    public int CId { get; set; }
-
-    /// <summary>
-    /// 圖片檔案名稱
-    /// </summary>
-    [Column("cUrl")]
-    [StringLength(200)]
-    public string CUrl { get; set; } = null!;
-
-    /// <summary>
-    /// 作品集ID
-    /// </summary>
-    [Column("cPortfolioId")]
-    public int CPortfolioId { get; set; }
+    [Table("tblPortfolioPhotoBefore")]
+    public partial class TblPortfolioPhotoBefore
+    {
+        [Key]
+        [Column("cId")]
+        public int CId { get; set; }
+        [Required]
+        [Column("cUrl")]
+        [StringLength(200)]
+        public string CUrl { get; set; }
+        [Column("cPortfolioId")]
+        public int CPortfolioId { get; set; }
+    }
 }

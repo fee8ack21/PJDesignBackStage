@@ -11,7 +11,7 @@ namespace App.DAL.Repositories
 {
     public class GroupRepository : GenericRepository<TblGroup>, IGroupRepository
     {
-        public GroupRepository(PjdesignContext context) : base(context)
+        public GroupRepository(PJDesignContext context) : base(context)
         {
         }
     }

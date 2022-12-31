@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class AdministratorRepository : GenericRepository<TblAdministrator>, IAdministratorRepository
     {
-        public AdministratorRepository(PjdesignContext context) : base(context)
+        public AdministratorRepository(PJDesignContext context) : base(context)
         {
         }
     }

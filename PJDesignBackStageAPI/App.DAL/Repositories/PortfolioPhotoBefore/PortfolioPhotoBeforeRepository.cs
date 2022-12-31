@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class PortfolioPhotoBeforeRepository : GenericRepository<TblPortfolioPhotoBefore>, IPortfolioPhotoBeforeRepository
     {
-        public PortfolioPhotoBeforeRepository(PjdesignContext context) : base(context)
+        public PortfolioPhotoBeforeRepository(PJDesignContext context) : base(context)
         {
         }
     }

@@ -10,7 +10,7 @@ namespace App.DAL.Repositories
 {
     public class RepositoryWrapper : IRepositoryWrapper
     {
-        private PjdesignContext _context;
+        private PJDesignContext _context;
         private IAdministratorRepository? _administrator;
         private IAdministratorGroupRepository? _administratorGroup;
         private IUnitRepository? _unit;
@@ -34,7 +34,7 @@ namespace App.DAL.Repositories
         private IType2ContentBeforeRepository? _type2ContentBefore;
         private IType2ContentAfterRepository? _type2ContentAfter;
 
-        public RepositoryWrapper(PjdesignContext context)
+        public RepositoryWrapper(PJDesignContext context)
         {
             _context = context;
         }
