@@ -4,6 +4,8 @@ using App.DAL.Repositories;
 using App.PL.HostedServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SpaServices;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -71,15 +73,18 @@ namespace App.PL
             {
                 options.AddPolicy("CorsPolicy", builder =>
                 {
-                    builder.WithOrigins("http://localhost:4200", "http://design.admin.pinjui.tw/")
+                    builder.AllowAnyOrigin()
                        .AllowAnyHeader()
-                       .AllowAnyMethod()
-                       .AllowCredentials(); ;
+                       .AllowAnyMethod();
                 });
             });
             services.AddDbContext<PJDesignContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("PJDesign"));
+            });
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "Client";
             });
 
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
@@ -99,16 +104,16 @@ namespace App.PL
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "PJ Design");
+            });
+
             if (env.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PJ Design");
-                });
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseStaticFiles(new StaticFileOptions()
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
@@ -121,10 +126,14 @@ namespace App.PL
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseSpaStaticFiles();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "Client";
             });
         }
     }

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:9453/'
+  apiUrl: 'http://design.admin.pinjui.tw/api/'
 };
