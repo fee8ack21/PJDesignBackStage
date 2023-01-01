@@ -8,6 +8,7 @@ import { ResponseBase } from 'src/app/shared/models/bases';
 import { EditAndEnabledOptions, StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { GetPortfoliosResponse } from '../feature-shared/models/get-portfolios';
 import { PortfolioListSearchParams } from '../feature-shared/models/portfolio-list-search-params';
@@ -29,30 +30,44 @@ export class PortfolioListComponent extends ListBaseComponent implements OnInit 
   constructor(
     protected httpService: HttpService,
     protected snackBarService: SnackBarService,
+    private spinnerService: SpinnerService,
     protected dialog: MatDialog,
     protected unitService: UnitService) {
     super(unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
-    this.getPortfolios();
-
     this.unitService.isBackStageUnitsInit$.subscribe(() => {
       this.setUnit();
-      this.getCategories();
+      this.fetchPageData();
     })
   }
 
-  getPortfolios(): void {
-    this.httpService.get<ResponseBase<GetPortfoliosResponse[]>>('portfolio/getPortfolios').subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-      this.rawListData = response.entries!;
-      this.dataSource = this.createDataSource<GetPortfoliosResponse>(this.rawListData, this.sort, this.paginator);
+    await Promise.all([
+      this.getPortfoliosPromise(),
+      this.getCategoriesPromise()
+    ]).then(([portfoliosResponse, categoriesResponse]) => {
+      this.handlePortfoliosResponse(portfoliosResponse);
+      this.handleCategoriesResponse(categoriesResponse);
+
+      this.spinnerService.isShow$.next(false);
     });
+  }
+
+  getPortfoliosPromise() {
+    return this.httpService.get<ResponseBase<GetPortfoliosResponse[]>>('portfolio/getPortfolios').toPromise();
+  }
+  handlePortfoliosResponse(response: ResponseBase<GetPortfoliosResponse[]>) {
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.rawListData = response.entries!;
+    this.dataSource = this.createDataSource<GetPortfoliosResponse>(this.rawListData, this.sort, this.paginator);
   }
 
   onSearch(): void {

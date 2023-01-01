@@ -168,21 +168,23 @@ export abstract class DetailBaseComponent extends BaseComponent {
     });
   }
 
-  getCategories(): void {
+  getCategoriesPromise() {
     if (!this.isUnitInit()) { return; }
+    return this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unit.id}`).toPromise();
+  }
+  handleCategoriesResponse(response: ResponseBase<GetCategoriesByUnitId[]> | undefined) {
+    if (response == undefined) { return; }
 
-    this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unit.id}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
 
-      if (response.entries != null) {
-        response.entries.forEach(item => {
-          this.unitCategories.push({ id: item.id, name: item.name, selected: false });
-        })
-      }
-    });
+    if (response.entries != null) {
+      response.entries.forEach(item => {
+        this.unitCategories.push({ id: item.id, name: item.name, selected: false });
+      })
+    }
   }
 
   updateCategories(categories: Category[] | null): void {

@@ -9,6 +9,7 @@ import { ReviewNote } from 'src/app/shared/models/review-note';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
 import { CreateOrUpdateType1ContentRequest } from './feature-shared/models/create-or-update-type1-content';
@@ -29,6 +30,7 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
     protected route: ActivatedRoute,
     protected unitService: UnitService,
     protected authService: AuthService,
+    private spinnerService: SpinnerService,
     private router: Router,
     protected dialog: MatDialog) {
     super(route, authService, unitService, httpService, snackBarService, dialog);
@@ -40,7 +42,7 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
     this.initForm();
     this.unitService.isBackStageUnitsInit$.subscribe(async response => {
       this.setUnit();
-      this.getType1Content();
+      this.fetchPageData();
     });
   }
 
@@ -58,27 +60,41 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
     })
   }
 
-  getType1Content() {
-    if (!this.isUnitInit()) { return; }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-    this.httpService.get<ResponseBase<GetType1ContentResponse>>(`type1/getType1ContentByUnitId?id=${this.unit.id}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+    await Promise.all([
+      this.getType1ContentPromise(),
+    ]).then(([type1Response]) => {
+      this.handleType1Response(type1Response);
 
-      this.setEditData(
-        response.entries?.editorId,
-        response.entries?.editorName,
-        response.entries?.createDt,
-        response.entries?.editStatus,
-        response.entries?.notes as ReviewNote[] ?? [],
-        response.entries?.afterId
-      );
-
-      this.handleFormStatus(this.form);
-      this.updateForm(response.entries!);
+      this.spinnerService.isShow$.next(false);
     });
+  }
+
+  getType1ContentPromise() {
+    if (!this.isUnitInit()) { return; }
+    return this.httpService.get<ResponseBase<GetType1ContentResponse>>(`type1/getType1ContentByUnitId?id=${this.unit.id}`).toPromise();
+  }
+  handleType1Response(response: ResponseBase<GetType1ContentResponse> | undefined) {
+    if (response == undefined) { return; }
+
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.setEditData(
+      response.entries?.editorId,
+      response.entries?.editorName,
+      response.entries?.createDt,
+      response.entries?.editStatus,
+      response.entries?.notes as ReviewNote[] ?? [],
+      response.entries?.afterId
+    );
+
+    this.handleFormStatus(this.form);
+    this.updateForm(response.entries!);
   }
 
   onSubmit(e: any, status: EditStatus = EditStatus.Review) {
@@ -105,14 +121,15 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
       request.note = new ReviewNote(this.administrator!.name, this.editReviewNote!);
     }
 
-    this.httpService.post<ResponseBase<string>>('type1/createOrUpdateType1Content', request).subscribe(response => {
+    this.httpService.post<ResponseBase<string>>('type1/createOrUpdateType1Content', request).subscribe(async response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;
       }
 
-      this.getType1Content();
       this.snackBarService.showSnackBar(SnackBarService.RequestSuccessText);
+      const type1Response = await this.getType1ContentPromise();
+      this.handleType1Response(type1Response);
     });
   }
 }

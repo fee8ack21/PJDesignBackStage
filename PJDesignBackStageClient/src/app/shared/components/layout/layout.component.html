@@ -1,7 +1,7 @@
 <div class="layout">
   <mat-toolbar class="layout__navbar" color="primary">
     <div class="d-flex items-center">
-      <button mat-icon-button (click)="sidenav.toggle()">
+      <button mat-icon-button (click)="sidenav.toggle();isSpinnerExpand = !isSpinnerExpand;">
         <mat-icon>menu</mat-icon>
       </button>
       <a class="layout__title-link" [routerLink]="['/']">
@@ -96,11 +96,10 @@
       </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content class="layout__content">
+      <div class="layout__spinner-wrap" *ngIf="isShowSpinner" [ngClass]="{'expand': isSpinnerExpand}">
+        <mat-spinner></mat-spinner>
+      </div>
       <router-outlet></router-outlet>
     </mat-sidenav-content>
   </mat-sidenav-container>
-
-  <div class="layout__spinner-wrap" *ngIf="isShowSpinner">
-    <mat-spinner></mat-spinner>
-  </div>
 </div>

@@ -63,17 +63,19 @@ export abstract class ListBaseComponent extends BaseComponent {
     return txt;
   }
 
-  getCategories(): void {
+  getCategoriesPromise() {
     if (!this.isUnitInit()) { return; }
+    return this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unit.id}`).toPromise();
+  }
+  handleCategoriesResponse(response: ResponseBase<GetCategoriesByUnitId[]> | undefined) {
+    if (response == undefined) { return; }
 
-    this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unit.id}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
 
-      this.unitCategories = response.entries ?? [];
-    });
+    this.unitCategories = response.entries ?? [];
   }
 
   openCategoryDialog(isEdit = false): void {
@@ -82,9 +84,9 @@ export abstract class ListBaseComponent extends BaseComponent {
       data: new CategoryDialogData(this.unit.id, isEdit, this.unitCategories)
     });
 
-    dialogRef.afterClosed().subscribe(doRefresh => {
+    dialogRef.afterClosed().subscribe(async doRefresh => {
       if (!doRefresh) { return; }
-      this.getCategories();
+      this.handleCategoriesResponse(await this.getCategoriesPromise());
     });
   }
 

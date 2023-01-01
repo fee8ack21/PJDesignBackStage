@@ -11,6 +11,7 @@ import { ReviewNote } from 'src/app/shared/models/review-note';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
 import { CreateOrUpdatePortfolioRequest } from '../feature-shared/models/create-or-update-portfolio';
@@ -36,6 +37,7 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
     protected authService: AuthService,
     protected unitService: UnitService,
     public validatorService: ValidatorService,
+    private spinnerService: SpinnerService,
     private router: Router,
     protected dialog: MatDialog) {
     super(route, authService, unitService, httpService, snackBarService, dialog);
@@ -45,8 +47,21 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
     this.initForm();
     this.unitService.isBackStageUnitsInit$.subscribe(response => {
       this.setUnit();
-      this.getCategories();
-      this.getPortfolio();
+      this.fetchPageData();
+    });
+  }
+
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
+
+    await Promise.all([
+      this.getPortfolioPromise(),
+      this.getCategoriesPromise()
+    ]).then(([portfolioResponse, categoriesResponse]) => {
+      this.handlePortfolioResponse(portfolioResponse);
+      this.handleCategoriesResponse(categoriesResponse);
+
+      this.spinnerService.isShow$.next(false);
     });
   }
 
@@ -59,32 +74,34 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
     });
   }
 
-  getPortfolio() {
+  getPortfolioPromise() {
     if (!this.isIdInit()) { return; }
+    return this.httpService.get<ResponseBase<GetPortfolioByIdResponse>>(`portfolio/getPortfolioById?id=${this.id}&isBefore=${this.isBefore}`).toPromise();
+  }
+  handlePortfolioResponse(response: ResponseBase<GetPortfolioByIdResponse> | undefined) {
+    if (response == undefined) { return; }
 
-    this.httpService.get<ResponseBase<GetPortfolioByIdResponse>>(`portfolio/getPortfolioById?id=${this.id}&isBefore=${this.isBefore}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
 
-      this.setEditData(
-        response.entries?.editorId,
-        response.entries?.editorName,
-        response.entries?.createDt,
-        response.entries?.editStatus,
-        response.entries?.notes as ReviewNote[] ?? [],
-        response.entries?.afterId
-      );
+    this.setEditData(
+      response.entries?.editorId,
+      response.entries?.editorName,
+      response.entries?.createDt,
+      response.entries?.editStatus,
+      response.entries?.notes as ReviewNote[] ?? [],
+      response.entries?.afterId
+    );
 
-      this.thumbnailUrl = response.entries?.thumbnailUrl ?? '';
-      this.thumbnailName = response.entries?.thumbnailUrl != null ? response.entries.thumbnailUrl.split('/')[response.entries.thumbnailUrl.split('/').length - 1] : '';
-      this.photos = response.entries?.photos ?? [];
+    this.thumbnailUrl = response.entries?.thumbnailUrl ?? '';
+    this.thumbnailName = response.entries?.thumbnailUrl != null ? response.entries.thumbnailUrl.split('/')[response.entries.thumbnailUrl.split('/').length - 1] : '';
+    this.photos = response.entries?.photos ?? [];
 
-      this.handleFormStatus(this.form);
-      this.updateForm(response.entries!);
-      this.updateCategories(response.entries!.categories);
-    });
+    this.handleFormStatus(this.form);
+    this.updateForm(response.entries!);
+    this.updateCategories(response.entries!.categories);
   }
 
   updateForm(data: GetPortfolioByIdResponse) {

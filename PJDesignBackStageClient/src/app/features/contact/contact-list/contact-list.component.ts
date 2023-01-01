@@ -8,6 +8,7 @@ import { ResponseBase } from 'src/app/shared/models/bases';
 import { EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ContactDialogComponent } from '../feature-shared/components/contact-dialog/contact-dialog.component';
 import { ContactDialogData } from '../feature-shared/models/contact-dialog-data';
@@ -32,25 +33,38 @@ export class ContactListComponent extends ListBaseComponent implements OnInit {
     protected unitService: UnitService,
     protected httpService: HttpService,
     protected snackBarService: SnackBarService,
+    private spinnerService: SpinnerService,
     protected dialog: MatDialog) {
     super(unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
     this.unitService.isBackStageUnitsInit$.subscribe(() => { this.setUnit(); })
-    this.getContacts();
+    this.fetchPageData();
   }
 
-  getContacts() {
-    this.httpService.get<ResponseBase<GetContactsResponse[]>>('contact/getContacts').subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-      this.rawListData = response.entries!;
-      this.dataSource = this.createDataSource<GetContactsResponse>(this.rawListData, this.sort, this.paginator);
+    await Promise.all([
+      this.getContactsPromise()
+    ]).then(([contactsResponse]) => {
+      this.handleContactsResponse(contactsResponse);
+      this.spinnerService.isShow$.next(false);
     });
+  }
+
+  getContactsPromise() {
+    return this.httpService.get<ResponseBase<GetContactsResponse[]>>('contact/getContacts').toPromise();
+  }
+  handleContactsResponse(response: ResponseBase<GetContactsResponse[]>) {
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.rawListData = response.entries!;
+    this.dataSource = this.createDataSource<GetContactsResponse>(this.rawListData, this.sort, this.paginator);
   }
 
   async openDialog(index: number): Promise<void> {

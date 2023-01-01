@@ -8,6 +8,7 @@ import { PageStatus, StatusCode } from 'src/app/shared/models/enums';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
 import { CreateOrUpdateAdministratorRequest } from '../feature-shared/models/create-or-update-administrator';
@@ -31,6 +32,7 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
     private router: Router,
     protected httpService: HttpService,
     protected snackBarService: SnackBarService,
+    private spinnerService: SpinnerService,
     public validatorService: ValidatorService) {
     super(route, authService, unitService, httpService, snackBarService, dialog);
   }
@@ -38,32 +40,48 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
   ngOnInit(): void {
     this.unitService.isBackStageUnitsInit$.subscribe(() => { this.setUnit(); });
     this.initForm();
-    this.getGroups();
-    this.getAdministratorById();
+    this.fetchPageData();
   }
 
-  getGroups() {
-    this.httpService.get<ResponseBase<GetGroupsResponse[]>>('administrator/getGroups').subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-      this.groups = response.entries!;
+    await Promise.all([
+      this.getAdministratorByIdPromise(),
+      this.getGroupsPromise()
+    ]).then(([administratorResponse, groupsResponse]) => {
+      this.handleAdministratorByIdResponse(administratorResponse);
+      this.handleGroupsResponse(groupsResponse);
+
+      this.spinnerService.isShow$.next(false);
     });
   }
 
-  getAdministratorById() {
+  getGroupsPromise() {
+    return this.httpService.get<ResponseBase<GetGroupsResponse[]>>('administrator/getGroups').toPromise();
+  }
+  handleGroupsResponse(response: ResponseBase<GetGroupsResponse[]>) {
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+    this.groups = response.entries!;
+  }
+
+  getAdministratorByIdPromise() {
     if (this.pageStatus == PageStatus.Create || !this.isIdInit()) { return; }
 
-    this.httpService.get<ResponseBase<GetAdministratorByIdResponse>>(`administrator/GetAdministratorById?id=${this.id}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+    return this.httpService.get<ResponseBase<GetAdministratorByIdResponse>>(`administrator/GetAdministratorById?id=${this.id}`).toPromise();
+  }
+  handleAdministratorByIdResponse(response: ResponseBase<GetAdministratorByIdResponse> | undefined) {
+    if (response == undefined) { return; }
 
-      this.updateForm(response.entries!);
-    });
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.updateForm(response.entries!);
   }
 
   initForm() {

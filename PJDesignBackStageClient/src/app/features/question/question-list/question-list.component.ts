@@ -8,6 +8,7 @@ import { ResponseBase } from 'src/app/shared/models/bases';
 import { EditAndEnabledOptions, EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { GetQuestionsResponse } from '../feature-shared/models/get-questions';
 import { QuestionListSearchParams } from '../feature-shared/models/question-list-search-params';
@@ -30,29 +31,43 @@ export class QuestionListComponent extends ListBaseComponent implements OnInit {
     protected httpService: HttpService,
     protected snackBarService: SnackBarService,
     protected unitService: UnitService,
+    private spinnerService: SpinnerService,
     protected dialog: MatDialog) {
     super(unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
-    this.getQuestions();
-
     this.unitService.isBackStageUnitsInit$.subscribe(response => {
       this.setUnit();
-      this.getCategories();
+      this.fetchPageData();
     });
   }
 
-  getQuestions(): void {
-    this.httpService.get<ResponseBase<GetQuestionsResponse[]>>('question/getQuestions').subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-      this.rawListData = response.entries!;
-      this.dataSource = this.createDataSource<GetQuestionsResponse>(this.rawListData, this.sort, this.paginator);
+    await Promise.all([
+      this.getQuestionsPromise(),
+      this.getCategoriesPromise()
+    ]).then(([questionsResponse, categoriesResponse]) => {
+      this.handleQuestionsResponse(questionsResponse);
+      this.handleCategoriesResponse(categoriesResponse);
+
+      this.spinnerService.isShow$.next(false);
     });
+  }
+
+  getQuestionsPromise() {
+    return this.httpService.get<ResponseBase<GetQuestionsResponse[]>>('question/getQuestions').toPromise();
+  }
+  handleQuestionsResponse(response: ResponseBase<GetQuestionsResponse[]>) {
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.rawListData = response.entries!;
+    this.dataSource = this.createDataSource<GetQuestionsResponse>(this.rawListData, this.sort, this.paginator);
   }
 
   onSearch(): void {

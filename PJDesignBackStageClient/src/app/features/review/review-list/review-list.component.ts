@@ -8,6 +8,7 @@ import { ResponseBase } from 'src/app/shared/models/bases';
 import { StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { GetReviewsResponse } from '../feature-shared/models/get-reviews';
 import { ReviewListSearchParams } from '../feature-shared/models/review-list-search-params';
@@ -30,6 +31,7 @@ export class ReviewListComponent extends ListBaseComponent implements OnInit {
   constructor(
     protected httpService: HttpService,
     protected snackBarService: SnackBarService,
+    private spinnerService: SpinnerService,
     protected unitService: UnitService,
     protected dialog: MatDialog) {
     super(unitService, httpService, snackBarService, dialog);
@@ -38,22 +40,35 @@ export class ReviewListComponent extends ListBaseComponent implements OnInit {
   ngOnInit(): void {
     this.unitService.isBackStageUnitsInit$.subscribe(response => {
       this.setUnit();
-      this.getReviews();
+      this.fetchPageData();
     });
   }
 
-  getReviews(): void {
-    this.httpService.get<ResponseBase<GetReviewsResponse[]>>('review/getReviews').subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-      this.rawListData = response.entries!;
-      this.dataSource = this.createDataSource<GetReviewsResponse>(this.rawListData, this.sort, this.paginator);
+    await Promise.all([
+      this.getReviewsPromise(),
+    ]).then(([reviewsResponse]) => {
+      this.handleReviewsResponse(reviewsResponse);
 
-      this.setUnitOptions(this.rawListData);
-    })
+      this.spinnerService.isShow$.next(false);
+    });
+  }
+
+  getReviewsPromise() {
+    return this.httpService.get<ResponseBase<GetReviewsResponse[]>>('review/getReviews').toPromise();
+  }
+  handleReviewsResponse(response: ResponseBase<GetReviewsResponse[]>) {
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.rawListData = response.entries!;
+    this.dataSource = this.createDataSource<GetReviewsResponse>(this.rawListData, this.sort, this.paginator);
+
+    this.setUnitOptions(this.rawListData);
   }
 
   setUnitOptions(data: GetReviewsResponse[]): void {

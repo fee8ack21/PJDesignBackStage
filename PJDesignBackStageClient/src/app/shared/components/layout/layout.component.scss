@@ -57,13 +57,20 @@
     z-index: 999;
     position: fixed;
     top: 0px;
-    right: 0px;
-    left: 0px;
+    left: 210px;
     bottom: 0px;
+    width: calc(100vw - 210px);
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.07);
+    transition-duration: 400ms;
+    transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    &.expand {
+      left: 0px;
+      width: 100vw;
+    }
   }
 
   .mat-list-item {

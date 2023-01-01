@@ -7,6 +7,7 @@ import { StageType, StatusCode } from 'src/app/shared/models/enums';
 import { GetUnitsRequest, GetUnitsResponse, UnitList } from 'src/app/shared/models/get-units';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { UnitDialogComponent } from './feature-shared/components/unit-dialog/unit-dialog.component';
 import { UpdateUnitsSortRequest } from './feature-shared/models/update-units-sort';
@@ -21,6 +22,7 @@ export class UnitComponent extends ListBaseComponent implements OnInit {
 
   constructor(
     protected httpService: HttpService,
+    private spinnerService: SpinnerService,
     protected unitService: UnitService,
     protected snackBarService: SnackBarService,
     protected dialog: MatDialog) {
@@ -29,19 +31,32 @@ export class UnitComponent extends ListBaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.unitService.isBackStageUnitsInit$.subscribe(() => { this.setUnit(); })
-    this.getFrontStageUnits();
+    this.fetchPageData();
   }
 
-  getFrontStageUnits() {
-    let request = new GetUnitsRequest(StageType.前台);
-    this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-      this.formatUnits(response.entries as UnitList[]);
-    })
+    await Promise.all([
+      this.getFrontStageUnitsPromise(),
+    ]).then(([unitsResponse]) => {
+      this.handleUnitsResponse(unitsResponse);
+
+      this.spinnerService.isShow$.next(false);
+    });
+  }
+
+  getFrontStageUnitsPromise() {
+    let request = new GetUnitsRequest(StageType.前台);
+    return this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
+  }
+  handleUnitsResponse(response: ResponseBase<GetUnitsResponse[]>) {
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.formatUnits(response.entries as UnitList[]);
   }
 
   formatUnits(units: UnitList[]) {
@@ -107,8 +122,10 @@ export class UnitComponent extends ListBaseComponent implements OnInit {
       data: { unit, parent }
     });
 
-    dialogRef.afterClosed().subscribe(doRefresh => {
-      if (doRefresh) { this.getFrontStageUnits(); }
+    dialogRef.afterClosed().subscribe(async doRefresh => {
+      if (doRefresh) {
+        this.handleUnitsResponse(await this.getFrontStageUnitsPromise());
+      }
     });
   }
 

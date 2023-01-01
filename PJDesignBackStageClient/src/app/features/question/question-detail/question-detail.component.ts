@@ -10,6 +10,7 @@ import { ReviewNote } from 'src/app/shared/models/review-note';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
 import { CreateOrUpdateQuestionRequest } from '../feature-shared/models/create-or-update-question';
@@ -31,6 +32,7 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
     protected httpService: HttpService,
     public validatorService: ValidatorService,
     protected unitService: UnitService,
+    private spinnerService: SpinnerService,
     private router: Router,
     protected dialog: MatDialog,
     protected authService: AuthService) {
@@ -41,33 +43,48 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
     this.initForm();
     this.unitService.isBackStageUnitsInit$.subscribe(async response => {
       this.setUnit();
-      this.getCategories();
-      this.getQuestion();
+      this.fetchPageData();
     });
   }
 
-  getQuestion() {
-    if (!this.isIdInit()) { return; }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-    this.httpService.get<ResponseBase<GetQuestionByIdResponse>>(`question/getQuestionById?id=${this.id}&isBefore=${this.isBefore}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+    await Promise.all([
+      this.getQuestionPromise(),
+      this.getCategoriesPromise()
+    ]).then(([questionResponse, categoriesResponse]) => {
+      this.handleQuestionResponse(questionResponse);
+      this.handleCategoriesResponse(categoriesResponse);
 
-      this.setEditData(
-        response.entries?.editorId,
-        response.entries?.editorName,
-        response.entries?.createDt,
-        response.entries?.editStatus,
-        response.entries?.notes as ReviewNote[] ?? [],
-        response.entries?.afterId
-      );
-
-      this.handleFormStatus(this.form);
-      this.updateForm(response.entries!);
-      this.updateCategories(response.entries!.categories);
+      this.spinnerService.isShow$.next(false);
     });
+  }
+
+  getQuestionPromise() {
+    if (!this.isIdInit()) { return; }
+    return this.httpService.get<ResponseBase<GetQuestionByIdResponse>>(`question/getQuestionById?id=${this.id}&isBefore=${this.isBefore}`).toPromise();
+  }
+  handleQuestionResponse(response: ResponseBase<GetQuestionByIdResponse> | undefined) {
+    if (response == undefined) { return; }
+
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.setEditData(
+      response.entries?.editorId,
+      response.entries?.editorName,
+      response.entries?.createDt,
+      response.entries?.editStatus,
+      response.entries?.notes as ReviewNote[] ?? [],
+      response.entries?.afterId
+    );
+
+    this.handleFormStatus(this.form);
+    this.updateForm(response.entries!);
+    this.updateCategories(response.entries!.categories);
   }
 
   initForm() {

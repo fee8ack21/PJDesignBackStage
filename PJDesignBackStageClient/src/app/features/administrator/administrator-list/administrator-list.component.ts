@@ -9,6 +9,7 @@ import { Group, StageType, StatusCode } from 'src/app/shared/models/enums';
 import { GetUnitsRequest, GetUnitsResponse } from 'src/app/shared/models/get-units';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { GroupDialogComponent } from '../feature-shared/components/group-dialog/group-dialog.component';
 import { AdministratorListSearchParams } from '../feature-shared/models/administrator-list-search-params';
@@ -37,35 +38,52 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
     protected httpService: HttpService,
     protected unitService: UnitService,
     protected snackBarService: SnackBarService,
-    protected dialog: MatDialog) {
+    protected dialog: MatDialog,
+    private spinnerService: SpinnerService) {
     super(unitService, httpService, snackBarService, dialog);
   }
 
   ngOnInit(): void {
     this.unitService.isBackStageUnitsInit$.subscribe(() => { this.setUnit(); });
-    this.getGroups();
-    this.getAdministrators();
+    this.fetchPageData();
   }
 
-  getAdministrators() {
-    this.httpService.get<ResponseBase<GetAdministratorsResponse[]>>('administrator/getAdministrators').subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
+
+    await Promise.all([
+      this.getAdministratorsPromise(),
+      this.getGroupsPromise()
+    ]).then(([administratorsResponse, groupsResponse]) => {
+      this.handleAdministratorsResponse(administratorsResponse);
+      this.handleGroupsResponse(groupsResponse);
+
+      this.spinnerService.isShow$.next(false);
+    });
+  }
+
+  getAdministratorsPromise() {
+    return this.httpService.get<ResponseBase<GetAdministratorsResponse[]>>('administrator/getAdministrators').toPromise();
+  }
+  handleAdministratorsResponse(response: ResponseBase<GetAdministratorsResponse[]>) {
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    } else {
       this.rawListData = response.entries!;
       this.dataSource = this.createDataSource<GetAdministratorsResponse>(this.rawListData, this.sort, this.paginator);
-    });
+    }
   }
 
-  getGroups() {
-    this.httpService.get<ResponseBase<GetGroupsResponse[]>>('administrator/getGroups').subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
-      this.groups = response.entries!;
-    });
+  getGroupsPromise() {
+    return this.httpService.get<ResponseBase<GetGroupsResponse[]>>('administrator/getGroups').toPromise();
+  }
+  handleGroupsResponse(response: ResponseBase<GetGroupsResponse[]>) {
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+    this.groups = response.entries!;
   }
 
   getBackStageUnitsPromise() {
@@ -111,9 +129,9 @@ export class AdministratorListComponent extends ListBaseComponent implements OnI
       data: data
     });
 
-    dialogRef.afterClosed().subscribe(doRefresh => {
+    dialogRef.afterClosed().subscribe(async doRefresh => {
       if (!doRefresh) { return; }
-      this.getGroups();
+      this.handleGroupsResponse(await this.getGroupsPromise());
     });
   }
 

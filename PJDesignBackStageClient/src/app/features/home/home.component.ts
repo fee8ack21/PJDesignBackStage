@@ -10,6 +10,7 @@ import { ReviewNote } from 'src/app/shared/models/review-note';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
 
@@ -29,6 +30,7 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
     protected route: ActivatedRoute,
     protected unitService: UnitService,
     protected authService: AuthService,
+    private spinnerService: SpinnerService,
     protected dialog: MatDialog) {
     super(route, authService, unitService, httpService, snackBarService, dialog);
   }
@@ -36,44 +38,50 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
   ngOnInit(): void {
     this.unitService.isBackStageUnitsInit$.subscribe(async response => {
       this.setUnit();
-      this.getSettingByUnitId();
-      await this.setType2Units();
+      this.fetchPageData();
     });
   }
 
-  getSettingByUnitId() {
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
+    this.handleUnitsResponse(await this.getType2UnitsPromise());
+    this.handleSettingResponse(await this.getSettingByUnitIdPromise());
+    this.spinnerService.isShow$.next(false);
+  }
+
+  getSettingByUnitIdPromise() {
     if (!this.isUnitInit()) { return }
+    return this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${this.unit.id}`).toPromise();
+  }
+  handleSettingResponse(response: ResponseBase<GetSettingByUnitIdResponse> | undefined) {
+    if (response == undefined) { return; }
 
-    this.httpService.get<ResponseBase<GetSettingByUnitIdResponse>>(`unit/getSettingByUnitId?id=${this.unit.id}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
 
-      this.setEditData(
-        response.entries?.editorId,
-        response.entries?.editorName,
-        response.entries?.createDt,
-        response.entries?.editStatus,
-        response.entries?.notes as ReviewNote[] ?? []
-      );
-    });
+    this.setEditData(
+      response.entries?.editorId,
+      response.entries?.editorName,
+      response.entries?.createDt,
+      response.entries?.editStatus,
+      response.entries?.notes as ReviewNote[] ?? []
+    );
   }
 
-  async setType2Units() {
-    const type2UnitsRespoonse = await this.getType2UnitsPromise();
-    if (type2UnitsRespoonse.statusCode == StatusCode.Fail) {
+  getType2UnitsPromise() {
+    let request = new GetUnitsRequest(TemplateType.模板二);
+    return this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
+  }
+  handleUnitsResponse(response: ResponseBase<GetUnitsResponse[]>) {
+    if (response.statusCode == StatusCode.Fail) {
       this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
       return;
     }
 
     if (this.type2Units.length > 0) { return; }
 
-    type2UnitsRespoonse.entries?.forEach(item => { this.type2Units.push({ ...item }); });
-  }
-
-  getType2UnitsPromise() {
-    let request = new GetUnitsRequest(TemplateType.模板二);
-    return this.httpService.post<ResponseBase<GetUnitsResponse[]>>('unit/getUnits', request).toPromise();
+    response.entries?.forEach(item => { this.type2Units.push({ ...item }); });
   }
 }

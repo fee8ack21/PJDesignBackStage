@@ -9,6 +9,7 @@ import { ResponseBase } from 'src/app/shared/models/bases';
 import { EditAndEnabledOptions, EditStatus, StatusCode } from 'src/app/shared/models/enums';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { GetType2ContentsResponse } from '../feature-shared/models/get-type2-contents';
 import { Type2ListSearchParams } from '../feature-shared/models/type2-list-search-params';
@@ -31,6 +32,7 @@ export class Type2ListComponent extends ListBaseComponent implements OnInit {
     private router: Router,
     protected httpService: HttpService,
     protected snackBarService: SnackBarService,
+    private spinnerService: SpinnerService,
     protected unitService: UnitService,
     protected dialog: MatDialog) {
     super(unitService, httpService, snackBarService, dialog);
@@ -38,26 +40,40 @@ export class Type2ListComponent extends ListBaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-
     this.unitService.isBackStageUnitsInit$.subscribe(response => {
       this.setUnit();
-      this.getCategories();
-      this.getType2Contents();
+      this.fetchPageData();
     });
   }
 
-  getType2Contents(): void {
-    if (!this.isUnitInit()) { return; }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-    this.httpService.get<ResponseBase<GetType2ContentsResponse[]>>(`type2/getType2ContentsByUnitId?id=${this.unit.id}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+    await Promise.all([
+      this.getType2ContentsPromise(),
+      this.getCategoriesPromise()
+    ]).then(([type2Response, categoriesResponse]) => {
+      this.handleType2Response(type2Response);
+      this.handleCategoriesResponse(categoriesResponse);
 
-      this.rawListData = response.entries!;
-      this.dataSource = this.createDataSource<GetType2ContentsResponse>(this.rawListData, this.sort, this.paginator);
+      this.spinnerService.isShow$.next(false);
     });
+  }
+
+  getType2ContentsPromise() {
+    if (!this.isUnitInit()) { return; }
+    return this.httpService.get<ResponseBase<GetType2ContentsResponse[]>>(`type2/getType2ContentsByUnitId?id=${this.unit.id}`).toPromise();
+  }
+  handleType2Response(response: ResponseBase<GetType2ContentsResponse[]> | undefined) {
+    if (response == undefined) { return; }
+
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.rawListData = response.entries!;
+    this.dataSource = this.createDataSource<GetType2ContentsResponse>(this.rawListData, this.sort, this.paginator);
   }
 
   onSearch(): void {

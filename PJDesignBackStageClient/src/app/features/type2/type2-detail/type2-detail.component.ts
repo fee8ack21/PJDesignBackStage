@@ -11,6 +11,7 @@ import { ReviewNote } from 'src/app/shared/models/review-note';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { SnackBarService } from 'src/app/shared/services/snack-bar.service';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { UnitService } from 'src/app/shared/services/unit-service';
 import { ValidatorService } from 'src/app/shared/services/validator.service';
 import { CreateOrUpdateType2ContentRequest } from '../feature-shared/models/create-or-update-type2-content';
@@ -36,6 +37,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
     protected httpService: HttpService,
     public validatorService: ValidatorService,
     protected unitService: UnitService,
+    private spinnerService: SpinnerService,
     private router: Router,
     protected dialog: MatDialog,
     protected authService: AuthService) {
@@ -43,41 +45,57 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
   }
 
   ngOnInit(): void {
+    this.initForm();
+
     this.unitService.isBackStageUnitsInit$.subscribe(async response => {
       this.setUnit();
-      this.initForm();
-      this.getCategories();
-      this.getType2Content();
+      this.fetchPageData();
     });
   }
 
-  getType2Content() {
-    if (!this.isIdInit() || !this.isUnitInit()) { return; }
+  async fetchPageData() {
+    this.spinnerService.isShow$.next(true);
 
-    this.httpService.get<ResponseBase<GetType2ContentByIdResponse>>(`type2/getType2ContentById?unitId=${this.unit.id}&id=${this.id}&isBefore=${this.isBefore}`).subscribe(response => {
-      if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
-        return;
-      }
+    await Promise.all([
+      this.getType2ContentPromise(),
+      this.getCategoriesPromise()
+    ]).then(([type2Response, categoriesResponse]) => {
+      this.handleType2Response(type2Response);
+      this.handleCategoriesResponse(categoriesResponse);
 
-      this.setEditData(
-        response.entries?.editorId,
-        response.entries?.editorName,
-        response.entries?.createDt,
-        response.entries?.editStatus,
-        response.entries?.notes as ReviewNote[] ?? [],
-        response.entries?.afterId
-      );
-
-      this.thumbnailUrl = response.entries?.thumbnailUrl ?? '';
-      this.thumbnailName = response.entries?.thumbnailUrl != null ? response.entries.thumbnailUrl.split('/')[response.entries.thumbnailUrl.split('/').length - 1] : '';
-      this.imageUrl = response.entries?.imageUrl ?? '';
-      this.imageName = response.entries?.imageUrl != null ? response.entries.imageUrl.split('/')[response.entries.imageUrl.split('/').length - 1] : '';
-
-      this.handleFormStatus(this.form);
-      this.updateForm(response.entries!);
-      this.updateCategories(response.entries!.categories);
+      this.spinnerService.isShow$.next(false);
     });
+  }
+
+  getType2ContentPromise() {
+    if (!this.isIdInit() || !this.isUnitInit()) { return; }
+    return this.httpService.get<ResponseBase<GetType2ContentByIdResponse>>(`type2/getType2ContentById?unitId=${this.unit.id}&id=${this.id}&isBefore=${this.isBefore}`).toPromise();
+  }
+  handleType2Response(response: ResponseBase<GetType2ContentByIdResponse> | undefined) {
+    if (response == undefined) { return; }
+
+    if (response.statusCode == StatusCode.Fail) {
+      this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+      return;
+    }
+
+    this.setEditData(
+      response.entries?.editorId,
+      response.entries?.editorName,
+      response.entries?.createDt,
+      response.entries?.editStatus,
+      response.entries?.notes as ReviewNote[] ?? [],
+      response.entries?.afterId
+    );
+
+    this.thumbnailUrl = response.entries?.thumbnailUrl ?? '';
+    this.thumbnailName = response.entries?.thumbnailUrl != null ? response.entries.thumbnailUrl.split('/')[response.entries.thumbnailUrl.split('/').length - 1] : '';
+    this.imageUrl = response.entries?.imageUrl ?? '';
+    this.imageName = response.entries?.imageUrl != null ? response.entries.imageUrl.split('/')[response.entries.imageUrl.split('/').length - 1] : '';
+
+    this.handleFormStatus(this.form);
+    this.updateForm(response.entries!);
+    this.updateCategories(response.entries!.categories);
   }
 
   initForm() {

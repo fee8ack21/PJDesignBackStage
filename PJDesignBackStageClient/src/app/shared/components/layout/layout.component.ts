@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UnitList } from '../../models/get-units';
 import { AuthService } from '../../services/auth.service';
@@ -17,11 +17,13 @@ export class LayoutComponent extends BaseComponent implements OnInit {
   fixedUnits: UnitList[] = [];
   customUnits: UnitList[] = [];
   isShowSpinner = false;
+  isSpinnerExpand = false;
 
   constructor(
     public unitService: UnitService,
     private snackBarService: SnackBarService,
     public router: Router,
+    private cd: ChangeDetectorRef,
     private authSerivce: AuthService,
     private spinnerService: SpinnerService) {
     super(unitService);
@@ -63,6 +65,7 @@ export class LayoutComponent extends BaseComponent implements OnInit {
   listenSpinnerService() {
     this.spinnerService.isShow$.subscribe(response => {
       this.isShowSpinner = response;
+      this.cd.detectChanges();
     })
   }
 
