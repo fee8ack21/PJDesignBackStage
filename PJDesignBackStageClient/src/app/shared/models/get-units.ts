@@ -6,6 +6,7 @@ export class GetUnitsRequest {
   constructor(stageType?: number, templateType?: number, groupId?: number) {
     this.stageType = stageType;
     this.templateType = templateType;
+    this.groupId = groupId;
   }
 }
 

@@ -87,7 +87,7 @@ namespace App.BLL
                    {
                        UnitId = x.x.CUnitId,
                        UnitName = x.y.CName,
-                       url = $"type2/detail?id={x.x.CId}&uid={x.x.CUnitId}&status={x.x.CEditStatus}&isBefore=true",
+                       url = $"/type2/detail?id={x.x.CId}&uid={x.x.CUnitId}&status={x.x.CEditStatus}&isBefore=true",
                        Title = x.x.CTitle,
                        ContentId = x.x.CId,
                        EditDt = x.x.CEditDt,

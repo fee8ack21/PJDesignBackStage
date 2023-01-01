@@ -22,7 +22,7 @@ namespace App.BLL
             _repositoryWrapper = repositoryWrapper;
         }
 
-        public async Task<ResponseBase<List<GetUnitsResponse>>> GetUnits(GetUnitsRequest request, JwtPayload payload)
+        public async Task<ResponseBase<List<GetUnitsResponse>>> GetUnits(GetUnitsRequest request)
         {
             var response = new ResponseBase<List<GetUnitsResponse>>() { Entries = new List<GetUnitsResponse>() };
             try
@@ -273,30 +273,54 @@ namespace App.BLL
                     if (tblUnit == null) { throw new Exception("無此單元"); }
 
                     tblUnit.CName = request.Name;
-                    tblUnit.CTemplateType = request.TemplateType;
                     tblUnit.CIsAnotherWindow = request.IsAnotherWindow;
                     tblUnit.CIsEnabled = request.IsEnabled;
 
-                    switch (request.TemplateType)
+                    if (tblUnit.CTemplateType != request.TemplateType)
                     {
-                        case (int)TemplateType.無:
-                            tblUnit.CBackStageUrl = request.Url;
-                            tblUnit.CFrontStageUrl = request.Url;
-                            break;
-                        case (int)TemplateType.模板一:
-                            tblUnit.CBackStageUrl = $"/type1?uid={tblUnit.CId}";
-                            tblUnit.CFrontStageUrl = $"/Unit/Type1?uid={tblUnit.CId}";
-                            break;
-                        case (int)TemplateType.模板二:
-                            tblUnit.CBackStageUrl = $"/type2?uid={tblUnit.CId}";
-                            tblUnit.CFrontStageUrl = $"/Unit/Type2?uid={tblUnit.CId}";
-                            break;
+                        switch (tblUnit.CTemplateType)
+                        {
+                            case (int)TemplateType.模板一:
+                                if (
+                                    _repositoryWrapper.Type1ContentAfter.GetByCondition(x => x.CUnitId == tblUnit.CId).Any() ||
+                                    _repositoryWrapper.Type1ContentBefore.GetByCondition(x => x.CUnitId == tblUnit.CId).Any()
+                                    )
+                                {
+                                    throw new Exception("若單元已有內容，則不可切換模板。");
+                                }
+                                break;
+                            case (int)TemplateType.模板二:
+                                if (
+                                  _repositoryWrapper.Type2ContentAfter.GetByCondition(x => x.CUnitId == tblUnit.CId).Any() ||
+                                  _repositoryWrapper.Type2ContentBefore.GetByCondition(x => x.CUnitId == tblUnit.CId).Any()
+                                  )
+                                {
+                                    throw new Exception("若單元已有內容，則不可切換模板。");
+                                }
+                                break;
+                        }
+
+                        tblUnit.CTemplateType = request.TemplateType;
+
+                        switch (request.TemplateType)
+                        {
+                            case (int)TemplateType.無:
+                                tblUnit.CBackStageUrl = request.Url;
+                                tblUnit.CFrontStageUrl = request.Url;
+                                break;
+                            case (int)TemplateType.模板一:
+                                tblUnit.CBackStageUrl = $"/type1?uid={tblUnit.CId}";
+                                tblUnit.CFrontStageUrl = $"/Unit/Type1?uid={tblUnit.CId}";
+                                break;
+                            case (int)TemplateType.模板二:
+                                tblUnit.CBackStageUrl = $"/type2?uid={tblUnit.CId}";
+                                tblUnit.CFrontStageUrl = $"/Unit/Type2?uid={tblUnit.CId}";
+                                break;
+                        }
                     }
 
                     _repositoryWrapper.Unit.Update(tblUnit);
                     await _repositoryWrapper.SaveAsync();
-
-                    // Todo: 若更改TemplateType，比對當前是否尚有該單元的模板內容，有則失敗。
                 }
             }
             catch (Exception ex)

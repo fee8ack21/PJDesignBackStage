@@ -97,21 +97,21 @@
 
           <div class="d-flex justify-center pt-1">
             <ng-container *ngIf="editStatus != EditStatus.Review && editStatus != EditStatus.Reject">
-              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">返回列表</a>
               <button type="button" mat-raised-button color="primary" (click)="onSubmit($event)">送出</button>
             </ng-container>
 
             <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id == editorId">
               <button type="button" class="mr-1-i" mat-stroked-button color="primary"
                 (click)="openReviewNoteDialog()">查看備註</button>
-              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">返回列表</a>
               <button type="button" mat-raised-button color="primary" disabled>審核中</button>
             </ng-container>
 
             <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
               <button type="button" class="mr-1-i" mat-stroked-button color="primary"
                 (click)="openReviewNoteDialog()">查看備註</button>
-              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">返回列表</a>
               <button type="button" mat-stroked-button color="primary" (click)="onSubmit($event, EditStatus.Reject)"
                 class="mr-1-i">駁回</button>
               <button type="button" mat-raised-button color="primary"
@@ -121,7 +121,7 @@
             <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id == editorId">
               <button type="button" class="mr-1-i" mat-stroked-button color="primary"
                 (click)="openReviewNoteDialog()">查看備註</button>
-              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">返回列表</a>
               <button type="button" mat-raised-button color="primary"
                 (click)="onSubmit($event, EditStatus.Review)">駁回待編輯</button>
             </ng-container>
@@ -129,7 +129,7 @@
             <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id != editorId">
               <button type="button" class="mr-1-i" mat-stroked-button color="primary"
                 (click)="openReviewNoteDialog()">查看備註</button>
-              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">取消</a>
+              <a mat-stroked-button color="primary" class="mr-1-i" [routerLink]="['/portfolio']">返回列表</a>
               <button type="button" mat-raised-button color="primary" disabled>駁回待編輯</button>
             </ng-container>
           </div>

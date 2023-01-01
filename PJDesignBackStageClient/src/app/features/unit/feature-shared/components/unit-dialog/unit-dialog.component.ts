@@ -71,7 +71,7 @@ export class UnitDialogComponent extends BaseComponent implements OnInit {
 
     this.httpService.post<ResponseBase<string>>('unit/createOrUpdateUnit', request).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
-        this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
+        this.snackBarService.showSnackBar((response.message && response.message.length > 0) ? response.message : SnackBarService.RequestFailedText);
         return;
       }
 

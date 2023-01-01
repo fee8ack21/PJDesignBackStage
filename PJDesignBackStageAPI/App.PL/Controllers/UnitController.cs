@@ -28,8 +28,7 @@ namespace App.PL.Controllers
         [JwtFilter]
         public async Task<ResponseBase<List<GetUnitsResponse>>> GetUnits(GetUnitsRequest request)
         {
-            var payload = (JwtPayload)HttpContext.Items["jwtPayload"]!;
-            return await _service.GetUnits(request, payload);
+            return await _service.GetUnits(request);
         }
 
         /// <summary>

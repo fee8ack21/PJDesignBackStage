@@ -9,7 +9,7 @@ namespace App.BLL
 {
     public interface IUnitService
     {
-        Task<ResponseBase<List<GetUnitsResponse>>> GetUnits(GetUnitsRequest request, JwtPayload payload);
+        Task<ResponseBase<List<GetUnitsResponse>>> GetUnits(GetUnitsRequest request);
         Task<ResponseBase<GetSettingByUnitIdResponse>> GetSettingByUnitId(int id);
         Task<ResponseBase<string>> CreateOrUpdateSetting(CreateOrUpdateSettingRequest request, JwtPayload payload);
         Task<ResponseBase<string>> CreateOrUpdateUnit(CreateOrUpdateUnitRequest request);

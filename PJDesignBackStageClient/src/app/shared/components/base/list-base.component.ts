@@ -20,7 +20,6 @@ export abstract class ListBaseComponent extends BaseComponent {
   readonly editAndEnabledOptions = [{ name: '全部', value: EditAndEnabledOptions.全部 }, { name: '啟用', value: EditAndEnabledOptions.啟用 }, { name: '停用', value: EditAndEnabledOptions.停用 }, { name: '審核中', value: EditAndEnabledOptions.審核中 }, { name: '駁回', value: EditAndEnabledOptions.駁回 }]
 
   unitCategories: GetCategoriesByUnitId[] = [];
-  unitEnabledCategories: GetCategoriesByUnitId[] = [];
 
   constructor(protected unitService: UnitService, protected httpService: HttpService, protected snackBarService: SnackBarService, protected dialog: MatDialog) {
     super(unitService);
@@ -74,7 +73,6 @@ export abstract class ListBaseComponent extends BaseComponent {
       }
 
       this.unitCategories = response.entries ?? [];
-      this.unitEnabledCategories = response.entries?.filter(x => x.isEnabled) ?? [];
     });
   }
 
