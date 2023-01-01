@@ -96,9 +96,10 @@
           <mat-divider></mat-divider>
 
           <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
-            <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;">
+            <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;"
+              [ngClass]="{'mat-form-field-invalid': editReviewNoteErrFlag}">
               <mat-label>備註</mat-label>
-              <textarea matInput [(ngModel)]="editReviewNote"></textarea>
+              <textarea matInput [(ngModel)]="editReviewNote" (input)="listenReviewInputChange($event)"></textarea>
             </mat-form-field>
             <mat-divider></mat-divider>
           </ng-container>

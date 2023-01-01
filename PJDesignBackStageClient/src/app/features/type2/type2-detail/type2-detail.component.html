@@ -51,8 +51,7 @@
                 <span *ngIf="imageName.length > 0"
                   style="max-width: 60px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;align-self: baseline;"
                   class="mr-1-i">{{imageName}}</span>
-                <label style="align-self: baseline;" class="file-input-btn"
-                  [ngClass]="{'disabled': isPreventEdit()}">
+                <label style="align-self: baseline;" class="file-input-btn" [ngClass]="{'disabled': isPreventEdit()}">
                   <input type="file" accept="image/*" (change)="onPhotoUpload($event, 'image')"
                     [disabled]="isPreventEdit()">
                   上傳Banner圖
@@ -102,9 +101,10 @@
 
           <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
             <mat-divider class="mt-1"></mat-divider>
-            <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;">
+            <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;"
+              [ngClass]="{'mat-form-field-invalid': editReviewNoteErrFlag}">
               <mat-label>備註</mat-label>
-              <textarea matInput [(ngModel)]="editReviewNote"></textarea>
+              <textarea matInput [(ngModel)]="editReviewNote" (input)="listenReviewInputChange($event)"></textarea>
             </mat-form-field>
             <mat-divider></mat-divider>
           </ng-container>

@@ -86,12 +86,15 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
       e.preventDefault();
     }
 
+    let isValidate = true;
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
-      return;
+      isValidate = false;
+      this.editReviewNoteErrFlag = true;
     }
 
-    if (!this.validateForm(this.form)) { return; }
+    if (!this.validateForm(this.form)) { isValidate = false; }
+
+    if (!isValidate) { return; }
 
     let request: CreateOrUpdateType1ContentRequest = {
       ...this.form.value,

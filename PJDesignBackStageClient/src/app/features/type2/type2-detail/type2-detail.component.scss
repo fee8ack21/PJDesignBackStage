@@ -1,0 +1,8 @@
+::ng-deep {
+  .editor-invalid {
+    .angular-editor-textarea {
+      transition: 0.2s border-color;
+      border-color: #f44336 !important;
+    }
+  }
+}

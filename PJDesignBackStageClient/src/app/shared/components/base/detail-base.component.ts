@@ -35,6 +35,7 @@ export abstract class DetailBaseComponent extends BaseComponent {
   editorId?: number;
   editorName?: string;
   editCreateDt?: Date;
+  editReviewNoteErrFlag = false;
   editReviewNote: string | null;
   editReviewNotes: ReviewNote[] = [];
   contentCreateDt?: Date | null;
@@ -134,6 +135,12 @@ export abstract class DetailBaseComponent extends BaseComponent {
     return this.editReviewNote == null || this.editReviewNote.trim().length == 0;
   }
 
+  listenReviewInputChange(e: any): void {
+    if (this.editReviewNote != null && this.editReviewNote.length > 0) {
+      this.editReviewNoteErrFlag = false;
+    }
+  }
+
   isPreventEdit(): boolean {
     return this.editStatus == EditStatus.Review || (this.editStatus == EditStatus.Reject && this.administrator?.id != this.editorId);
   }
@@ -161,7 +168,7 @@ export abstract class DetailBaseComponent extends BaseComponent {
     });
   }
 
-  getCategories() {
+  getCategories(): void {
     if (!this.isUnitInit()) { return; }
 
     this.httpService.get<ResponseBase<GetCategoriesByUnitId[]>>(`category/getCategoriesByUnitId?id=${this.unit.id}`).subscribe(response => {
@@ -190,7 +197,7 @@ export abstract class DetailBaseComponent extends BaseComponent {
     })
   }
 
-  getListSelectedIDs(list: MatSelectionList) {
+  getListSelectedIDs(list: MatSelectionList): number[] {
     if (list?.selectedOptions?.selected == null) { return [] };
 
     let ids: number[] = [];

@@ -91,12 +91,15 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
   onSubmit(e: any, status: EditStatus = EditStatus.Review) {
     if (e !== undefined) { e.preventDefault(); }
 
+    let isValidate = true;
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
-      return;
+      isValidate = false;
+      this.editReviewNoteErrFlag = true;
     }
 
-    if (!this.validateForm(this.form)) { return; }
+    if (!this.validateForm(this.form)) { isValidate = false; }
+
+    if (!isValidate) { return; }
 
     let request: CreateOrUpdateQuestionRequest = {
       ...this.form.value,

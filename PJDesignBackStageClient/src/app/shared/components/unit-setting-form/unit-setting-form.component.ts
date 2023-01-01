@@ -94,7 +94,7 @@ export class UnitSettingFormComponent extends DetailBaseComponent implements OnI
 
   onSubmit(status = EditStatus.Review) {
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
+      this.editReviewNoteErrFlag = true;
       return;
     }
 

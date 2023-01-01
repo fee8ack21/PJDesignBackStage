@@ -125,15 +125,24 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
   onSubmit(e: any, status: EditStatus = EditStatus.Review) {
     if (e !== undefined) { e.preventDefault(); }
 
-    if (!this.validateForm(this.form)) { return; }
+    let isValidate = true;
+    let snackBarText = '';
+    if (!this.validateForm(this.form)) { isValidate = false; }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
-      return;
+      this.editReviewNoteErrFlag = true;
+      isValidate = false;
     }
 
     if (this.thumbnailUrl.length == 0) {
-      this.snackBarService.showSnackBar('請上傳縮圖');
+      snackBarText += '請上傳縮圖';
+      isValidate = false;
+    }
+
+    if (!isValidate) {
+      if (snackBarText.length > 0) {
+        this.snackBarService.showSnackBar(snackBarText);
+      }
       return;
     }
 

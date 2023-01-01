@@ -43,8 +43,7 @@
             <mat-divider></mat-divider>
             <div class="pt-1" [ngClass]="{'pb-1': editStatus == EditStatus.Review && administrator?.id != editorId}">
               <ng-container *ngIf="!isPreventEdit()">
-                <angular-editor
-                  [ngClass]="{'editor-invalid': validatorService.isFormControlInvalid(form, 'content')}"
+                <angular-editor [ngClass]="{'editor-invalid': validatorService.isFormControlInvalid(form, 'content')}"
                   [config]="editorConfig" formControlName="content">
                 </angular-editor>
               </ng-container>
@@ -60,9 +59,10 @@
 
           <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
             <mat-divider class="mt-1"></mat-divider>
-            <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;">
+            <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;"
+              [ngClass]="{'mat-form-field-invalid': editReviewNoteErrFlag}">
               <mat-label>備註</mat-label>
-              <textarea matInput [(ngModel)]="editReviewNote"></textarea>
+              <textarea matInput [(ngModel)]="editReviewNote" (input)="listenReviewInputChange($event)"></textarea>
             </mat-form-field>
             <mat-divider></mat-divider>
           </ng-container>

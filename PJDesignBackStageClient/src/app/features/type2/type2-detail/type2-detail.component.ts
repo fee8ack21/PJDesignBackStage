@@ -130,20 +130,33 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       e.preventDefault();
     }
 
-    if (!this.validateForm(this.form)) { return; }
+    let isValidate = true;
+    let snackBarText = '';
+    if (!this.validateForm(this.form)) { isValidate = false; }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
-      return;
+      this.editReviewNoteErrFlag = true;
+      isValidate = false;
     }
 
     if (this.thumbnailUrl.length == 0) {
-      this.snackBarService.showSnackBar('請上傳縮圖');
-      return;
+      isValidate = false;
+      snackBarText += '請上傳縮圖';
     }
 
     if (this.imageUrl.length == 0) {
-      this.snackBarService.showSnackBar('請上傳Banner圖');
+      isValidate = false;
+      if (snackBarText.length > 0) {
+        snackBarText += '及Banner圖';
+      } else {
+        snackBarText += '請上傳Banner圖';
+      }
+    }
+
+    if (!isValidate) {
+      if (snackBarText.length > 0) {
+        this.snackBarService.showSnackBar(snackBarText);
+      }
       return;
     }
 

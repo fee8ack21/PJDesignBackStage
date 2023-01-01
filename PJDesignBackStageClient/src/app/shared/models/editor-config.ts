@@ -11,7 +11,6 @@ export let defaultEditorConfig: AngularEditorConfig = {
   translate: 'yes',
   enableToolbar: true,
   showToolbar: true,
-  placeholder: '請填寫內容...',
   defaultParagraphSeparator: '',
   defaultFontName: '',
   defaultFontSize: '',

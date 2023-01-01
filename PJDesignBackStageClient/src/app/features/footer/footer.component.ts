@@ -162,7 +162,7 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
 
   async onSubmit(status = EditStatus.Review) {
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
-      this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);
+      this.editReviewNoteErrFlag = true;
       return;
     }
 
