@@ -125,10 +125,7 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
   onSubmit(e: any, status: EditStatus = EditStatus.Review) {
     if (e !== undefined) { e.preventDefault(); }
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (!this.validateForm(this.form)) { return; }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
       this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);

@@ -130,10 +130,7 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
       e.preventDefault();
     }
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (!this.validateForm(this.form)) { return; }
 
     if (status == EditStatus.Reject && this.isReviewNoteEmpty()) {
       this.snackBarService.showSnackBar(SnackBarService.ReviewErrorText);

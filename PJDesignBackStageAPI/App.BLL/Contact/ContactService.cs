@@ -23,23 +23,15 @@ namespace App.BLL
         {
             var response = new ResponseBase<List<GetContactsResponse>>() { Entries = new List<GetContactsResponse>() };
 
-            try
+            response.Entries = await _repositoryWrapper.Contact.GetAll().OrderBy(x => x.CId).Select(x => new GetContactsResponse
             {
-                response.Entries = await _repositoryWrapper.Contact.GetAll().OrderBy(x => x.CId).Select(x => new GetContactsResponse
-                {
-                    Id = x.CId,
-                    Name = x.CName,
-                    Content = x.CContent,
-                    Email = x.CEmail,
-                    Phone = x.CPhone,
-                    CreateDt = x.CCreateDt
-                }).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-                response.StatusCode = StatusCode.Fail;
-            }
+                Id = x.CId,
+                Name = x.CName,
+                Content = x.CContent,
+                Email = x.CEmail,
+                Phone = x.CPhone,
+                CreateDt = x.CCreateDt
+            }).ToListAsync();
 
             return response;
         }

@@ -53,10 +53,7 @@ export class CategoryDialogComponent extends BaseComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (!this.validateForm(this.form)) { return; }
 
     if (!this.data.isEdit) {
       let request = new CreateCategoryRequest(this.data.unitId, this.form.value['name'], this.form.value['isEnabled']);

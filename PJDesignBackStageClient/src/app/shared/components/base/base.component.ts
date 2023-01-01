@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { FormControlErrorType, PageStatus, EditStatus } from '../../models/enums';
 import { UnitService } from '../../services/unit-service';
 
@@ -39,5 +40,12 @@ export abstract class BaseComponent {
 
     const params = new URLSearchParams(url.split('?')[1]);
     return Object.fromEntries(params.entries());
+  }
+
+  validateForm(form: FormGroup) {
+    if (!form.invalid) { return true; }
+
+    form.markAllAsTouched();
+    return false;
   }
 }

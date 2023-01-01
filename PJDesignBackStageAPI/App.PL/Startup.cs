@@ -1,9 +1,13 @@
 ﻿using App.BLL;
 using App.DAL.Contexts;
 using App.DAL.Repositories;
+using App.Enum;
+using App.Model;
 using App.PL.HostedServices;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +19,7 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 
 namespace App.PL
 {
@@ -121,6 +126,18 @@ namespace App.PL
             });
 
             app.UseCors("CorsPolicy");
+            app.UseExceptionHandler(c =>
+            {
+                c.Run(async context =>
+                {
+                    var ex = context.Features.Get<IExceptionHandlerPathFeature>();
+                    var response = new ResponseBase<string>() { StatusCode = StatusCode.Fail, Message = ex?.Error?.Message ?? "Internal Server Error." };
+
+                    context.Response.StatusCode = (int)StatusCodes.Status200OK;
+                    context.Response.ContentType = "application/json";
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                });
+            });
             app.UseHttpsRedirection();
 
             app.UseRouting();

@@ -82,10 +82,7 @@ export class AdministratorDetailComponent extends DetailBaseComponent implements
   }
 
   onSubmit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (!this.validateForm(this.form)) { return; }
 
     let request: CreateOrUpdateAdministratorRequest = { ...this.form.value };
 

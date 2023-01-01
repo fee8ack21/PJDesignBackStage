@@ -20,7 +20,7 @@ import { GetType1ContentResponse } from './feature-shared/models/get-type1-conte
   styleUrls: ['./type1.component.scss']
 })
 export class Type1Component extends DetailBaseComponent implements OnInit {
-  type1Form: FormGroup;
+  form: FormGroup;
 
   constructor(
     protected httpService: HttpService,
@@ -45,14 +45,14 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
   }
 
   initForm() {
-    this.type1Form = new FormGroup({
+    this.form = new FormGroup({
       unitId: new FormControl(null),
       content: new FormControl(null, [Validators.required]),
     });
   }
 
   updateForm(data: GetType1ContentResponse) {
-    this.type1Form.patchValue({
+    this.form.patchValue({
       unitId: this.unit.id,
       content: data.content
     })
@@ -76,7 +76,7 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
         response.entries?.afterId
       );
 
-      this.handleFormStatus(this.type1Form);
+      this.handleFormStatus(this.form);
       this.updateForm(response.entries!);
     });
   }
@@ -91,13 +91,10 @@ export class Type1Component extends DetailBaseComponent implements OnInit {
       return;
     }
 
-    if (this.type1Form.invalid) {
-      this.type1Form.markAllAsTouched();
-      return;
-    }
+    if (!this.validateForm(this.form)) { return; }
 
     let request: CreateOrUpdateType1ContentRequest = {
-      ...this.type1Form.value,
+      ...this.form.value,
       editStatus: status,
     };
 

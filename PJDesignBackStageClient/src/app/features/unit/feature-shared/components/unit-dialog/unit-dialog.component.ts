@@ -62,10 +62,7 @@ export class UnitDialogComponent extends BaseComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (!this.validateForm(this.form)) { return; }
 
     let request: CreateOrUpdateUnitRequest = { ...this.form.value };
 

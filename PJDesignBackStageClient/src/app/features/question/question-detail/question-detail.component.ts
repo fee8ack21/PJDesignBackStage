@@ -96,10 +96,7 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
       return;
     }
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (!this.validateForm(this.form)) { return; }
 
     let request: CreateOrUpdateQuestionRequest = {
       ...this.form.value,
