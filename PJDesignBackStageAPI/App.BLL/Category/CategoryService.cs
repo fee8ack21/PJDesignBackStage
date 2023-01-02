@@ -43,11 +43,7 @@ namespace App.BLL
         {
             var response = new ResponseBase<string>();
 
-            var tblCategory = new TblCategory();
-            tblCategory.CUnitId = request.UnitId;
-            tblCategory.CName = request.Name;
-            tblCategory.CIsEnabled = request.IsEnabled;
-
+            var tblCategory = new TblCategory() { CUnitId = request.UnitId, CName = request.Name, CIsEnabled = request.IsEnabled };
             _repositoryWrapper.Category.Create(tblCategory);
             await _repositoryWrapper.SaveAsync();
 
@@ -57,7 +53,7 @@ namespace App.BLL
         public async Task<ResponseBase<string>> UpdateCategories(IEnumerable<UpdateCategoriesRequest> requests)
         {
             var response = new ResponseBase<string>();
-            
+
             foreach (var request in requests)
             {
                 var tblCategory = await _repositoryWrapper.Category.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();

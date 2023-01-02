@@ -66,7 +66,7 @@ export class UnitSettingFormComponent extends DetailBaseComponent implements OnI
         response.entries?.editorName,
         response.entries?.createDt,
         response.entries?.editStatus,
-        toCamel(response.entries?.notes) as ReviewNote[] ?? [])
+        response.entries?.notes as ReviewNote[] ?? [])
       this.updateSetting(response.entries?.content as UnitSetting)
     });
   }
@@ -83,7 +83,10 @@ export class UnitSettingFormComponent extends DetailBaseComponent implements OnI
     this.imageFile = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
     this.imageName = this.imageFile.name;
 
-    this.httpService.post<ResponseBase<string>>('upload/uploadPhoto', new FormData().append('image', this.imageFile, this.imageFile.name), { headers: new HttpHeaders() }).subscribe(response => {
+    const formData = new FormData();
+    formData.append('image', this.imageFile, this.imageFile.name);
+
+    this.httpService.post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() }).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
         this.snackBarService.showSnackBar(SnackBarService.RequestFailedText);
         return;

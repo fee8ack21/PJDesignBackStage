@@ -4,46 +4,453 @@
       <mat-card-content>
         <h2>{{unit.name}}</h2>
         <mat-divider></mat-divider>
-        <div class="pt-2 pb-1 px-2">
-          <mat-tab-group>
-            <mat-tab label="自定義區塊">
-              <div class="p-1">
-                自定義區塊
+        <button *ngIf="!isPreventEdit()" mat-stroked-button class="mt-2-i mb-1-i" (click)="addSection()">新增區塊</button>
+        <div *ngIf="sections && sections.length == 0" class="py-1">
+          <h2 class="text-center">
+            無區塊資料
+          </h2>
+        </div>
+        <div *ngIf="sections && sections.length > 0" cdkDropList class="cdk-drop-list mb-1-i"
+          [ngClass]="{'mt-2-i': isPreventEdit()}" (cdkDropListDropped)="drop($event, sections)">
+          <cdk-accordion class="cdk-accordion">
+            <cdk-accordion-item *ngFor="let item of sections; let index = index;" cdkDrag
+              [cdkDragDisabled]="isPreventEdit()" #accordionItem="cdkAccordionItem" class="cdk-accordion-item"
+              role="button" tabindex="0" [attr.id]="'accordion-header-' + index"
+              [attr.aria-expanded]="accordionItem.expanded" [attr.aria-controls]="'accordion-body-' + index">
+              <div class="cdk-accordion-item-header"
+                [ngStyle]="{'text-decoration': item.isEnabled ? 'none' : 'line-through'}">
+                <button mat-icon-button class="mr-1-i" (click)="accordionItem.toggle()">
+                  <mat-icon>{{accordionItem.expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}</mat-icon>
+                </button>
+                {{ getSectionTypeName(item.type) }}
+                <button *ngIf="!isPreventEdit()" mat-icon-button class="ml-auto" (click)="removeSection(item.id)"
+                  style="position: absolute;right: 16px;top: 15px;">
+                  <mat-icon>close</mat-icon>
+                </button>
               </div>
-            </mat-tab>
-            <mat-tab label="單元區塊">
-              <div class="py-2 px-3">
-                <div class="d-flex justify-space-between items-center">
-                  <mat-form-field appearance="fill">
-                    <mat-label>Type2 單元</mat-label>
-                    <mat-select>
-                      <mat-option *ngFor="let item of type2Units" [value]="item.id">
-                        {{item.name}}
-                      </mat-option>
+              <div style="background-color: #f9f9f9;" [style.display]="accordionItem.expanded ? '' : 'none'"
+                class="d-flex justify-space-between flex-wrap pt-1 pb-2 px-2">
+                <mat-form-field appearance="fill" class="w-48">
+                  <mat-label>區塊類別</mat-label>
+                  <mat-select [disabled]="isPreventEdit()" [(ngModel)]="item.type">
+                    <mat-option *ngFor="let type of sectionTypes" [value]="type.type">{{type.name}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="fill" class="w-48">
+                  <mat-label>狀態</mat-label>
+                  <mat-select [disabled]="isPreventEdit()" [(ngModel)]="item.isEnabled">
+                    <mat-option [value]="true">啟用</mat-option>
+                    <mat-option [value]="false">停用</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <!-- Type1, 2 -->
+                <ng-container *ngIf="item.type == undefined || item.type == 1 || item.type == 2">
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>標題</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.title">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>標題顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.titleColor" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>內文</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.text" rows="1"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>內文顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.textColor" type="color">
+                  </mat-form-field>
+                  <div class="d-flex items-center w-48">
+                    <img style="max-width: 100px;object-position: center;object-fit: cover;max-height: 52px;"
+                      *ngIf="item.data.imageUrl != undefined && item.data.imageUrl.length > 0"
+                      [src]="item.data.imageUrl" alt="">
+                    <span
+                      style="max-width: 100px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;"
+                      class="mx-1-i"
+                      *ngIf="item.data.imageName != undefined && item.data.imageName.length > 0">{{item.data.imageName}}</span>
+                    <label class="file-input-btn" *ngIf="!isPreventEdit()" [ngClass]="{'disabled': isPreventEdit()}">
+                      <input type="file" accept="image/*" (change)="onPhotoUpload($event, item.id, 'image')">
+                      上傳圖片
+                    </label>
+                  </div>
+                  <div class="d-flex items-center w-48">
+                    <img style="max-width: 100px;object-position: center;object-fit: cover;max-height: 52px;"
+                      *ngIf="item.data.backgroundImageUrl != undefined && item.data.backgroundImageUrl.length > 0"
+                      [src]="item.data.backgroundImageUrl" alt="">
+                    <span
+                      style="max-width: 100px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;"
+                      class="mx-1-i"
+                      *ngIf="item.data.backgroundImageName != undefined && item.data.backgroundImageName.length > 0">{{item.data.backgroundImageName}}</span>
+                    <label class="file-input-btn" *ngIf="!isPreventEdit()" [ngClass]="{'disabled': isPreventEdit()}">
+                      <input type="file" accept="image/*" (change)="onPhotoUpload($event, item.id, 'backgroundImage')">
+                      上傳背景圖片
+                    </label>
+                  </div>
+                </ng-container>
+                <!-- Type3, 4 -->
+                <ng-container *ngIf="item.type == 3 || item.type == 4">
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>標題</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.title">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>標題顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.titleColor" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>內文</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1" [(ngModel)]="item.data.text"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>內文顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.textColor" type="color">
+                  </mat-form-field>
+
+                  <div class="d-flex items-center w-48">
+                    <img style="max-width: 100px;object-position: center;object-fit: cover;max-height: 52px;"
+                      *ngIf="item.data.backgroundImageUrl != undefined && item.data.backgroundImageUrl.length > 0"
+                      [src]="item.data.backgroundImageUrl" alt="">
+                    <span
+                      style="max-width: 100px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;"
+                      class="mx-1-i"
+                      *ngIf="item.data.backgroundImageName != undefined && item.data.backgroundImageName.length > 0">{{item.data.backgroundImageName}}</span>
+                    <label class="file-input-btn" *ngIf="!isPreventEdit()" [ngClass]="{'disabled': isPreventEdit()}">
+                      <input type="file" accept="image/*" (change)="onPhotoUpload($event, item.id, 'backgroundImage')">
+                      上傳背景圖片
+                    </label>
+                  </div>
+
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>按鈕文字</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.btnText">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>按鈕顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.btnTextColor" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>按鈕外框顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.btnBorderColor" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>按鈕連結</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.btnUrl">
+                  </mat-form-field>
+                </ng-container>
+                <!-- Type5 -->
+                <ng-container *ngIf="item.type == 5">
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>標題</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.title">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>標題顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.titleColor" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>內文</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1" [(ngModel)]="item.data.text"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>內文顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.textColor" type="color">
+                  </mat-form-field>
+                </ng-container>
+                <!-- Type6 -->
+                <ng-container *ngIf="item.type == 6">
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>背景顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.backgroundColor" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題一</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle1">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題一顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle1Color" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文一</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1"
+                      [(ngModel)]="item.data.smallText1"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文一顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallText1Color" type="color">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題二</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle2">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題二顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle2Color" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文二</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1"
+                      [(ngModel)]="item.data.smallText2"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文二顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallText2Color" type="color">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題三</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle3">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題三顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle3Color" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文三</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1"
+                      [(ngModel)]="item.data.smallText3"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文三顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallText3Color" type="color">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題四</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle4">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題四顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle4Color" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文四</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1"
+                      [(ngModel)]="item.data.smallText4"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文四顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallText4Color" type="color">
+                  </mat-form-field>
+                </ng-container>
+                <!-- Type7 -->
+                <ng-container *ngIf="item.type == 7">
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>背景顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.backgroundColor" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>標題</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.title">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>標題顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.titleColor" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>英文標題</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.engTitle" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>英文標題顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.engTitleColor" type="color">
+                  </mat-form-field>
+
+                  <div class="d-flex items-center w-48">
+                    <img style="max-width: 100px;object-position: center;object-fit: cover;max-height: 52px;"
+                      *ngIf="item.data.smallIconUrl1 != undefined && item.data.smallIconUrl1.length > 0"
+                      [src]="item.data.smallIconUrl1" alt="">
+                    <span
+                      style="max-width: 100px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;"
+                      class="mx-1-i"
+                      *ngIf="item.data.smallIconName1 != undefined && item.data.smallIconName1.length > 0">{{item.data.smallIconName1}}</span>
+                    <label class="file-input-btn" *ngIf="!isPreventEdit()" [ngClass]="{'disabled': isPreventEdit()}">
+                      <input type="file" accept="image/*" (change)="onPhotoUpload($event, item.id, 'smallIcon1')">
+                      上傳小圖案一
+                    </label>
+                  </div>
+
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題一</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle1">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題一顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle1Color" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文一</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1"
+                      [(ngModel)]="item.data.smallText1"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文一顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallText1Color" type="color">
+                  </mat-form-field>
+
+                  <div class="d-flex items-center w-48">
+                    <img style="max-width: 100px;object-position: center;object-fit: cover;max-height: 52px;"
+                      *ngIf="item.data.smallIconUrl2 != undefined && item.data.smallIconUrl2.length > 0"
+                      [src]="item.data.smallIconUrl2" alt="">
+                    <span
+                      style="max-width: 100px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;"
+                      class="mx-1-i"
+                      *ngIf="item.data.smallIconName2 != undefined && item.data.smallIconName2.length > 0">{{item.data.smallIconName2}}</span>
+                    <label class="file-input-btn" *ngIf="!isPreventEdit()" [ngClass]="{'disabled': isPreventEdit()}">
+                      <input type="file" accept="image/*" (change)="onPhotoUpload($event, item.id, 'smallIcon2')">
+                      上傳小圖案二
+                    </label>
+                  </div>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題二</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle2">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題二顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle2Color" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文二</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1"
+                      [(ngModel)]="item.data.smallText2"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文二顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallText2Color" type="color">
+                  </mat-form-field>
+
+                  <div class="d-flex items-center w-48">
+                    <img style="max-width: 100px;object-position: center;object-fit: cover;max-height: 52px;"
+                      *ngIf="item.data.smallIconUrl3 != undefined && item.data.smallIconUrl3.length > 0"
+                      [src]="item.data.smallIconUrl3" alt="">
+                    <span
+                      style="max-width: 100px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;"
+                      class="mx-1-i"
+                      *ngIf="item.data.smallIconName3 != undefined && item.data.smallIconName3.length > 0">{{item.data.smallIconName3}}</span>
+                    <label class="file-input-btn" *ngIf="!isPreventEdit()" [ngClass]="{'disabled': isPreventEdit()}">
+                      <input type="file" accept="image/*" (change)="onPhotoUpload($event, item.id, 'smallIcon3')">
+                      上傳小圖案三
+                    </label>
+                  </div>
+
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題三</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle3">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題三顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle3Color" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文三</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1"
+                      [(ngModel)]="item.data.smallText3"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文三顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallText3Color" type="color">
+                  </mat-form-field>
+
+                  <div class="d-flex items-center w-48">
+                    <img style="max-width: 100px;object-position: center;object-fit: cover;max-height: 52px;"
+                      *ngIf="item.data.smallIconUrl4 != undefined && item.data.smallIconUrl4.length > 0"
+                      [src]="item.data.smallIconUrl4" alt="">
+                    <span
+                      style="max-width: 100px;overflow-x: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis;"
+                      class="mx-1-i"
+                      *ngIf="item.data.smallIconName4 != undefined && item.data.smallIconName4.length > 0">{{item.data.smallIconName4}}</span>
+                    <label *ngIf="!isPreventEdit()" [ngClass]="{'disabled': isPreventEdit()}" class="file-input-btn">
+                      <input type="file" accept="image/*" (change)="onPhotoUpload($event, item.id, 'smallIcon4')">
+                      上傳小圖案四
+                    </label>
+                  </div>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題四</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle4">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小標題四顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallTitle4Color" type="color">
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文四</mat-label>
+                    <textarea matInput [disabled]="isPreventEdit()" rows="1"
+                      [(ngModel)]="item.data.smallText4"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>小內文四顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.smallText4Color" type="color">
+                  </mat-form-field>
+                </ng-container>
+                <!-- Type8, 9, 10 -->
+                <ng-container *ngIf="type2Units.length > 0 && (item.type == 8 || item.type == 9 || item.type == 10)">
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>Type2單元</mat-label>
+                    <mat-select [disabled]="isPreventEdit()" [(ngModel)]="item.data.unitId">
+                      <mat-option *ngFor="let item of type2Units" [value]="item.id">{{item.name}}</mat-option>
                     </mat-select>
                   </mat-form-field>
-                  <mat-form-field appearance="fill">
-                    <mat-label>單元模板</mat-label>
-                    <mat-select>
-                      <mat-option *ngFor="let item of type2TemplateTypes" [value]="item.id">
-                        {{item.name}}
-                      </mat-option>
-                    </mat-select>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>背景顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.backgroundColor" type="color">
                   </mat-form-field>
-                  <mat-form-field appearance="fill">
-                    <mat-label>排序</mat-label>
-                    <input matInput type="number">
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>標題顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.titleColor" type="color" />
                   </mat-form-field>
-                  <button type="button" mat-stroked-button color="basic" [disabled]="isPreventEdit()"
-                    style="position: relative;top: 8px;align-self: baseline;">移除</button>
-                </div>
-                <button mat-raised-button color="primary" class="w-100">新增</button>
+                  <mat-form-field appearance="fill" class="w-48">
+                    <mat-label>英文標題顏色</mat-label>
+                    <input matInput [disabled]="isPreventEdit()" [(ngModel)]="item.data.engTitleColor" type="color">
+                  </mat-form-field>
+                </ng-container>
               </div>
-            </mat-tab>
-          </mat-tab-group>
-          <div class="my-1">
-            <mat-checkbox class="example-margin">是否呈現作品集</mat-checkbox>
-          </div>
+            </cdk-accordion-item>
+          </cdk-accordion>
+        </div>
+        <mat-divider></mat-divider>
+
+        <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+          <mat-form-field appearance="fill" class="w-100-i mt-1-i" style="max-width:none;"
+            [ngClass]="{'mat-form-field-invalid': editReviewNoteErrFlag}">
+            <mat-label>備註</mat-label>
+            <textarea matInput [(ngModel)]="editReviewNote" (input)="listenReviewInputChange($event)"></textarea>
+          </mat-form-field>
+          <mat-divider></mat-divider>
+        </ng-container>
+
+        <div class="d-flex justify-center pt-1">
+          <ng-container *ngIf="editStatus != EditStatus.Review && editStatus != EditStatus.Reject">
+            <button type="button" mat-raised-button color="primary" (click)="onSubmit(EditStatus.Review)">送出</button>
+          </ng-container>
+
+          <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id == editorId">
+            <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+              (click)="openReviewNoteDialog()">查看備註</button>
+            <button type="button" mat-raised-button color="primary" disabled>審核中</button>
+          </ng-container>
+
+          <ng-container *ngIf="editStatus == EditStatus.Review && administrator?.id != editorId">
+            <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+              (click)="openReviewNoteDialog()">查看備註</button>
+            <button type="button" mat-stroked-button color="primary" (click)="onSubmit(EditStatus.Reject)"
+              class="mr-1-i">駁回</button>
+            <button type="button" mat-raised-button color="primary" (click)="onSubmit(EditStatus.Approve)">批准</button>
+          </ng-container>
+
+          <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id == editorId">
+            <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+              (click)="openReviewNoteDialog()">查看備註</button>
+            <button type="button" mat-raised-button color="primary" (click)="onSubmit(EditStatus.Review)">駁回待編輯</button>
+          </ng-container>
+
+          <ng-container *ngIf="editStatus == EditStatus.Reject && administrator?.id != editorId">
+            <button type="button" class="mr-1-i" mat-stroked-button color="primary"
+              (click)="openReviewNoteDialog()">查看備註</button>
+            <button type="button" mat-raised-button color="primary" disabled>駁回待編輯</button>
+          </ng-container>
         </div>
       </mat-card-content>
     </mat-card>

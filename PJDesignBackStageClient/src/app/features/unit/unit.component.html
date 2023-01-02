@@ -1,7 +1,7 @@
 <div class="d-flex justify-center my-1">
   <div class="w-95">
     <mat-card>
-      <mat-card-content>
+      <mat-card-content style="overflow-x: hidden;">
         <h2>{{unit.name}}</h2>
         <mat-divider></mat-divider>
         <button mat-stroked-button class="mt-2-i mb-1-i" (click)="openDialog()">新增母節點</button>
@@ -36,7 +36,7 @@
               <div *ngIf="item.children != null && item.children.length > 0" cdkDropList
                 (cdkDropListDropped)="drop($event, item.children)" class="cdk-accordion-item-body" role="region"
                 [style.display]="accordionItem.expanded ? '' : 'none'" [attr.id]="'accordion-body-' + index"
-                [attr.aria-labelledby]="'accordion-header-' + index">
+                [attr.aria-labelledby]="'accordion-header-' + index" style="width:calc(100% - 40px)">
                 <div class="cdk-box" *ngFor="let child of item.children" cdkDrag
                   [ngStyle]="{'text-decoration': child.isEnabled ? 'none' : 'line-through'}">
                   {{child.name}}

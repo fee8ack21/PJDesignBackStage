@@ -22,6 +22,11 @@ namespace App.PL.Controllers
         [JwtFilter]
         public async Task<ResponseBase<string>> UploadPhoto([FromForm] IFormFile image)
         {
+            if (image == null)
+            {
+                throw new Exception("請求錯誤");
+            }
+
             var response = new ResponseBase<string>();
             var hostUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}"; ;
             var fileLength = image.Length;

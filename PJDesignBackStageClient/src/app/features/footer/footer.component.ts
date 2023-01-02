@@ -195,5 +195,4 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
       this.handleSettingResponse(await this.getSettingByUnitIdPromise());
     })
   }
-
 }

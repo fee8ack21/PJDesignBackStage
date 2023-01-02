@@ -135,7 +135,7 @@ namespace App.PL
 
                     context.Response.StatusCode = (int)StatusCodes.Status200OK;
                     context.Response.ContentType = "application/json";
-                    await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(response, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
                 });
             });
             app.UseHttpsRedirection();

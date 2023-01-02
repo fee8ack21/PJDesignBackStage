@@ -3,3 +3,147 @@
     width: 100% !important;
   }
 }
+
+.cdk-drop-list {
+  width: 100%;
+  max-width: 100%;
+  min-height: 60px;
+  display: block;
+  background: white;
+  border-radius: 4px;
+}
+
+.cdk-box {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 20px 10px;
+  padding-left: 32px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.87);
+  background: white;
+  box-sizing: border-box;
+  cursor: move;
+
+  &:hover {
+    background-color: #eee;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 39.5px;
+    left: 0px;
+    height: 1px;
+    width: 20px;
+    background-color: #ccc;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0px;
+    height: 100%;
+    width: 1px;
+    background-color: #ccc;
+  }
+
+  &:last-child {
+    border: none;
+    &::after {
+      height: 50%;
+      top: 0px;
+    }
+  }
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-box .cdk-drop-list.cdk-drop-list-dragging .cdk-box:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-accordion {
+  display: block;
+}
+
+.cdk-accordion-item {
+  position: relative;
+  display: block;
+  border-bottom: 1px solid #ccc;
+  cursor: move !important;
+
+  &:first-child {
+    border-top: 1px solid transparent;
+  }
+  &:last-child {
+    border-color: transparent;
+
+    .cdk-accordion-item-header {
+      border-bottom: solid 1px transparent;
+    }
+  }
+}
+
+.cdk-accordion-item + .cdk-accordion-item {
+  border-top: none;
+}
+
+.cdk-accordion-item-header {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid transparent !important;
+  cursor: move !important;
+}
+
+.cdk-accordion-item-description {
+  font-size: 0.85em;
+  color: #999;
+}
+
+.cdk-accordion-item-body {
+  position: relative;
+  padding: 0 20px 0 20px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -37px;
+    left: 20px;
+    width: 1px;
+    height: 40px;
+    background-color: #ccc;
+  }
+}
+
+.cdk-accordion-item-header:hover {
+  cursor: pointer;
+  background-color: #eee;
+}
+
+.cdk-accordion-item:first-child {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.cdk-accordion-item:last-child {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}

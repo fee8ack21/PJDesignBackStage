@@ -106,7 +106,7 @@ namespace App.BLL
                        y
                    }).FirstOrDefault();
 
-                if (portfolio == null) { throw new Exception("無此問題"); }
+                if (portfolio == null) { throw new Exception("無此作品"); }
 
                 response.Entries.Id = portfolio.x.x.CId;
                 response.Entries.AfterId = portfolio.x.x.CAfterId;
@@ -150,7 +150,7 @@ namespace App.BLL
                            y
                        }).FirstOrDefault();
 
-                if (portfolio == null) { throw new Exception("無此問題"); }
+                if (portfolio == null) { throw new Exception("無此作品"); }
 
                 response.Entries.Id = portfolio.x.x.CId;
                 response.Entries.AfterId = null;

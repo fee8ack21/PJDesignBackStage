@@ -1,4 +1,3 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ListBaseComponent } from 'src/app/shared/components/base/list-base.component';
@@ -98,24 +97,6 @@ export class UnitComponent extends ListBaseComponent implements OnInit {
     };
   }
 
-  toggleNodeStatus(id: number) {
-    this.units.forEach(u => {
-      if (u.id == id) {
-        u.isEnabled = !u.isEnabled;
-        return;
-      }
-
-      if (u.children != null) {
-        u.children.forEach(c => {
-          if (c.id == id) {
-            c.isEnabled = !c.isEnabled;
-            return;
-          }
-        })
-      }
-    })
-  }
-
   openDialog(unit?: UnitList, parent?: number): void {
     const dialogRef = this.dialog.open(UnitDialogComponent, {
       width: '300px',
@@ -127,10 +108,6 @@ export class UnitComponent extends ListBaseComponent implements OnInit {
         this.handleUnitsResponse(await this.getFrontStageUnitsPromise());
       }
     });
-  }
-
-  drop(event: CdkDragDrop<string[]>, list: any) {
-    moveItemInArray(list, event.previousIndex, event.currentIndex);
   }
 
   getUpdateUnitsSortRequest(): UpdateUnitsSortRequest[] {

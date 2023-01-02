@@ -115,7 +115,7 @@ namespace App.BLL
 
                     if (tblGroup.CName != request.Name)
                     {
-                        if (_repositoryWrapper.Group.GetByCondition(x => x.CName == request.Name).Any())
+                        if (await _repositoryWrapper.Group.GetByCondition(x => x.CName == request.Name).AnyAsync())
                         {
                             throw new Exception("此組別名稱已存在");
                         }

@@ -21,7 +21,7 @@ namespace App.BLL
         public async Task<ResponseBase<AuthLoginResponse>> Login(AuthLoginRequest request)
         {
             var response = new ResponseBase<AuthLoginResponse>() { Entries = new AuthLoginResponse() };
-            
+
             var administrator = await _repositoryWrapper.Administrator.GetByCondition(x => x.CAccount == request.Account).FirstOrDefaultAsync();
             if (administrator == null)
             {
@@ -50,6 +50,12 @@ namespace App.BLL
                 await _repositoryWrapper.SaveAsync();
 
                 throw new Exception("嘗試登入達三次，帳戶停用");
+            }
+            else
+            {
+                administrator.CLoginAttemptCount = 0;
+                _repositoryWrapper.Administrator.Update(administrator);
+                await _repositoryWrapper.SaveAsync();
             }
 
             var tblAdministratorGroup = await _repositoryWrapper.AdministratorGroup.GetByCondition(x => x.CAdministratorId == administrator.CId).FirstOrDefaultAsync();

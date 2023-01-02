@@ -1,3 +1,4 @@
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormControlErrorType, PageStatus, EditStatus } from '../../models/enums';
@@ -47,5 +48,9 @@ export abstract class BaseComponent {
 
     form.markAllAsTouched();
     return false;
+  }
+
+  drop(event: CdkDragDrop<string[]>, list: any) {
+    moveItemInArray(list, event.previousIndex, event.currentIndex);
   }
 }

@@ -23,7 +23,7 @@ namespace App.BLL
         {
             var response = new ResponseBase<List<GetReviewsResponse>>() { Entries = new List<GetReviewsResponse>() };
         
-            var setting = await _repositoryWrapper.SettingBefore.GetByCondition(x => x.CEditorId != payload.Id)
+            var settings = await _repositoryWrapper.SettingBefore.GetByCondition(x => x.CEditorId != payload.Id)
             .Join(_repositoryWrapper.Unit.GetAll(), x => x.CUnitId, y => y.CId, (x, y) => new { x, y })
             .Join(_repositoryWrapper.Administrator.GetAll(), x => x.x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
             {
@@ -38,7 +38,7 @@ namespace App.BLL
                 EditorName = y.CName
             }).ToListAsync();
 
-            var question = await _repositoryWrapper.QuestionBefore.GetByCondition(x => x.CEditorId != payload.Id)
+            var questions = await _repositoryWrapper.QuestionBefore.GetByCondition(x => x.CEditorId != payload.Id)
                 .Join(_repositoryWrapper.Administrator.GetAll(), x => x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                 {
                     UnitId = (int)UnitId.常見問題,
@@ -52,7 +52,7 @@ namespace App.BLL
                     EditorName = y.CName
                 }).ToListAsync();
 
-            var portfolio = await _repositoryWrapper.PortfolioBefore.GetByCondition(x => x.CEditorId != payload.Id)
+            var portfolios = await _repositoryWrapper.PortfolioBefore.GetByCondition(x => x.CEditorId != payload.Id)
                 .Join(_repositoryWrapper.Administrator.GetAll(), x => x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                 {
                     UnitId = (int)UnitId.作品集,
@@ -66,7 +66,7 @@ namespace App.BLL
                     EditorName = y.CName
                 }).ToListAsync();
 
-            var type1 = await _repositoryWrapper.Type1ContentBefore.GetByCondition(x => x.CEditorId != payload.Id)
+            var type1Contents = await _repositoryWrapper.Type1ContentBefore.GetByCondition(x => x.CEditorId != payload.Id)
               .Join(_repositoryWrapper.Unit.GetAll(), x => x.CUnitId, y => y.CId, (x, y) => new { x, y })
               .Join(_repositoryWrapper.Administrator.GetAll(), x => x.x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
               {
@@ -80,7 +80,7 @@ namespace App.BLL
                   EditorName = y.CName
               }).ToListAsync();
 
-            var type2 = await _repositoryWrapper.Type2ContentBefore.GetByCondition(x => x.CEditorId != payload.Id)
+            var type2Contents = await _repositoryWrapper.Type2ContentBefore.GetByCondition(x => x.CEditorId != payload.Id)
                .Join(_repositoryWrapper.Unit.GetAll(), x => x.CUnitId, y => y.CId, (x, y) => new { x, y })
                .Join(_repositoryWrapper.Administrator.GetAll(), x => x.x.CEditorId, y => y.CId, (x, y) => new GetReviewsResponse
                {
@@ -95,11 +95,11 @@ namespace App.BLL
                    EditorName = y.CName
                }).ToListAsync();
 
-            response.Entries.AddRange(setting);
-            response.Entries.AddRange(question);
-            response.Entries.AddRange(portfolio);
-            response.Entries.AddRange(type1);
-            response.Entries.AddRange(type2);
+            response.Entries.AddRange(settings);
+            response.Entries.AddRange(questions);
+            response.Entries.AddRange(portfolios);
+            response.Entries.AddRange(type1Contents);
+            response.Entries.AddRange(type2Contents);
             response.Entries = response.Entries.OrderByDescending(x => x.EditDt).ToList();
 
             return response;

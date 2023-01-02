@@ -95,7 +95,7 @@ namespace App.BLL
                 response.Entries.EditorId = tblSettingBefore.CEditorId;
                 response.Entries.EditorName = _repositoryWrapper.Administrator.GetByCondition(x => x.CId == tblSettingBefore.CEditorId).FirstOrDefault()?.CName ?? "";
                 response.Entries.ReviewerId = tblSettingBefore.CReviewerId;
-                response.Entries.Notes = (List<ReviewNote>?)(tblSettingBefore.CNotes != null ? JsonSerializer.Deserialize<object?>(tblSettingBefore.CNotes) : null);
+                response.Entries.Notes = (List<ReviewNote>?)(tblSettingBefore.CNotes != null ? JsonSerializer.Deserialize<object?>(tblSettingBefore.CNotes, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }) : null);
                 response.Entries.CreateDt = tblSettingBefore.CCreateDt;
                 return response;
             }
@@ -307,7 +307,7 @@ namespace App.BLL
         public async Task<ResponseBase<string>> UpdateUnitsSort(IEnumerable<UpdateUnitsSortRequest> request)
         {
             var response = new ResponseBase<string>();
-   
+
             var tblUnits = await _repositoryWrapper.Unit.GetByCondition(x => x.CStageType == (int)StageType.前台 || x.CStageType == (int)StageType.前後台).ToListAsync();
             foreach (var unit in tblUnits)
             {
@@ -316,7 +316,7 @@ namespace App.BLL
 
             _repositoryWrapper.Unit.UpdateRange(tblUnits);
             await _repositoryWrapper.SaveAsync();
-            
+
             return response;
         }
     }
