@@ -359,6 +359,9 @@ namespace App.BLL
                             };
 
                             _repositoryWrapper.PortfolioAfter.Create(tblPortfolioAfter);
+                            _repositoryWrapper.PortfolioPhotoBefore.DeleteRange(_repositoryWrapper.PortfolioPhotoBefore.GetByCondition(x => x.CPortfolioId == tblPortfolioBefore.CId));
+                            await _repositoryWrapper.SaveAsync();
+
                             _repositoryWrapper.PortfolioBefore.Delete(tblPortfolioBefore);
                             await _repositoryWrapper.SaveAsync();
 
@@ -407,6 +410,9 @@ namespace App.BLL
                             tblPortfolioAfter.CThumbnailUrl = request.ThumbnailUrl;
 
                             _repositoryWrapper.PortfolioAfter.Update(tblPortfolioAfter);
+                            _repositoryWrapper.PortfolioPhotoBefore.DeleteRange(_repositoryWrapper.PortfolioPhotoBefore.GetByCondition(x => x.CPortfolioId == tblPortfolioBefore.CId));
+                            await _repositoryWrapper.SaveAsync();
+
                             _repositoryWrapper.PortfolioBefore.Delete(tblPortfolioBefore);
                             await _repositoryWrapper.SaveAsync();
 
