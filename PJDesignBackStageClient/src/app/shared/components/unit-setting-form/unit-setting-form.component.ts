@@ -80,9 +80,11 @@ export class UnitSettingFormComponent extends DetailBaseComponent implements OnI
   }
 
   onPhotoUpload(e: any) {
-    console.log('e', e);
-    this.imageFile = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
-    console.log('imageFile', this.imageFile);
+    const file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
+
+    if (file == undefined) { return; }
+
+    this.imageFile = file;
     this.imageName = this.imageFile.name;
 
     const formData = new FormData();

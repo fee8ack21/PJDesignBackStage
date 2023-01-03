@@ -207,9 +207,12 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
   }
 
   onPhotoUpload(e: any, index: number, type: string) {
-    const imageFile = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
+    const file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
+
+    if (file == undefined) { return; }
+
     const formData = new FormData();
-    formData.append('image', imageFile, imageFile.name)
+    formData.append('image', file, file.name)
 
     this.httpService.post<ResponseBase<string>>('upload/uploadPhoto', formData, { headers: new HttpHeaders() }).subscribe(response => {
       if (response.statusCode == StatusCode.Fail) {
@@ -217,7 +220,7 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
         return;
       }
 
-      this.setImageData(index, type, imageFile.name, response.entries!);
+      this.setImageData(index, type, file.name, response.entries!);
     })
   }
 

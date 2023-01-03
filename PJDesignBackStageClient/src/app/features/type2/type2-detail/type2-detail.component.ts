@@ -124,6 +124,9 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
 
   onPhotoUpload(e: any, type: string) {
     const file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
+
+    if (file == undefined) { return; }
+
     const formData = new FormData();
     formData.append('image', file, file.name);
 

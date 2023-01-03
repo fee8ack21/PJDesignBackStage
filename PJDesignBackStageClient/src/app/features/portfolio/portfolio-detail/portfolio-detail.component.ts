@@ -119,6 +119,9 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
 
   onPhotoUpload(e: any, type = 'photo') {
     const file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
+
+    if (file == undefined) { return; }
+
     const formData = new FormData();
     formData.append('image', file, file.name);
 

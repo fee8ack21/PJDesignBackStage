@@ -136,6 +136,9 @@ export class FooterComponent extends DetailBaseComponent implements OnInit {
 
   onPhotoUpload(e: any, index: number) {
     const file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
+
+    if (file == undefined) { return; }
+
     const pattern = /image-*/;
     const reader = new FileReader();
     if (!file.type.match(pattern)) {
