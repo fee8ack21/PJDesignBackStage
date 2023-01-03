@@ -45,10 +45,10 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
   }
 
   ngOnInit(): void {
-    this.initForm();
-
     this.unitService.isBackStageUnitsInit$.subscribe(async response => {
       this.setUnit();
+
+      this.initForm();
       this.fetchPageData();
     });
   }
