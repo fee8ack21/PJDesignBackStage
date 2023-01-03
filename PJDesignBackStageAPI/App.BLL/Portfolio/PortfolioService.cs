@@ -204,22 +204,18 @@ namespace App.BLL
 
                             if (request.CategoryIDs != null)
                             {
-                                var tblCategoryMappingBefores = new List<TblCategoryMappingBefore>();
-                                foreach (var categoryId in request.CategoryIDs)
-                                {
-                                    var temp = new TblCategoryMappingBefore() { CCategoryId = categoryId, CContentId = tblPortfolioBefore.CId };
-                                    tblCategoryMappingBefores.Add(temp);
-                                }
+                                var tblCategoryMappingBefores = CategoryService.GetCreatedCategoryMappingBefores(request.CategoryIDs, tblPortfolioBefore.CId);
                                 _repositoryWrapper.CategoryMappingBefore.CreateRange(tblCategoryMappingBefores);
                             }
                             if (request.Photos != null)
                             {
                                 var tblPortfolioPhotoBefores = new List<TblPortfolioPhotoBefore>();
-                                foreach (var photo in request.Photos)
+                                foreach (var url in request.Photos)
                                 {
-                                    var temp = new TblPortfolioPhotoBefore() { CUrl = photo, CPortfolioId = tblPortfolioBefore.CId };
+                                    var temp = new TblPortfolioPhotoBefore() { CUrl = url, CPortfolioId = tblPortfolioBefore.CId };
                                     tblPortfolioPhotoBefores.Add(temp);
                                 }
+
                                 _repositoryWrapper.PortfolioPhotoBefore.CreateRange(tblPortfolioPhotoBefores);
                             }
 
@@ -262,21 +258,8 @@ namespace App.BLL
                             else
                             {
                                 var createCategoryIDs = request.CategoryIDs.Except(tblCategoryMappingBefores.Select(x => x.CCategoryId).ToList());
-                                var createCategories = new List<TblCategoryMappingBefore>();
-                                var removeCategories = new List<TblCategoryMappingBefore>();
-                                foreach (var mappingBefore in tblCategoryMappingBefores)
-                                {
-                                    if (!request.CategoryIDs.Contains(mappingBefore.CCategoryId))
-                                    {
-                                        removeCategories.Add(mappingBefore);
-
-                                    }
-                                }
-                                foreach (var categoryId in createCategoryIDs)
-                                {
-                                    var temp = new TblCategoryMappingBefore() { CCategoryId = categoryId, CContentId = (int)request.Id };
-                                    createCategories.Add(temp);
-                                }
+                                var createCategories = CategoryService.GetCreatedCategoryMappingBefores(createCategoryIDs, (int)request.Id);
+                                var removeCategories = CategoryService.GetRemovedCategoryMappingBefores(tblCategoryMappingBefores, request.CategoryIDs);
 
                                 _repositoryWrapper.CategoryMappingBefore.CreateRange(createCategories);
                                 _repositoryWrapper.CategoryMappingBefore.DeleteRange(removeCategories);
@@ -359,6 +342,9 @@ namespace App.BLL
                             };
 
                             _repositoryWrapper.PortfolioAfter.Create(tblPortfolioAfter);
+                            _repositoryWrapper.PortfolioPhotoBefore.DeleteRange(_repositoryWrapper.PortfolioPhotoBefore.GetByCondition(x => x.CPortfolioId == tblPortfolioBefore.CId));
+                            await _repositoryWrapper.SaveAsync();
+
                             _repositoryWrapper.PortfolioBefore.Delete(tblPortfolioBefore);
                             await _repositoryWrapper.SaveAsync();
 
@@ -366,12 +352,7 @@ namespace App.BLL
                             {
                                 _repositoryWrapper.CategoryMappingBefore.DeleteRange(_repositoryWrapper.CategoryMappingBefore.GetByCondition(x => request.CategoryIDs.Contains(x.CCategoryId) && x.CContentId == tblPortfolioBefore.CId));
 
-                                var tblCategoryMappingAfters = new List<TblCategoryMappingAfter>();
-                                foreach (var id in request.CategoryIDs)
-                                {
-                                    var temp = new TblCategoryMappingAfter() { CCategoryId = id, CContentId = tblPortfolioAfter.CId };
-                                    tblCategoryMappingAfters.Add(temp);
-                                }
+                                var tblCategoryMappingAfters = CategoryService.GetCreatedCategoryMappingAfters(request.CategoryIDs, tblPortfolioAfter.CId); ;
 
                                 _repositoryWrapper.CategoryMappingAfter.CreateRange(tblCategoryMappingAfters);
                             }
@@ -379,10 +360,12 @@ namespace App.BLL
                             if (request.Photos != null && request.Photos.Count() > 0)
                             {
                                 _repositoryWrapper.PortfolioPhotoBefore.DeleteRange(_repositoryWrapper.PortfolioPhotoBefore.GetByCondition(x => x.CPortfolioId == tblPortfolioBefore.CId));
+
                                 var tblPortfolioPhotoAfters = new List<TblPortfolioPhotoAfter>();
-                                foreach (var photo in request.Photos)
+
+                                foreach (var url in request.Photos)
                                 {
-                                    var temp = new TblPortfolioPhotoAfter() { CUrl = photo, CPortfolioId = tblPortfolioAfter.CId };
+                                    var temp = new TblPortfolioPhotoAfter() { CUrl = url, CPortfolioId = tblPortfolioAfter.CId };
                                     tblPortfolioPhotoAfters.Add(temp);
                                 }
 
@@ -397,7 +380,7 @@ namespace App.BLL
                             // 修改after 資料
                             var tblPortfolioAfter = await _repositoryWrapper.PortfolioAfter.GetByCondition(x => x.CId == tblPortfolioBefore.CAfterId).FirstOrDefaultAsync();
 
-                            if (tblPortfolioAfter == null) { throw new Exception("請求錯物"); }
+                            if (tblPortfolioAfter == null) { throw new Exception("請求錯誤"); }
 
                             tblPortfolioAfter.CTitle = request.Title;
                             tblPortfolioAfter.CDate = request.Date;
@@ -407,6 +390,9 @@ namespace App.BLL
                             tblPortfolioAfter.CThumbnailUrl = request.ThumbnailUrl;
 
                             _repositoryWrapper.PortfolioAfter.Update(tblPortfolioAfter);
+                            _repositoryWrapper.PortfolioPhotoBefore.DeleteRange(_repositoryWrapper.PortfolioPhotoBefore.GetByCondition(x => x.CPortfolioId == tblPortfolioBefore.CId));
+                            await _repositoryWrapper.SaveAsync();
+
                             _repositoryWrapper.PortfolioBefore.Delete(tblPortfolioBefore);
                             await _repositoryWrapper.SaveAsync();
 
@@ -427,26 +413,11 @@ namespace App.BLL
                                     });
 
                             var createCategoryIDs = request.CategoryIDs == null ? new List<int>() : request.CategoryIDs.Except(tblCategoryMappingAfters.Select(x => x.CCategoryId).ToList());
-                            var createCategories = new List<TblCategoryMappingAfter>();
-                            var removeCategories = new List<TblCategoryMappingAfter>();
-                            foreach (var mappingAfter in tblCategoryMappingAfters)
-                            {
-                                if (request.CategoryIDs == null || !request.CategoryIDs.Contains(mappingAfter.CCategoryId))
-                                {
-                                    removeCategories.Add(mappingAfter);
-
-                                }
-                            }
-                            foreach (var categoryId in createCategoryIDs)
-                            {
-                                var temp = new TblCategoryMappingAfter() { CCategoryId = categoryId, CContentId = tblPortfolioBefore.CAfterId };
-                                createCategories.Add(temp);
-                            }
+                            var createCategories = CategoryService.GetCreatedCategoryMappingAfters(createCategoryIDs, tblPortfolioBefore.CAfterId);
+                            var removeCategories = CategoryService.GetRemovedCategoryMappingAfters(tblCategoryMappingAfters, request.CategoryIDs);
 
                             _repositoryWrapper.CategoryMappingAfter.CreateRange(createCategories);
                             _repositoryWrapper.CategoryMappingAfter.DeleteRange(removeCategories);
-
-
                             _repositoryWrapper.PortfolioPhotoBefore.DeleteRange(_repositoryWrapper.PortfolioPhotoBefore.GetByCondition(x => x.CPortfolioId == tblPortfolioBefore.CId));
 
                             var tblPortfolioPhotoAfters = _repositoryWrapper.PortfolioPhotoAfter.GetByCondition(x => x.CPortfolioId == tblPortfolioAfter.CId);

@@ -54,22 +54,81 @@ namespace App.BLL
         {
             var response = new ResponseBase<string>();
 
-            foreach (var request in requests)
+            var tblCategories = await _repositoryWrapper.Category.GetByCondition(x => requests.Any(y => y.Id == x.CId)).ToListAsync();
+
+            foreach (var category in tblCategories)
             {
-                var tblCategory = await _repositoryWrapper.Category.GetByCondition(x => x.CId == request.Id).FirstOrDefaultAsync();
+                var temp = requests.Where(x => x.Id == category.CId).FirstOrDefault();
 
-                if (tblCategory == null) { continue; }
+                if (temp == null) { continue; }
 
-                tblCategory.CName = request.Name;
-                tblCategory.CIsEnabled = request.IsEnabled;
-                tblCategory.CEditDt = DateHelper.GetNowDate();
-
-                _repositoryWrapper.Category.Update(tblCategory);
+                category.CName = temp.Name;
+                category.CIsEnabled = temp.IsEnabled;
+                category.CEditDt = DateHelper.GetNowDate();
             }
 
+            _repositoryWrapper.Category.UpdateRange(tblCategories);
             await _repositoryWrapper.SaveAsync();
 
             return response;
+        }
+
+        public static List<TblCategoryMappingBefore> GetCreatedCategoryMappingBefores(IEnumerable<int> categoryIDs, int contentId)
+        {
+            var mappings = new List<TblCategoryMappingBefore>();
+
+            if (categoryIDs == null || categoryIDs.Count() == 0) { return mappings; }
+
+            foreach (var categoryId in categoryIDs)
+            {
+                var temp = new TblCategoryMappingBefore() { CCategoryId = categoryId, CContentId = contentId };
+                mappings.Add(temp);
+            }
+
+            return mappings;
+        }
+
+        public static List<TblCategoryMappingAfter> GetCreatedCategoryMappingAfters(IEnumerable<int> categoryIDs, int? contentId)
+        {
+            var mappings = new List<TblCategoryMappingAfter>();
+
+            if (categoryIDs == null || categoryIDs.Count() == 0) { return mappings; }
+
+            foreach (var categoryId in categoryIDs)
+            {
+                var temp = new TblCategoryMappingAfter() { CCategoryId = categoryId, CContentId = contentId };
+                mappings.Add(temp);
+            }
+
+            return mappings;
+        }
+
+        public static List<TblCategoryMappingBefore> GetRemovedCategoryMappingBefores(List<TblCategoryMappingBefore> sourceBefores, IEnumerable<int>? finalIDs)
+        {
+            var mappings = new List<TblCategoryMappingBefore>();
+            foreach (var mappingBefore in sourceBefores)
+            {
+                if (!finalIDs.Contains(mappingBefore.CCategoryId))
+                {
+                    mappings.Add(mappingBefore);
+                }
+            }
+
+            return mappings;
+        }
+
+        public static List<TblCategoryMappingAfter> GetRemovedCategoryMappingAfters(IEnumerable<TblCategoryMappingAfter> sourceAfters, IEnumerable<int>? finalIDs)
+        {
+            var mappings = new List<TblCategoryMappingAfter>();
+            foreach (var mappingAfter in sourceAfters)
+            {
+                if (finalIDs == null || !finalIDs.Contains(mappingAfter.CCategoryId))
+                {
+                    mappings.Add(mappingAfter);
+                }
+            }
+
+            return mappings;
         }
     }
 }

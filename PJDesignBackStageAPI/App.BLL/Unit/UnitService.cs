@@ -209,33 +209,24 @@ namespace App.BLL
             {
                 using (var transaction = _repositoryWrapper.CreateTransaction())
                 {
-                    var tblUnit = new TblUnit();
-                    tblUnit.CName = request.Name;
-                    tblUnit.CTemplateType = request.TemplateType;
-                    tblUnit.CIsAnotherWindow = request.IsAnotherWindow;
-                    tblUnit.CIsEnabled = request.IsEnabled;
-                    tblUnit.CParent = request.Parent;
-                    tblUnit.CStageType = (int)StageType.前後台;
+                    var tblUnit = new TblUnit()
+                    {
+                        CName = request.Name,
+                        CTemplateType = request.TemplateType,
+                        CIsAnotherWindow = request.IsAnotherWindow,
+                        CIsEnabled = request.IsEnabled,
+                        CParent = request.Parent,
+                        CStageType = (int)StageType.前後台
+                    };
 
                     _repositoryWrapper.Unit.Create(tblUnit);
                     await _repositoryWrapper.SaveAsync();
 
                     var id = tblUnit.CId;
-                    switch (request.TemplateType)
-                    {
-                        case (int)TemplateType.無:
-                            tblUnit.CBackStageUrl = request.Url;
-                            tblUnit.CFrontStageUrl = request.Url;
-                            break;
-                        case (int)TemplateType.模板一:
-                            tblUnit.CBackStageUrl = $"/type1?uid={id}";
-                            tblUnit.CFrontStageUrl = $"/Unit/Type1?uid={id}";
-                            break;
-                        case (int)TemplateType.模板二:
-                            tblUnit.CBackStageUrl = $"/type2?uid={id}";
-                            tblUnit.CFrontStageUrl = $"/Unit/Type2?uid={id}";
-                            break;
-                    }
+                    var urls = GetUnitUrls(request.TemplateType, id, request.Url);
+
+                    tblUnit.CFrontStageUrl = urls.frontUrl;
+                    tblUnit.CBackStageUrl = urls.backUrl;
 
                     _repositoryWrapper.Unit.Update(tblUnit);
                     _repositoryWrapper.GroupUnitRight.Create(new TblGroupUnitRight() { CGroupId = (int)Group.系統管理員, CRightId = (int)Right.C_R_U_D, CUnitId = id });
@@ -280,21 +271,10 @@ namespace App.BLL
 
                     tblUnit.CTemplateType = request.TemplateType;
 
-                    switch (request.TemplateType)
-                    {
-                        case (int)TemplateType.無:
-                            tblUnit.CBackStageUrl = request.Url;
-                            tblUnit.CFrontStageUrl = request.Url;
-                            break;
-                        case (int)TemplateType.模板一:
-                            tblUnit.CBackStageUrl = $"/type1?uid={tblUnit.CId}";
-                            tblUnit.CFrontStageUrl = $"/Unit/Type1?uid={tblUnit.CId}";
-                            break;
-                        case (int)TemplateType.模板二:
-                            tblUnit.CBackStageUrl = $"/type2?uid={tblUnit.CId}";
-                            tblUnit.CFrontStageUrl = $"/Unit/Type2?uid={tblUnit.CId}";
-                            break;
-                    }
+                    var urls = GetUnitUrls(request.TemplateType, tblUnit.CId, request.Url);
+
+                    tblUnit.CFrontStageUrl = urls.frontUrl;
+                    tblUnit.CBackStageUrl = urls.backUrl;
                 }
 
                 _repositoryWrapper.Unit.Update(tblUnit);
@@ -318,6 +298,21 @@ namespace App.BLL
             await _repositoryWrapper.SaveAsync();
 
             return response;
+        }
+
+        (string frontUrl, string backUrl) GetUnitUrls(int templateType, int unitId, string url)
+        {
+            switch (templateType)
+            {
+                case (int)TemplateType.無:
+                    return (url, url);
+                case (int)TemplateType.模板一:
+                    return ($"/Unit/Type1?uid={unitId}", $"/type1?uid={unitId}");
+                case (int)TemplateType.模板二:
+                    return ($"/Unit/Type2?uid={unitId}", $"/type2?uid={unitId}");
+            }
+
+            return ("", "");
         }
     }
 }
