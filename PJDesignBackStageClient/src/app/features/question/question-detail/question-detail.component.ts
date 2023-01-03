@@ -49,16 +49,9 @@ export class QuestionDetailComponent extends DetailBaseComponent implements OnIn
 
   async fetchPageData() {
     this.spinnerService.isShow$.next(true);
-
-    await Promise.all([
-      this.getQuestionPromise(),
-      this.getCategoriesPromise()
-    ]).then(([questionResponse, categoriesResponse]) => {
-      this.handleQuestionResponse(questionResponse);
-      this.handleCategoriesResponse(categoriesResponse);
-
-      this.spinnerService.isShow$.next(false);
-    });
+    this.handleCategoriesResponse(await this.getCategoriesPromise());
+    this.handleQuestionResponse(await this.getQuestionPromise());
+    this.spinnerService.isShow$.next(false);
   }
 
   getQuestionPromise() {

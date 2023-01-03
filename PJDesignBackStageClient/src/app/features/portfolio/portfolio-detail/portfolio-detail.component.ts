@@ -53,16 +53,9 @@ export class PortfolioDetailComponent extends DetailBaseComponent implements OnI
 
   async fetchPageData() {
     this.spinnerService.isShow$.next(true);
-
-    await Promise.all([
-      this.getPortfolioPromise(),
-      this.getCategoriesPromise()
-    ]).then(([portfolioResponse, categoriesResponse]) => {
-      this.handlePortfolioResponse(portfolioResponse);
-      this.handleCategoriesResponse(categoriesResponse);
-
-      this.spinnerService.isShow$.next(false);
-    });
+    this.handleCategoriesResponse(await this.getCategoriesPromise());
+    this.handlePortfolioResponse(await this.getPortfolioPromise());
+    this.spinnerService.isShow$.next(false);
   }
 
   initForm() {

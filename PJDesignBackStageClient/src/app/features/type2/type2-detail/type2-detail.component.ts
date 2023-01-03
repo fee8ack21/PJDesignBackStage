@@ -55,16 +55,9 @@ export class Type2DetailComponent extends DetailBaseComponent implements OnInit 
 
   async fetchPageData() {
     this.spinnerService.isShow$.next(true);
-
-    await Promise.all([
-      this.getType2ContentPromise(),
-      this.getCategoriesPromise()
-    ]).then(([type2Response, categoriesResponse]) => {
-      this.handleType2Response(type2Response);
-      this.handleCategoriesResponse(categoriesResponse);
-
-      this.spinnerService.isShow$.next(false);
-    });
+    this.handleCategoriesResponse(await this.getCategoriesPromise());
+    this.handleType2Response(await this.getType2ContentPromise());
+    this.spinnerService.isShow$.next(false);
   }
 
   getType2ContentPromise() {
