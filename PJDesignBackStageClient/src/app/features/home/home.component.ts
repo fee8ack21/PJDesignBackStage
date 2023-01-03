@@ -117,6 +117,9 @@ export class HomeComponent extends DetailBaseComponent implements OnInit {
   }
 
   addSection() {
+    if (!Array.isArray(this.sections)) {
+      this.sections = [];
+    }
     this.sections.push(new HomeSettings(this.sections.length + 1));
   }
 
