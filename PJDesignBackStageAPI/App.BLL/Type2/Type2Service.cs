@@ -210,7 +210,12 @@ namespace App.BLL
 
                             if (request.CategoryIDs != null)
                             {
-                                var tblCategoryMappingBefores = CategoryService.GetCreatedCategoryMappingBefores(request.CategoryIDs, tblType2ContentBefore.CId);
+                                var tblCategoryMappingBefores = new List<TblCategoryMappingBefore>();
+                                foreach (var categoryId in request.CategoryIDs)
+                                {
+                                    var temp = new TblCategoryMappingBefore() { CCategoryId = categoryId, CContentId = tblType2ContentBefore.CId };
+                                    tblCategoryMappingBefores.Add(temp);
+                                }
                                 _repositoryWrapper.CategoryMappingBefore.CreateRange(tblCategoryMappingBefores);
                             }
 
@@ -256,9 +261,22 @@ namespace App.BLL
                             else
                             {
                                 var createCategoryIDs = request.CategoryIDs.Except(tblCategoryMappingBefores.Select(x => x.CCategoryId).ToList());
-                                var createCategories = CategoryService.GetCreatedCategoryMappingBefores(createCategoryIDs, (int)request.Id);
-                                var removeCategories = CategoryService.GetRemovedCategoryMappingBefores(tblCategoryMappingBefores, request.CategoryIDs);
-                               
+                                var createCategories = new List<TblCategoryMappingBefore>();
+                                var removeCategories = new List<TblCategoryMappingBefore>();
+                                foreach (var mappingBefore in tblCategoryMappingBefores)
+                                {
+                                    if (!request.CategoryIDs.Contains(mappingBefore.CCategoryId))
+                                    {
+                                        removeCategories.Add(mappingBefore);
+
+                                    }
+                                }
+                                foreach (var categoryId in createCategoryIDs)
+                                {
+                                    var temp = new TblCategoryMappingBefore() { CCategoryId = categoryId, CContentId = (int)request.Id };
+                                    createCategories.Add(temp);
+                                }
+
                                 _repositoryWrapper.CategoryMappingBefore.CreateRange(createCategories);
                                 _repositoryWrapper.CategoryMappingBefore.DeleteRange(removeCategories);
                             }
@@ -319,7 +337,12 @@ namespace App.BLL
                             {
                                 _repositoryWrapper.CategoryMappingBefore.DeleteRange(_repositoryWrapper.CategoryMappingBefore.GetByCondition(x => request.CategoryIDs.Contains(x.CCategoryId) && x.CContentId == tblType2ContentBefore.CId));
 
-                                var tblCategoryMappingAfters = CategoryService.GetCreatedCategoryMappingAfters(request.CategoryIDs, tblType2ContentAfter.CId);
+                                var tblCategoryMappingAfters = new List<TblCategoryMappingAfter>();
+                                foreach (var id in request.CategoryIDs)
+                                {
+                                    var temp = new TblCategoryMappingAfter() { CCategoryId = id, CContentId = tblType2ContentAfter.CId };
+                                    tblCategoryMappingAfters.Add(temp);
+                                }
 
                                 _repositoryWrapper.CategoryMappingAfter.CreateRange(tblCategoryMappingAfters);
                             }
@@ -332,7 +355,7 @@ namespace App.BLL
                             // 修改after 資料
                             var tblType2ContentAfter = await _repositoryWrapper.Type2ContentAfter.GetByCondition(x => x.CId == tblType2ContentBefore.CAfterId).FirstOrDefaultAsync();
 
-                            if (tblType2ContentAfter == null) { throw new Exception("請求錯誤"); }
+                            if (tblType2ContentAfter == null) { throw new Exception("請求錯物"); }
 
                             tblType2ContentAfter.CTitle = request.Title;
                             tblType2ContentAfter.CDescription = request.Description;
@@ -365,8 +388,21 @@ namespace App.BLL
                                     });
 
                             var createCategoryIDs = request.CategoryIDs == null ? new List<int>() : request.CategoryIDs.Except(tblCategoryMappingAfters.Select(x => x.CCategoryId).ToList());
-                            var createCategories = CategoryService.GetCreatedCategoryMappingAfters(createCategoryIDs, tblType2ContentBefore.CAfterId);
-                            var removeCategories = CategoryService.GetRemovedCategoryMappingAfters(tblCategoryMappingAfters, request.CategoryIDs);
+                            var createCategories = new List<TblCategoryMappingAfter>();
+                            var removeCategories = new List<TblCategoryMappingAfter>();
+                            foreach (var mappingAfter in tblCategoryMappingAfters)
+                            {
+                                if (request.CategoryIDs == null || !request.CategoryIDs.Contains(mappingAfter.CCategoryId))
+                                {
+                                    removeCategories.Add(mappingAfter);
+
+                                }
+                            }
+                            foreach (var categoryId in createCategoryIDs)
+                            {
+                                var temp = new TblCategoryMappingAfter() { CCategoryId = categoryId, CContentId = tblType2ContentBefore.CAfterId };
+                                createCategories.Add(temp);
+                            }
 
                             _repositoryWrapper.CategoryMappingAfter.CreateRange(createCategories);
                             _repositoryWrapper.CategoryMappingAfter.DeleteRange(removeCategories);
